@@ -1,10 +1,13 @@
 from datetime import datetime, timedelta
 
 from flask import Flask, jsonify, request, abort
+from flask_cors import CORS, cross_origin
 import pymysql.cursors
 import csv
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 def get_connection():
@@ -16,11 +19,13 @@ def get_connection():
 
 
 @app.route('/db_stations', methods=['GET'])
+@cross_origin()
 def db_stations():
     return jsonify(get_stations())
 
 
 @app.route('/stations', methods=['GET'])
+@cross_origin()
 def stations():
     data = {}
     with open('data.csv', 'r') as f:
@@ -34,6 +39,7 @@ def stations():
 
 
 @app.route('/vlinder/<id>', methods=['GET'])
+@cross_origin()
 def vlinder(id: str = None):
     start_p = request.args.get('start')
     end_p = request.args.get('end')

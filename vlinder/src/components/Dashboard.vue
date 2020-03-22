@@ -2,19 +2,21 @@
     <div>
         <b-container style="height: 100%">
             <b-row align-v="center" style="height: 100%">
-                <b-col>One of three columns</b-col>
-                <b-col>One of three columns</b-col>
-                <div class="w-100"></div>
-                <b-col>One of three columns</b-col>
-                <b-col>One of four columns</b-col>
+                <example-visualization style="padding: 5em"/>
+                <example-visualization style="padding: 5em"/>
             </b-row>
         </b-container>
     </div>
 </template>
 
 <script>
+    import ExampleVisualization from "./ExampleVisualization";
+
     export default {
-        name: "Dashboard"
+        name: "Dashboard",
+        components: {
+            ExampleVisualization
+        }
     }
 </script>
 
