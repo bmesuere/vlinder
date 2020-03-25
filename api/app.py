@@ -57,6 +57,12 @@ def vlinder(id: str = None):
     return jsonify(add_status(get_vlinder(id, start, end), start_d))
 
 
+@app.route('/vlinder', methods=['GET'])
+@cross_origin()
+def latest_vlinder_data():
+    return jsonify(get_latest_all_vlinder())
+
+
 def vlinder_data_transform(row):
     return {
         'id': row['StationID'],
@@ -81,6 +87,16 @@ def get_vlinder(id, start, end):
             id = cursor.fetchone()['ID']
     with connection.cursor() as cursor:
         sql = f"SELECT * FROM Vlinder WHERE StationID = '{id}' AND datetime BETWEEN '{start}' AND '{end}' ORDER BY datetime ASC"
+        cursor.execute(sql)
+        data = cursor.fetchall()
+    connection.close()
+    return list(map(vlinder_data_transform, data))
+
+
+def get_latest_all_vlinder():
+    connection = get_connection()
+    with connection.cursor() as cursor:
+        sql = f"SELECT * FROM Vlinder ORDER BY datetime DESC LIMIT 59"
         cursor.execute(sql)
         data = cursor.fetchall()
     connection.close()

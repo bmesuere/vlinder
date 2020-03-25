@@ -1,8 +1,5 @@
 export default {
     created () {
-        if (this.$store.getters.vlinderData === []) {
-            this.fetchVlinderData('jvy7zdAPZ5ymI2hydh6tvnmm')
-        }
     },
     computed: {
         stations() {

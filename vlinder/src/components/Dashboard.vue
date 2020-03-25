@@ -3,7 +3,6 @@
         <b-container style="height: 100%">
             <b-row align-v="center" style="height: 100%">
                 <example-visualization style="padding: 5em"/>
-                <example-visualization style="padding: 5em"/>
             </b-row>
         </b-container>
     </div>

@@ -1,53 +1,33 @@
 <template>
     <div id="d3-viz">
-        <b-button onclick="this.makeSelectionClicked">Make selection</b-button>
-        <b-button onclick="showFocusedClicked">Show Focused</b-button>
-        <b-button onclick="showAllClicked">Show All</b-button>
-
-        <p v-for="d in this.focusedVlinderData" :key="d.id">{{d.VLINDER}}</p>
+        <div id="stations"></div>
+        <div id="latest"></div>
+        <div id="some-vlinder"></div>
     </div>
 </template>
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
+    import vlinderService from "../services/vlinderService";
+    import * as d3 from 'd3'
 
     export default {
         name: "ExampleVisualization",
         mixins: [
-            // You can look at the file mixins/visualizationMixin.js
-            // All that stuff is automatically added to this component => the computed variables and the methods
             VisualizationMixin
         ],
-        created () {
+        mounted () {
             // This is code is ran on creation of the component
-        },
-        data () {
-            return {
-                // Component local data
-                displayFocused: false
-            }
-        },
-        watch: {
-            // These variables can be interpreted as global variables
-            stations () {
-                // When 'stations' variable changes this code will be rerun
-            },
-            vlinderData () {
-                // When 'vlinderData' variable changes this code will be rerun
-            },
-            focusedVlinderData () {
-                // When 'focusedVlinderData' variable changes this code will be rerun
-            }
-        },
-        methods: {
-            makeSelectionClicked () {
-                let focused = [this.vlinderData[3], this.vlinderData[7]];
-                this.setFocusedVlinderData(focused)
-            },
-            showFocusedClicked () {
-                this.displayFocused = true
 
-            }
+            let stationsDiv = d3.select('#stations');
+            vlinderService.getStations(d => stationsDiv.html(d.data['0xwg6AsDvbnxXzB4S3c2BRyJ']['VLINDER']));
+            let latestDiv = d3.select('#latest');
+            vlinderService.getLatestVlinderData(d => latestDiv.html(d.data[0]['temp']));
+            let vlinderDiv = d3.select('#some-vlinder');
+            vlinderService.getVlinderData('jvy7zdAPZ5ymI2hydh6tvnmm',
+                new Date(2020, 1, 14, 23, 33, 20, 0),
+                new Date(2020, 1, 16, 10, 0, 0, 0),
+                d => vlinderDiv.html(d.data[0]['temp']));
         }
     }
 </script>
