@@ -47,14 +47,15 @@ export default {
     var selectedDate = new Date(d3.select("#date").property("value"));
     var [startDate, endDate] = getBoundaries(selectedDate);
 
-    let selectedStations = ["jvy7zdAPZ5ymI2hydh6tvnmm", "2MDSH0xR5dG2plS7R9ZLNutq"];
+    let selectedStations = [];
     
     construct_graph(selectedStations, startDate, endDate);
 
     async function construct_graph(selectedStations, startDate, endDate) {
-        let dist = 38;
-        let stroke_width = 20;
-        let bar_padding = 1;
+        let dist = 10;
+        let ticks = 50;
+        let stroke_width = 35;
+        let bar_padding = 2;
         let height = (selectedStations.length + 1) * stroke_width;
 
         d3.select("#timeline-div")
@@ -86,12 +87,12 @@ export default {
 
         const xAxis = d3.axisBottom() // create a new bottom axis
             .scale(xScale); // that uses the domain of the xScale
-        xAxis.ticks(288);
+        xAxis.ticks(ticks);
 
         graph
             .append("g")
             .attr("class", "axis")
-            .attr("transform", `translate(0, ${height -  20})`)
+            .attr("transform", `translate(0, ${height -  stroke_width})`)
             .call(xAxis);
 
         var promises = []
@@ -142,8 +143,9 @@ export default {
                 let inserts = (diff/300000);
                 var date = new Date(ddata[i].time);
                 for (var j = 0; j < inserts - 1; j++) {
+                    console.log(j)
                     date.setTime(date.getTime() + 300000)
-                    data.push({time: date, status:"missing", id: ddata[i].id})
+                    data.push({time: new Date(date), status:"missing", id: ddata[i].id})
                 }
             }
             data.push(ddata[i+1])
@@ -177,12 +179,20 @@ export default {
 </script>
 
 <style>
+
+.lol {
+  position: absolute;
+  width: 20px;
+  height: 50px;
+  background-color: blue;
+}
+
 .ok {
   fill: green;
 }
 
 .missing {
-    fill: grey;
+    fill: rgb(128, 128, 128);
 }
 
 .bar.ok:hover {
