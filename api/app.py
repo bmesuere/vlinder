@@ -5,128 +5,92 @@ from flask_cors import CORS, cross_origin
 import pymysql.cursors
 import csv
 
+from static import station_metadata, rename
+from database import get_stations_raw, get_measurements_raw
+from utils import unpack
+
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+@app.route('/')
+def root():
+    return jsonify({
+        "stations"    : request.base_url + "/stations",
+        "measurements": request.base_url + "/measurements",
+    })
 
-def get_connection():
-    return pymysql.connect(host='framboos.ugent.be',
-                           user='s225015',
-                           password='fmztqgxfakuy3n',
-                           db='vlinder',
-                           cursorclass=pymysql.cursors.DictCursor)
-
-
-@app.route('/db_stations', methods=['GET'])
-@cross_origin()
-def db_stations():
-    return jsonify(get_stations())
-
-
-@app.route('/stations', methods=['GET'])
+@app.route('/stations')
 @cross_origin()
 def stations():
-    data = {}
-    with open('data.csv', 'r') as f:
-        csv_reader = csv.DictReader(f)
-        for row in csv_reader:
-            id = row.get('ID')
-            for key in ["lat","lon","water20","verhard20","groen20","water50","verhard50","groen50","water100","verhard100","groen100","water250","verhard250","groen250","water500","verhard500","groen500"]:
-                row[key] = float(row[key])
-            data[id] = row
-    return jsonify(data)
+    return map(station,get_stations_raw())
 
-
-@app.route('/vlinder/<id>', methods=['GET'])
+@app.route('/stations/<id>')
 @cross_origin()
-def vlinder(id: str = None):
+def stationsid(id):
+    #TODO error handling
+    return station(get_stations_raw(id))
+
+@app.route('/measurements')
+@cross_origin()
+def measurements():
+    return map(measurement,get_measurements_raw())
+
+@app.route('/measurement/<id>')
+@cross_origin()
+def measurementsid(id):
     start_p = request.args.get('start')
     end_p = request.args.get('end')
-    if start_p is None and end_p:
-        abort(400)
+    #arg checking
+    return map(measurement,get_measurements_raw(id,start_p,end_p))
 
-    start_d = datetime.now() - timedelta(hours=24) if not start_p else datetime.strptime(start_p, '%Y-%m-%dT%H:%M:%S.%fZ')
-    end_d = datetime.now() if not end_p else datetime.strptime(end_p, '%Y-%m-%dT%H:%M:%S.%fZ')
-    if start_d >= end_d:
-        abort(400)
+@unpack
+def station(ID,VLINDER,status,lat,lon,
+    water20 ,verhard20 ,groen20,
+    water50 ,verhard50 ,groen50,
+    water100,verhard100,groen100,
+    water250,verhard250,groen250,
+    water500,verhard500,groen500):
 
-    start = start_d.strftime('%Y-%m-%d %H:%M')
-    end = end_d.strftime('%Y-%m-%d %H:%M')
-
-    return jsonify(add_status(get_vlinder(id, start, end), start_d))
-
-
-@app.route('/vlinder', methods=['GET'])
-@cross_origin()
-def latest_vlinder_data():
-    return jsonify(get_latest_all_vlinder())
-
-
-def vlinder_data_transform(row):
     return {
-        'id': row['StationID'],
-        'temp': float(row['temperature']),
-        'humidity': float(row['humidity']),
-        'pressure': row['pressure'] / 100,
-        'windSpeed': float(row['WindSpeed']),
-        'windDirection': float(row['WindDirection']),
-        'rainIntensity': float(row['RainIntensity']),
-        'rainVolume': float(row['RainVolume']),
-        'windGust': float(row['WindGust']),
-        'time': row['datetime']
+        "id": ID,
+        "name": VLINDER,
+        "status": status
+        "coordinates": {
+            "longitude": lon,
+            "latitude": lat,
+        },
+        "landUse":[
+            {"distance":20 , "usage":[{"type":"water", "value":water20},
+                                     {"type":"green", "value":groen20},
+                                     {"type":"paved", "value":verhard20}]
+            },
+            {"distance":50 , "usage":[{"type":"water", "value":water50},
+                                     {"type":"green", "value":groen50},
+                                     {"type":"paved", "value":verhard50}]
+            },
+            {"distance":100, "usage":[{"type":"water", "value":water100},
+                                     {"type":"green", "value":groen100},
+                                     {"type":"paved", "value":verhard100}]
+            },
+            {"distance":250, "usage":[{"type":"water", "value":water250},
+                                     {"type":"green", "value":groen250},
+                                     {"type":"paved", "value":verhard250}]
+            },
+            {"distance":500, "usage":[{"type":"water", "value":water500},
+                                     {"type":"green", "value":groen500},
+                                     {"type":"paved", "value":verhard500}]
+            },
+        ],
+        "measurements": f"{request.base_url}/measurements/{ID}"
     }
 
-
-def get_vlinder(id, start, end):
-    connection = get_connection()
-    if id is None:
-        with connection.cursor() as cursor:
-            sql = "SELECT ID FROM Vlinder_Identification"
-            cursor.execute(sql)
-            id = cursor.fetchone()['ID']
-    with connection.cursor() as cursor:
-        sql = f"SELECT * FROM Vlinder WHERE StationID = '{id}' AND datetime BETWEEN '{start}' AND '{end}' ORDER BY datetime ASC"
-        cursor.execute(sql)
-        data = cursor.fetchall()
-    connection.close()
-    return list(map(vlinder_data_transform, data))
-
-
-def get_latest_all_vlinder():
-    connection = get_connection()
-    with connection.cursor() as cursor:
-        sql = f"SELECT * FROM Vlinder ORDER BY datetime DESC LIMIT 59"
-        cursor.execute(sql)
-        data = cursor.fetchall()
-    connection.close()
-    return list(map(vlinder_data_transform, data))
-
-
-def get_stations():
-    connection = get_connection()
-    with connection.cursor() as cursor:
-        sql = "SELECT * FROM Vlinder_Identification LIMIT 0, 100"
-        cursor.execute(sql)
-        data = cursor.fetchall()
-    connection.close()
-    return data
-
-
-def add_status(vlinder_data, start_time):
-    prev = None
-    prev_time = start_time
-    for d in vlinder_data:
-        if prev_time < d['time'] - timedelta(minutes=9):
-            d['status'] = 'server_failure'
-        elif prev is not None and prev['temp'] == d['temp'] and prev['humidity'] == d['humidity'] and prev['pressure'] == d['pressure'] and \
-                prev['windSpeed'] == d['windSpeed'] and prev['windDirection'] == d['windDirection']:
-            d['status'] = 'vlinder_failure'
-        else:
-            d['status'] = 'ok'
-        prev_time = d['time']
-        prev = d
-    return vlinder_data
+def measurements(m):
+    #m[time] = format it
+    m["measurements"] = f"{request.base_url}/measurements/{m["id"]}"
+    m["station"]      = f"{request.base_url}/stations/{m["id"]}"
+    m.pop("id")
+    return m
 
 
 if __name__ == '__main__':
