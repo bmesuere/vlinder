@@ -1,3 +1,6 @@
 .idea/
 venv/
 
+api/login.json
+*/__pycache__/
+
