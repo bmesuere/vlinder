@@ -1,20 +1,16 @@
 <template>
     <div>
-        <b-container style="height: 100%">
-            <b-row align-v="center" style="height: 100%">
-                <example-visualization style="padding: 5em"/>
-            </b-row>
-        </b-container>
+        <Map style="padding: 5em"/>
     </div>
 </template>
 
 <script>
-    import ExampleVisualization from "./ExampleVisualization";
+    import Map from "./Map";
 
     export default {
         name: "Dashboard",
         components: {
-            ExampleVisualization
+            Map,
         }
     }
 </script>
