@@ -1,8 +1,8 @@
 <template>
     <div id="d3-viz">
-        <div id="stations"></div>
-        <div id="latest"></div>
-        <div id="some-vlinder"></div>
+        <div id="stationss"></div>
+        <div id="latestt"></div>
+        <div id="some-vlinders"></div>
     </div>
 </template>
 
@@ -18,12 +18,11 @@
         ],
         mounted () {
             // This is code is ran on creation of the component
-
-            let stationsDiv = d3.select('#stations');
+            let stationsDiv = d3.select('#stationss');
             vlinderService.getStations(d => stationsDiv.html(d.data['0xwg6AsDvbnxXzB4S3c2BRyJ']['VLINDER']));
-            let latestDiv = d3.select('#latest');
+            let latestDiv = d3.select('#latestt');
             vlinderService.getLatestVlinderData(d => latestDiv.html(d.data[0]['temp']));
-            let vlinderDiv = d3.select('#some-vlinder');
+            let vlinderDiv = d3.select('#some-vlinders');
             vlinderService.getVlinderData('jvy7zdAPZ5ymI2hydh6tvnmm',
                 new Date(2020, 1, 14, 23, 33, 20, 0),
                 new Date(2020, 1, 16, 10, 0, 0, 0),

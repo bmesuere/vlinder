@@ -10,7 +10,7 @@ class VlinderService {
             .catch(d => console.error(d))
     }
 
-    getVlinderData(id, start, end, callback) {
+    getVlinderDataPromise(id, start, end){
         return axios.get(this.baseUrl + 'vlinder/' + id, {
             headers: this.headers,
             params: {
@@ -18,9 +18,13 @@ class VlinderService {
                 end: end
             }
         })
-            .then(callback)
-            .catch(d => console.error(d))
     }
+    getVlinderData(id, start, end, callback) {
+        return this.getVlinderDataPromise(id, start, end)
+            .then(callback)
+            .catch(d => console.log(d));
+    }
+
 
     getLatestVlinderData(callback) {
         return axios.get(this.baseUrl + 'vlinder', {headers: this.headers})
