@@ -15,6 +15,12 @@
         name: "Dashboard",
         components: {
             ExampleVisualization
+        },
+        created () {
+            this.$store.dispatch('fetchLatestVlinderData');
+            setInterval(() => {
+                this.$store.dispatch('fetchLatestVlinderData')
+            }, 300000)
         }
     }
 </script>

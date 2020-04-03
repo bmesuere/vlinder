@@ -19,7 +19,7 @@ def root():
 @app.route('/stations')
 @cross_origin()
 def stations():
-    return jsonify(list(map(station, get_stations_raw())))
+    return jsonify([station(**s) for s in get_stations_raw()])
 
 
 @app.route('/stations/<id>')
@@ -27,13 +27,13 @@ def stations():
 def stations_id(id):
     if id is None or id == '':
         abort(400)
-    return station(get_stations_raw([id]))
+    return station(**get_stations_raw({id}))
 
 
 @app.route('/measurements')
 @cross_origin()
 def measurements():
-    return map(measurement, get_measurements_raw())
+    return jsonify(list(map(measurement, get_measurements_raw())))
 
 
 @app.route('/measurement/<id>')
@@ -45,17 +45,16 @@ def measurements_id(id):
     return map(measurement, get_measurements_raw(id, start_p, end_p))
 
 
-@unpack
-def station(ID, VLINDER, status, lat, lon,
+def station(ID, VLINDER, lat, lon,
             water20, verhard20, groen20,
             water50, verhard50, groen50,
             water100, verhard100, groen100,
             water250, verhard250, groen250,
             water500, verhard500, groen500):
+    base_url = request.base_url.rsplit('/', 1)[0]
     return {
         "id": ID,
         "name": VLINDER,
-        "status": status,
         "coordinates": {
             "longitude": lon,
             "latitude": lat,
@@ -82,7 +81,7 @@ def station(ID, VLINDER, status, lat, lon,
                                         {"type": "paved", "value": verhard500}]
              },
         ],
-        "measurements": f"{request.base_url}measurements/{ID}"
+        "measurements": f"{base_url}/measurements/{ID}"
     }
 
 
