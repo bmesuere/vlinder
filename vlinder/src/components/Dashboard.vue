@@ -2,19 +2,19 @@
     <div>
         <b-container style="height: 100%">
             <b-row align-v="center" style="height: 100%">
-                <example-visualization style="padding: 5em"/>
+                <temperature style="padding: 5em"/>
             </b-row>
         </b-container>
     </div>
 </template>
 
 <script>
-    import ExampleVisualization from "./ExampleVisualization";
+    import temperature from "./Temperature";
 
     export default {
         name: "Dashboard",
         components: {
-            ExampleVisualization
+            temperature
         }
     }
 </script>
