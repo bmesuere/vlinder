@@ -87,11 +87,6 @@ export default {
           endDate = new Date(Math.max.apply(null,dates))
         }
 
-        d3.select("#timeline-div")
-            .selectAll("g")
-            .enter()
-            .remove()
-
         let graph = d3
             .select("#timeline-div").html("")
             .append("svg")
