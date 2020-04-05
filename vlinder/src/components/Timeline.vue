@@ -22,8 +22,8 @@ export default {
     var today = new Date();
     d3.select("#date").attr(
       "value",
-      `${today.getFullYear()}-${("0" + today.getMonth()).slice(-2)}-${(
-        "0" + today.getDay()
+      `${today.getFullYear()}-${("0" + (today.getMonth() + 1)).slice(-2)}-${(
+        "0" + today.getDate()
       ).slice(-2)}`
     );
 
@@ -52,11 +52,41 @@ export default {
     construct_graph(selectedStations, startDate, endDate);
 
     async function construct_graph(selectedStations, startDate, endDate) {
-        let dist = 10;
-        let ticks = 50;
+        var datas = []
+        var promises = []
+        var i = 0;
+
+        for (i = 0; i < selectedStations.length; i++) {
+            promises.push(vlinderService.getVlinderData(
+                selectedStations[i],
+                startDate,
+                endDate,
+                d => {
+                    var dataset = fillMissingData(d.data);
+                    datas.push(dataset)
+                }
+            ));
+        }
+
+        await Promise.all(promises);
+
+        let dist = 4;
+        let ticks = 30;
         let stroke_width = 35;
         let bar_padding = 2;
         let height = (selectedStations.length + 1) * stroke_width;
+
+        if (datas.length > 0) {
+          let dates = [];
+
+          for (i = 0; i < datas.length; i++) {
+            dates.push(new Date(datas[i][0].time))
+            dates.push(new Date(datas[i][datas[i].length - 1].time))
+          }
+
+          startDate = new Date(Math.min.apply(null,dates))
+          endDate = new Date(Math.max.apply(null,dates))
+        }
 
         d3.select("#timeline-div")
             .selectAll("g")
@@ -95,43 +125,79 @@ export default {
             .attr("transform", `translate(0, ${height -  stroke_width})`)
             .call(xAxis);
 
-        var promises = []
-        var i = 0;
 
-        for (i = 0; i < selectedStations.length; i++) {
-            promises.push(vlinderService.getVlinderData(
-                selectedStations[i],
-                startDate,
-                endDate,
-                d => {
-                    var dataset = fillMissingData(d.data);
-                    let a = graph.append("g");
+        for (i = 0; i < datas.length; i++) {
+          var dataset = datas[i];
+          let a = graph.append("g");
 
-                    a
-                    .selectAll("rect")
-                    .data(dataset)
-                    .enter()
-                    .append("rect")
-                    .style("opacity", 0.0)
-                    .attr("x", d => xScale(new Date(d.time)))
-                    .attr("y", d => yScale(selectedStations.indexOf(d.id)))
-                    .attr("width", 0)
-                    .attr("height", stroke_width - bar_padding)
-                    .classed("bar", true)
-                    .classed("ok", d => d.status === "ok")
-                    .classed("missing", d => d.status === "missing")
-                    .classed("niet-ok", d => d.status !== "ok" && d.status !== "missing")
-                    .transition()
-                    .style("opacity", 1.0)
-                    .attr("width", dist - bar_padding)
-                    .duration(1000)
-                }
-            ));
+          a
+          .selectAll("rect")
+          .data(dataset)
+          .enter()
+          .append("rect")
+          .style("opacity", 0.0)
+          .attr("x", d => xScale(new Date(d.time)))
+          .attr("y", d => yScale(selectedStations.indexOf(d.id)))
+          .attr("width", 0)
+          .attr("height", stroke_width - bar_padding)
+          .on("mouseover", handleMouseOver)
+          .on("mouseout", handleMouseOut)
+          .classed("bar", true)
+          .classed("ok", d => d.status === "ok")
+          .classed("missing", d => d.status === "missing")
+          .classed("niet-ok", d => d.status !== "ok" && d.status !== "missing")
+          .transition()
+          .style("opacity", 1.0)
+          .attr("width", dist - bar_padding)
+          .duration(1000)
         }
 
-        await Promise.all(promises);
 
+        /*if (datas.length > 0) {
+          var min = new Date(datas[0][0].time);
+          var max = new Date(datas[0][datas[0].length].time);
+          
+          for (var j = 0; j < datas.length; j++){
+            if (datas[j][0] < min) {
+              min = datas[j][0]
+            }
+
+            if (datas[j][datas[j].length - 1] > max) {
+              max = datas[j][datas[j].length]
+            }
+          }
+        } else {
+
+        }
+
+        console.log(min)
+        console.log(max)*/
         // TODO: names on y axis (might have to do that purely with adding text)
+    }
+
+    function handleMouseOver(d) {
+      console.log(d)
+      let g = d3.select("#timeline-div")
+        .append("div")
+        .attr("id", "temp")
+        .classed("lol", true)
+        .append("svg")
+
+      g.append("rect")
+        .attr("x", 4)
+        .attr("y", 0)
+        .classed("test", true)
+        .classed("ok", d.status === "ok")
+        .classed("missing", d.status === "missing")
+        .classed("niet-ok", d.status !== "ok" && d.status !== "missing")
+
+    }
+
+    function handleMouseOut(d) {
+      d
+      d3.select("#timeline-div")
+        .selectAll("#temp")
+        .remove()
     }
 
     function fillMissingData(ddata) {
@@ -143,7 +209,6 @@ export default {
                 let inserts = (diff/300000);
                 var date = new Date(ddata[i].time);
                 for (var j = 0; j < inserts - 1; j++) {
-                    console.log(j)
                     date.setTime(date.getTime() + 300000)
                     data.push({time: new Date(date), status:"missing", id: ddata[i].id})
                 }
@@ -180,11 +245,23 @@ export default {
 
 <style>
 
+.a {
+  fill: green;
+}
+
+.test {
+  width: 150px;
+  height: 146px;
+}
+
 .lol {
   position: absolute;
-  width: 20px;
-  height: 50px;
-  background-color: blue;
+  bottom: 2px;
+  left: 2px;
+  width: 300px;
+  height: 150px;
+  border: 2px solid black;
+  background-color: white;
 }
 
 .ok {
