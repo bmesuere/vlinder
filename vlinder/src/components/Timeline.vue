@@ -63,7 +63,7 @@ export default {
                 endDate,
                 d => {
                     var dataset = fillMissingData(d.data);
-                    datas.push(dataset)
+                    datas.push(...dataset)
                 }
             ));
         }
@@ -72,16 +72,15 @@ export default {
 
         let dist = 4;
         let ticks = 30;
-        let stroke_width = 35;
-        let bar_padding = 2;
+        let stroke_width = 30;
+        let bar_padding = 1;
         let height = (selectedStations.length + 1) * stroke_width;
 
         if (datas.length > 0) {
           let dates = [];
 
           for (i = 0; i < datas.length; i++) {
-            dates.push(new Date(datas[i][0].time))
-            dates.push(new Date(datas[i][datas[i].length - 1].time))
+            dates.push(new Date(datas[i].time))
           }
 
           startDate = new Date(Math.min.apply(null,dates))
@@ -126,31 +125,28 @@ export default {
             .call(xAxis);
 
 
-        for (i = 0; i < datas.length; i++) {
-          var dataset = datas[i];
-          let a = graph.append("g");
+        let a = graph.append("g");
 
-          a
-          .selectAll("rect")
-          .data(dataset)
-          .enter()
-          .append("rect")
-          .style("opacity", 0.0)
-          .attr("x", d => xScale(new Date(d.time)))
-          .attr("y", d => yScale(selectedStations.indexOf(d.id)))
-          .attr("width", 0)
-          .attr("height", stroke_width - bar_padding)
-          .on("mouseover", handleMouseOver)
-          .on("mouseout", handleMouseOut)
-          .classed("bar", true)
-          .classed("ok", d => d.status === "ok")
-          .classed("missing", d => d.status === "missing")
-          .classed("niet-ok", d => d.status !== "ok" && d.status !== "missing")
-          .transition()
-          .style("opacity", 1.0)
-          .attr("width", dist - bar_padding)
-          .duration(1000)
-        }
+        a
+        .selectAll("rect")
+        .data(datas)
+        .enter()
+        .append("rect")
+        .style("opacity", 0.0)
+        .attr("x", d => xScale(new Date(d.time)))
+        .attr("y", d => yScale(selectedStations.indexOf(d.id)))
+        .attr("width", 0)
+        .attr("height", stroke_width - bar_padding)
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+        .classed("bar", true)
+        .classed("ok", d => d.status === "ok")
+        .classed("missing", d => d.status === "missing")
+        .classed("niet-ok", d => d.status !== "ok" && d.status !== "missing")
+        .transition()
+        .style("opacity", 1.0)
+        .attr("width", dist - bar_padding)
+        .duration(1000)
         // TODO: names on y axis (might have to do that purely with adding text)
     }
 
