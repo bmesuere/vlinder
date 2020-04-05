@@ -16,7 +16,6 @@
             </b-row>
             <b-row align-v="center" style="height: 50%">
                 <timeline />
-            </b-row>
         </b-container>
     </div>
 </template>
@@ -25,7 +24,6 @@
     import ExampleVisualization from "./ExampleVisualization";
     import Timeline from "./Timeline"
     import vlinderService from "../services/vlinderService";
-
     export default {
         name: "Dashboard",
         components: {
