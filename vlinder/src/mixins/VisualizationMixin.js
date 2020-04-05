@@ -10,6 +10,9 @@ export default {
         },
         focusedVlinderData() {
             return this.$store.getters.focusedVlinderData
+        },
+        latestVlinderData() {
+            return this.$store.getters.latestVlinderData
         }
     },
     methods: {
