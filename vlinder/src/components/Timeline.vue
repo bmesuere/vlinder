@@ -49,7 +49,23 @@ export default {
 
     let selectedStations = [];
     
+    let dist = 4;
+    let ticks = 30;
+    let stroke_width = 30;
+    let bar_padding = 1;
+    let height = (selectedStations.length + 1) * stroke_width;
+    
+    let graph = d3
+      .select("#timeline-div").html("")
+      .append("svg")
+
+    const axis = graph
+    .append("g")
+    .attr("class", "axis")
+    
     construct_graph(selectedStations, startDate, endDate);
+
+    window.setInterval(updateData, 300000); // update every 5 minutes
 
     async function construct_graph(selectedStations, startDate, endDate) {
         var datas = []
@@ -69,12 +85,17 @@ export default {
         }
 
         await Promise.all(promises);
+        height = (selectedStations.length + 1) * stroke_width;
 
-        let dist = 4;
-        let ticks = 30;
-        let stroke_width = 30;
-        let bar_padding = 1;
-        let height = (selectedStations.length + 1) * stroke_width;
+      graph
+      .transition()
+      .duration(500)
+      .attr("height", height)
+      .attr(
+          "viewBox",
+          "0 0 " + (288 * dist + stroke_width + 20) + " " + height
+      )
+      .attr("direction", "ltr");
 
         if (datas.length > 0) {
           let dates = [];
@@ -86,16 +107,6 @@ export default {
           startDate = new Date(Math.min.apply(null,dates))
           endDate = new Date(Math.max.apply(null,dates))
         }
-
-        let graph = d3
-            .select("#timeline-div").html("")
-            .append("svg")
-            .attr("height", height)
-            .attr(
-                "viewBox",
-                "0 0 " + (288 * dist + stroke_width + 20) + " " + height
-            )
-            .attr("direction", "ltr");
         
         const xScale = d3
         .scaleTime()
@@ -113,36 +124,48 @@ export default {
             .scale(xScale); // that uses the domain of the xScale
         xAxis.ticks(ticks);
 
-        graph
-            .append("g")
-            .attr("class", "axis")
+        axis
+            .transition()
+            .duration(500)
             .attr("transform", `translate(0, ${height -  stroke_width})`)
             .call(xAxis);
 
 
-        let a = graph.append("g");
+        let a = graph.selectAll("rect").data(datas);
 
-        a
-        .selectAll("rect")
-        .data(datas)
-        .enter()
-        .append("rect")
-        .style("opacity", 0.0)
+        a.exit()
+        .transition()
+        .duration(500)
+        .attr("height", 0)
+        .attr("y", 0)
+        .remove();
+
+        a.transition()
         .attr("x", d => xScale(new Date(d.time)))
         .attr("y", d => yScale(selectedStations.indexOf(d.id)))
-        .attr("width", 0)
+        .attr("class", d => "bar " + getClass(d))
+        .duration(500)
+
+        a.enter()
+        .append("rect")
+        .attr("x", d => 0 - xScale(new Date(d.time)))
+        .attr("y", d => yScale(selectedStations.indexOf(d.id)))
+        .attr("width", dist - bar_padding)
         .attr("height", stroke_width - bar_padding)
         .on("mouseover", handleMouseOver)
         .on("mouseout", handleMouseOut)
-        .classed("bar", true)
-        .classed("ok", d => d.status === "ok")
-        .classed("missing", d => d.status === "missing")
-        .classed("niet-ok", d => d.status !== "ok" && d.status !== "missing")
+        .attr("class", d => "bar " + getClass(d))
         .transition()
-        .style("opacity", 1.0)
-        .attr("width", dist - bar_padding)
+        .attr("x", d => xScale(new Date(d.time)))
         .duration(1000)
+        
         // TODO: names on y axis (might have to do that purely with adding text)
+    }
+
+    function getClass(d) {
+      if (d.status === "ok") return "ok"
+      else if (d.status === "missing") return "missing"
+      else return "niet-ok"
     }
 
     function handleMouseOver(d) {
