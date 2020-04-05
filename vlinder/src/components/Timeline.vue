@@ -151,33 +151,12 @@ export default {
           .attr("width", dist - bar_padding)
           .duration(1000)
         }
-
-
-        /*if (datas.length > 0) {
-          var min = new Date(datas[0][0].time);
-          var max = new Date(datas[0][datas[0].length].time);
-          
-          for (var j = 0; j < datas.length; j++){
-            if (datas[j][0] < min) {
-              min = datas[j][0]
-            }
-
-            if (datas[j][datas[j].length - 1] > max) {
-              max = datas[j][datas[j].length]
-            }
-          }
-        } else {
-
-        }
-
-        console.log(min)
-        console.log(max)*/
         // TODO: names on y axis (might have to do that purely with adding text)
     }
 
     function handleMouseOver(d) {
-      console.log(d)
-      let g = d3.select("#timeline-div")
+      d
+      /*let g = d3.select("#timeline-div")
         .append("div")
         .attr("id", "temp")
         .classed("lol", true)
@@ -189,15 +168,16 @@ export default {
         .classed("test", true)
         .classed("ok", d.status === "ok")
         .classed("missing", d.status === "missing")
-        .classed("niet-ok", d.status !== "ok" && d.status !== "missing")
+        .classed("niet-ok", d.status !== "ok" && d.status !== "missing")*/
 
     }
 
     function handleMouseOut(d) {
       d
+      /*d
       d3.select("#timeline-div")
         .selectAll("#temp")
-        .remove()
+        .remove()*/
     }
 
     function fillMissingData(ddata) {
