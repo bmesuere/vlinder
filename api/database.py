@@ -3,9 +3,7 @@ from datetime import timedelta, datetime
 
 import pymysql
 import pymysql.cursors
-
 from static import station_metadata
-
 
 latest_vlinder_data = []
 last_request_time = None
@@ -45,8 +43,9 @@ def get_measurements_raw(id=None, start=None, end=None):
     if id is None:
         global last_request_time, latest_vlinder_data
         now = datetime.now()
-        if last_request_time and now - last_request_time > timedelta(minutes=5):
-            latest_vlinder_data = list(map(vlinder_data_transform, query(f"SELECT * FROM Vlinder ORDER BY datetime DESC LIMIT 59")))
+        if not last_request_time or now - last_request_time > timedelta(minutes=5):
+            latest_vlinder_data = list(
+                map(vlinder_data_transform, query(f"SELECT * FROM Vlinder ORDER BY datetime DESC LIMIT 59")))
         last_request_time = now
         return latest_vlinder_data
     if start is None and end:

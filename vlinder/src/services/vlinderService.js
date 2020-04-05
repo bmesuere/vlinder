@@ -11,7 +11,7 @@ class VlinderService {
     }
 
     getVlinderData(id, start, end, callback) {
-        return axios.get(this.baseUrl + 'vlinder/' + id, {
+        return axios.get(this.baseUrl + 'measurements/' + id, {
             headers: this.headers,
             params: {
                 start: start,
@@ -23,7 +23,7 @@ class VlinderService {
     }
 
     getLatestVlinderData(callback) {
-        return axios.get(this.baseUrl + 'vlinder', {headers: this.headers})
+        return axios.get(this.baseUrl + 'measurements', {headers: this.headers})
             .then(callback)
             .catch(d => console.error(d))
     }

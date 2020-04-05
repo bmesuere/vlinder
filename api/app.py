@@ -1,18 +1,19 @@
 from database import get_stations_raw, get_measurements_raw
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS, cross_origin
-from utils import unpack
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+base_url = open('../vlinder/.env').readline().split('=')[1].rstrip('\n')
+
 
 @app.route('/')
 def root():
     return jsonify({
-        "stations": request.base_url + "stations",
-        "measurements": request.base_url + "measurements",
+        "stations": base_url + "stations",
+        "measurements": base_url + "measurements",
     })
 
 
@@ -36,13 +37,13 @@ def measurements():
     return jsonify(list(map(measurement, get_measurements_raw())))
 
 
-@app.route('/measurement/<id>')
+@app.route('/measurements/<id>')
 @cross_origin()
 def measurements_id(id):
     start_p = request.args.get('start')
     end_p = request.args.get('end')
     # arg checking
-    return map(measurement, get_measurements_raw(id, start_p, end_p))
+    return jsonify(list(map(measurement, get_measurements_raw(id, start_p, end_p))))
 
 
 def station(ID, VLINDER, lat, lon,
@@ -51,7 +52,6 @@ def station(ID, VLINDER, lat, lon,
             water100, verhard100, groen100,
             water250, verhard250, groen250,
             water500, verhard500, groen500):
-    base_url = request.base_url.rsplit('/', 1)[0]
     return {
         "id": ID,
         "name": VLINDER,
@@ -87,8 +87,8 @@ def station(ID, VLINDER, lat, lon,
 
 def measurement(m):
     # m[time] = format it
-    m['measurements'] = f"{request.base_url}measurements/{m['id']}"
-    m['station'] = f"{request.base_url}stations/{m['id']}"
+    m['measurements'] = f"{base_url}measurements/{m['id']}"
+    m['station'] = f"{base_url}stations/{m['id']}"
     return m
 
 
