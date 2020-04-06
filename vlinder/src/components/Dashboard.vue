@@ -3,14 +3,6 @@
         <b-container style="height: 100%">
             <b-row align-h="center" style="padding: 5em">
                 <b-col>
-                    First station selection:
-                    <b-form-select v-model="selectedStation1" :options="options"/>
-                </b-col>
-                <b-col>
-                    Second station selection:
-                    <b-form-select v-model="selectedStation2" :options="options"/>
-                </b-col>
-                <b-col>
                      <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false" :multiple="true" :options="options" :searchable="true" :close-on-select="false" :show-labels="false" placeholder="No stations selected"></multiselect>
                 </b-col>
             </b-row>

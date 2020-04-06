@@ -46,20 +46,27 @@
                     ).then(d => vlinderDiv.html(d.data[0]['temp']));
                 }
             },*/
-            selectedStations() {
-                let nameDiv = d3.select('#selected-vlinder').selectAll('div').data(this.selectedStations);
-                nameDiv.exit().remove()
-                nameDiv.enter()
-                       .append("div")
-                       .html(d => d.value)
+            async selectedStations() {
 
-                if (this.selectedStations.length > 0) {
-                    let vlinderDiv = d3.select('#latest-vlinder');
-                    vlinderService.getVlinderData(this.selectedStations[0].value,
+                let promises = []
+                let datas = []
+
+                for (var i of this.selectedStations) {
+                    promises.push(
+                        vlinderService.getVlinderData(i.value,
                             new Date(2020, 1, 14, 23, 33, 20, 0),
                             new Date(2020, 1, 16, 10, 0, 0, 0)
-                        ).then(d => vlinderDiv.html(d.data[0]['temp']));
+                        ).then(d => datas.push(d.data[0])));
                 }
+
+                await Promise.all(promises)
+
+                let nameDiv = d3.select('#selected-vlinder').selectAll('text').data(datas);
+                nameDiv.exit().remove()
+                nameDiv.transition().text(d => "the temperature at station " + d.id + " is " + d.temp + ", ")
+                nameDiv.enter()
+                       .append("text")
+                       .text(d => "the temperature at station " + d.id + " is " + d.temp + ", ")
             }
         }
     }
