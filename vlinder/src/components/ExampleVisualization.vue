@@ -19,7 +19,8 @@
         ],
         props: {
             // Declare properties where a parent component can bind information to
-            selectedStation: String
+            selectedStation: String,
+            result: Array
         },
         mounted() {
             // This is code is ran on creation of the component
@@ -35,6 +36,8 @@
             selectedStation() {
                 // This code is ran when selected station is changed => selectedStation is a variable bound on creation
                 // of this component in Dashboard
+                console.log(this.result)
+                console.log(this.selectedStation)
                 if (this.selectedStation !== '') {
                     let vlinderDiv = d3.select('#latest-vlinder');
                     let nameDiv = d3.select('#selected-vlinder');

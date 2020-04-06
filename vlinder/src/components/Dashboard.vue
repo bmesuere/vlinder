@@ -10,9 +10,12 @@
                     Second station selection:
                     <b-form-select v-model="selectedStation2" :options="options"/>
                 </b-col>
+                <b-col>
+                     <multiselect v-model="result" label="text" track-by="text" :clear-on-select="false" :multiple="true" :options="options" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="No stations selected"></multiselect>
+                </b-col>
             </b-row>
             <b-row>
-                <example-visualization v-bind:selectedStation="selectedStation1" style="padding: 5em"/>
+                <example-visualization v-bind:selectedStation="selectedStation1" v-bind:result="result" style="padding: 5em"/>
             </b-row>
         </b-container>
     </div>
@@ -21,11 +24,13 @@
 <script>
     import ExampleVisualization from "./ExampleVisualization";
     import vlinderService from "../services/vlinderService";
+    import Multiselect from 'vue-multiselect'
 
     export default {
         name: "Dashboard",
         components: {
-            ExampleVisualization
+            ExampleVisualization,
+            Multiselect
         },
         created() {
             this.$store.dispatch('fetchLatestVlinderData');
@@ -46,12 +51,13 @@
             return {
                 selectedStation1: '',
                 selectedStation2: '',
+                result: [],
                 options: []
             }
         }
     }
 </script>
-
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style scoped>
 
 </style>
