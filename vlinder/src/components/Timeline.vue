@@ -162,7 +162,7 @@ export default {
     }
 
     function getClass(d) {
-      if (d.status === "ok") return "ok"
+      if (d.status === "Ok") return "ok"
       else if (d.status === "missing") return "missing"
       else return "niet-ok"
     }
