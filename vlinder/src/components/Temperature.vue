@@ -1,10 +1,12 @@
 <template>
     <div id="d3-viz-temperature" style="width:auto">
         <div id="temperature-svg" style="width:auto"/>
-        <input type="checkbox" id="perceivedTempCheckbox" checked="checked" value="showPerceivedTempCheckbox">
-        <label for="perceivedTempCheckbox"> Gevoelstemperatuur **Only semi implemented**</label><br>
-        <input type="checkbox" id="avgTempCheckbox" checked="checked" value="showAvgTempCheckbox">
-        <label for="avgTempCheckbox"> Gemiddelde **Not implemented yet**</label><br>
+        <input type="checkbox" id="perceivedTempCheckbox" checked="checked" value="showPerceivedTempCheckbox" style="visibility: hidden">
+        <label id="perceivedTempLabel" for="perceivedTempCheckbox" style="visibility: hidden">
+            Gevoelstemperatuur **Only semi implemented**</label><br>
+        <input type="checkbox" id="avgTempCheckbox" checked="checked" value="showAvgTempCheckbox" style="visibility: hidden">
+        <label id="avgTempLabel" for="avgTempCheckbox" style="visibility: hidden">
+            Gemiddelde **Not implemented yet**</label><br>
     </div>
 </template>
 
@@ -16,23 +18,52 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
 
     export default {
         name: "Temperature",
-        mixins: [
+                mixins: [
             VisualizationMixin
         ],
-
-
-        mounted () {
+        props: {
+            // Declare properties where a parent component can bind information to
+            selectedStation: String,
+            startDate: {
+                type: Date,
+                default: function () {
+                    return new Date(2020, 1, 14, 23, 33, 20, 0);
+                }
+            },
+            endDate: {
+                type: Date,
+                default: function () {
+                    return new Date(2020, 1, 16, 10, 0, 0, 0);
+                }
+            }
+        },
+        mounted() {
             // This is code is ran on creation of the component
             let stationsDiv = d3.select('#stations');
-            vlinderService.getStations(d => stationsDiv.html(d.data['0xwg6AsDvbnxXzB4S3c2BRyJ']['VLINDER']));
-            let latestDiv = d3.select('#latest');
-            vlinderService.getLatestVlinderData(d => latestDiv.html(d.data[0]['temp']));
-            vlinderService.getVlinderData('jvy7zdAPZ5ymI2hydh6tvnmm',
-                new Date(2020, 1, 14, 12, 33, 20, 0), // todo use correct input date
-                new Date(2020, 1, 14, 14, 0, 0, 0), // todo use correct input date
-                dataset => this.createPlot(dataset.data));
-
+            vlinderService.getStations().then(d => stationsDiv.html(d.data[0]['name']));
         },
+
+        watch: {
+            latestVlinderData() {
+                // This code is ran when there is new latestVlinderData
+                let vlinderDiv = d3.select('#latest-vlinder');
+                vlinderDiv.html(this.latestVlinderData[0]['temp'])
+            },
+            selectedStation() {
+                // This code is ran when selected station is changed => selectedStation is a variable bound on creation
+                // of this component in Dashboard
+                if (this.selectedStation !== '') {
+                    //let vlinderDiv = d3.select('#latest-vlinder');
+                    let nameDiv = d3.select('#selected-vlinder');
+                    nameDiv.html('Selected Station: ' + this.selectedStation);
+                    vlinderService.getVlinderData(this.selectedStation,
+                        this.startDate,
+                        this.endDate,
+                    ).then(d => this.createPlot(d.data));
+                }
+            }
+        },
+
 
         methods: {
             /**
@@ -50,10 +81,10 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
             /**
              * Adds a line to the plot that shows the perceived temperature of the data
              */
-            addPerceivedTemperature(data, graph, xScale, yScale){
+            addPerceivedTemperature(data, graph){
                 const linePerceived = d3.line()
-                    .x(d => xScale(new Date(d['time'])))
-                    .y(d => yScale(this.computePerceivedTemperature(d['temp'], d['windSpeed'])));
+                    .x(d => this.xScale(new Date(d['time'])))
+                    .y(d => this.yScale(this.computePerceivedTemperature(d['temp'], d['windSpeed'])));
 
                 graph.append("path")
                     .datum(data)
@@ -65,12 +96,14 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
              * Create a plot based on the given data
              */
             createPlot(data) {
+                console.log(data);
                 const padding = {top: 20, left: 45, right: 40, bottom: 55};
                 const width = window.innerWidth * 0.7;
                 const height = window.innerHeight * 0.5;
                 const [startDateString, endDateString] = [data[0]['time'], data[data.length - 1]['time']];
                 const startDate = new Date(startDateString);
                 const endDate = new Date(endDateString);
+
                 // set time formatting based on first and last date
                 let formatTime = d3.timeFormat("%H:%M");
                 if (startDate.getFullYear() !== endDate.getFullYear()) {
@@ -80,7 +113,7 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
                 } else if (startDate.getDay() !== endDate.getDay()) {
                     formatTime = d3.timeFormat("%e %b, %H:%M");
                 }
-
+                d3.select('#temperature-svg').selectAll("svg").remove();
                 const graph = d3.select('#temperature-svg')
                     .append("svg")
                     .attr("width", width)
@@ -88,22 +121,22 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
                     .attr("preserveAspectRatio", "xMinYMin meet");
 
                 //create x scale and axis
-                const xScale = d3.scaleTime()
+                this.xScale = d3.scaleTime()
                     .domain([startDate, endDate])
                     .range([padding.left, width - padding.right]);
 
                 const xAxis = d3.axisBottom()
-                    .scale(xScale)
+                    .scale(this.xScale)
                     .ticks(10)
                     .tickFormat(formatTime);
 
                 // create y scale and axis
-                const yScale = d3.scaleLinear()
+                this.yScale = d3.scaleLinear()
                     .domain([Math.min(0, d3.min(data, d => d['temp'] * 1.1)), d3.max(data, d => d['temp']) * 1.1])
                     .range([height - padding.bottom, padding.top]);
 
                 const yAxis = d3.axisLeft()
-                    .scale(yScale);
+                    .scale(this.yScale);
 
                 // add axes to plot
                 graph.append("g")
@@ -123,17 +156,22 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
 
                 // create and add data line to plot
                 const lineReal = d3.line()
-                    .x(d => xScale(new Date(d['time'])))
-                    .y(d => yScale(d['temp']));
+                    .x(d => this.xScale(new Date(d['time'])))
+                    .y(d => this.yScale(d['temp']));
 
                 graph.append("path")
                     .datum(data)
                     .attr("class", "lineRealTemp")
                     .attr("d", lineReal);
 
+                document.getElementById('perceivedTempCheckbox').style.visibility = "visible";
+                document.getElementById('perceivedTempLabel').style.visibility = "visible";
+                document.getElementById('avgTempCheckbox').style.visibility = "visible";
+                document.getElementById('avgTempLabel').style.visibility = "visible";
+
                 // add perceived temperature line if checked
                 if(document.getElementById('perceivedTempCheckbox').checked) {
-                    this.addPerceivedTemperature(data, graph, xScale, yScale);
+                    this.addPerceivedTemperature(data, graph);
                 }
                 if(document.getElementById('avgTempCheckbox').checked) {
                     //todo
