@@ -27,7 +27,7 @@ export default {
       ).slice(-2)}`
     );
 
-    var stations = await vlinderService.getStations(d => {
+    var stations = await vlinderService.getStations().then(d => {
       var data = [];
       for (var i in d.data) {
         data.push(d.data[i]);
@@ -40,9 +40,8 @@ export default {
       .data(stations)
       .enter()
       .append("option")
-      .attr("value", d => d.ID)
-      .append("text")
-      .text(d => d.VLINDER);
+      .attr("value", d => d.id)
+      .html(d => d.name)
 
     var selectedDate = new Date(d3.select("#date").property("value"));
     var [startDate, endDate] = getBoundaries(selectedDate);
@@ -76,7 +75,7 @@ export default {
             promises.push(vlinderService.getVlinderData(
                 selectedStations[i],
                 startDate,
-                endDate,
+                endDate).then(
                 d => {
                     var dataset = fillMissingData(d.data);
                     datas.push(...dataset)
@@ -84,8 +83,8 @@ export default {
             ));
         }
 
-        await Promise.all(promises);
-        height = (selectedStations.length + 1) * stroke_width;
+      await Promise.all(promises);
+      height = (selectedStations.length + 1) * stroke_width;
 
       graph
       .transition()
@@ -260,6 +259,10 @@ export default {
 
 .ok {
   fill: green;
+}
+
+#stations-selector {
+  width: 100px;
 }
 
 .missing {

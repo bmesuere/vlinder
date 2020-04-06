@@ -12,22 +12,20 @@
                 </b-col>
             </b-row>
             <b-row>
-                <example-visualization v-bind:selectedStation="selectedStation1" style="padding: 5em"/>
+                <timeline v-bind:selectedStation="selectedStation1" style="padding: 5em"/>
             </b-row>
-            <b-row align-v="center" style="height: 50%">
-                <timeline />
         </b-container>
     </div>
 </template>
 
 <script>
-    import ExampleVisualization from "./ExampleVisualization";
+    //import ExampleVisualization from "./ExampleVisualization";
     import Timeline from "./Timeline"
     import vlinderService from "../services/vlinderService";
     export default {
         name: "Dashboard",
         components: {
-            ExampleVisualization,
+            //ExampleVisualization,
             Timeline
         },
         created() {
