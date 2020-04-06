@@ -20,7 +20,7 @@
         props: {
             // Declare properties where a parent component can bind information to
             selectedStation: String,
-            result: Array
+            selectedStations: Array
         },
         mounted() {
             // This is code is ran on creation of the component
@@ -33,11 +33,9 @@
                 let vlinderDiv = d3.select('#latest-vlinder');
                 vlinderDiv.html(this.latestVlinderData[0]['temp'])
             },
-            selectedStation() {
+            /*selectedStation() {
                 // This code is ran when selected station is changed => selectedStation is a variable bound on creation
                 // of this component in Dashboard
-                console.log(this.result)
-                console.log(this.selectedStation)
                 if (this.selectedStation !== '') {
                     let vlinderDiv = d3.select('#latest-vlinder');
                     let nameDiv = d3.select('#selected-vlinder');
@@ -46,6 +44,21 @@
                         new Date(2020, 1, 14, 23, 33, 20, 0),
                         new Date(2020, 1, 16, 10, 0, 0, 0)
                     ).then(d => vlinderDiv.html(d.data[0]['temp']));
+                }
+            },*/
+            selectedStations() {
+                let nameDiv = d3.select('#selected-vlinder').selectAll('div').data(this.selectedStations);
+                nameDiv.exit().remove()
+                nameDiv.enter()
+                       .append("div")
+                       .html(d => d.value)
+
+                if (this.selectedStations.length > 0) {
+                    let vlinderDiv = d3.select('#latest-vlinder');
+                    vlinderService.getVlinderData(this.selectedStations[0].value,
+                            new Date(2020, 1, 14, 23, 33, 20, 0),
+                            new Date(2020, 1, 16, 10, 0, 0, 0)
+                        ).then(d => vlinderDiv.html(d.data[0]['temp']));
                 }
             }
         }

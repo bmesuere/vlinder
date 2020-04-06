@@ -11,11 +11,11 @@
                     <b-form-select v-model="selectedStation2" :options="options"/>
                 </b-col>
                 <b-col>
-                     <multiselect v-model="result" label="text" track-by="text" :clear-on-select="false" :multiple="true" :options="options" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="No stations selected"></multiselect>
+                     <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false" :multiple="true" :options="options" :searchable="true" :close-on-select="false" :show-labels="false" placeholder="No stations selected"></multiselect>
                 </b-col>
             </b-row>
             <b-row>
-                <example-visualization v-bind:selectedStation="selectedStation1" v-bind:result="result" style="padding: 5em"/>
+                <example-visualization v-bind:selectedStation="selectedStation1" v-bind:selectedStations="selectedStations" style="padding: 5em"/>
             </b-row>
         </b-container>
     </div>
@@ -51,7 +51,7 @@
             return {
                 selectedStation1: '',
                 selectedStation2: '',
-                result: [],
+                selectedStations: [],
                 options: []
             }
         }
