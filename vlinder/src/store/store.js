@@ -8,7 +8,8 @@ export default new Vuex.Store({
     state: {
         stations: [],
         vlinderData: [],
-        focusedVlinderData: []
+        focusedVlinderData: [],
+        latestVlinderData: []
     },
     mutations: {
         setStations(state, stations) {
@@ -20,6 +21,9 @@ export default new Vuex.Store({
         },
         setFocusedVlinderData(state, focusedVlinderData) {
             state.focusedVlinderData = focusedVlinderData
+        },
+        setLatestVlinderData(state, latestVlinderData) {
+            state.latestVlinderData = latestVlinderData
         }
     },
     actions: {
@@ -35,6 +39,11 @@ export default new Vuex.Store({
         },
         updateFocusedVlinderdata({commit}, data) {
             commit('setFocusedVlinderData', data)
+        },
+        fetchLatestVlinderData({commit}) {
+            vlinderService.getLatestVlinderData(response => {
+                commit('setLatestVlinderData', response.data)
+            })
         }
     },
     getters: {
@@ -46,6 +55,9 @@ export default new Vuex.Store({
         },
         focusedVlinderData: state => {
             return state.focusedVlinderData
+        },
+        latestVlinderData: state => {
+            return state.latestVlinderData
         }
     }
 })
