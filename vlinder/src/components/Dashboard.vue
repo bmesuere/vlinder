@@ -14,6 +14,9 @@
             <b-row>
                 <example-visualization v-bind:selectedStation="selectedStation1" style="padding: 5em"/>
             </b-row>
+            <b-row align-v="center" style="height: 100%">
+                <area-station v-bind:selectedStation="selectedStation1"/>
+            </b-row>
         </b-container>
     </div>
 </template>
@@ -21,10 +24,13 @@
 <script>
     import ExampleVisualization from "./ExampleVisualization";
     import vlinderService from "../services/vlinderService";
+    import AreaStation from "./AreaStation";
+
 
     export default {
         name: "Dashboard",
         components: {
+            AreaStation,
             ExampleVisualization
         },
         created() {
