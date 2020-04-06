@@ -19,7 +19,6 @@
         ],
         props: {
             // Declare properties where a parent component can bind information to
-            selectedStation: String,
             selectedStations: Array
         },
         mounted() {

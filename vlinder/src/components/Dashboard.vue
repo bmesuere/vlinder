@@ -7,7 +7,7 @@
                 </b-col>
             </b-row>
             <b-row>
-                <example-visualization v-bind:selectedStation="selectedStation1" v-bind:selectedStations="selectedStations" style="padding: 5em"/>
+                <example-visualization v-bind:selectedStations="selectedStations" style="padding: 5em"/>
             </b-row>
         </b-container>
     </div>
@@ -41,8 +41,6 @@
         },
         data() {
             return {
-                selectedStation1: '',
-                selectedStation2: '',
                 selectedStations: [],
                 options: []
             }
