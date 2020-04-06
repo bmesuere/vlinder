@@ -32,19 +32,6 @@
                 let vlinderDiv = d3.select('#latest-vlinder');
                 vlinderDiv.html(this.latestVlinderData[0]['temp'])
             },
-            /*selectedStation() {
-                // This code is ran when selected station is changed => selectedStation is a variable bound on creation
-                // of this component in Dashboard
-                if (this.selectedStation !== '') {
-                    let vlinderDiv = d3.select('#latest-vlinder');
-                    let nameDiv = d3.select('#selected-vlinder');
-                    nameDiv.html('Selected Station: ' + this.selectedStation);
-                    vlinderService.getVlinderData(this.selectedStation,
-                        new Date(2020, 1, 14, 23, 33, 20, 0),
-                        new Date(2020, 1, 16, 10, 0, 0, 0)
-                    ).then(d => vlinderDiv.html(d.data[0]['temp']));
-                }
-            },*/
             async selectedStations() {
 
                 let promises = []
@@ -58,7 +45,7 @@
                         ).then(d => datas.push(d.data[0])));
                 }
 
-                await Promise.all(promises)
+                await Promise.all(promises);
 
                 let nameDiv = d3.select('#selected-vlinder').selectAll('text').data(datas);
                 nameDiv.exit().remove()
