@@ -30,7 +30,8 @@
             latestVlinderData() {
                 // This code is ran when there is new latestVlinderData
                 let vlinderDiv = d3.select('#latest-vlinder');
-                vlinderDiv.html(this.latestVlinderData[0]['temp'])
+                vlinderDiv.html(this.latestVlinderData[0]['temp']);
+                console.log(this.latestVlinderData);
             },
             selectedStation() {
                 // This code is ran when selected station is changed => selectedStation is a variable bound on creation

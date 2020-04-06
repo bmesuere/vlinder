@@ -6,7 +6,8 @@
     import VisualizationMixin from "../mixins/VisualizationMixin";
     //import vlinderService from "../services/vlinderService";
     import * as d3 from 'd3'
-    import {generate_fake_data, uuidv4} from "../utils";
+    import {uuidv4} from "../utils";
+    import vlinderService from "../services/vlinderService";
 
     export default {
         name: "LineChartVisualization",
@@ -22,7 +23,8 @@
                 type: Boolean,
                 default: false
             },
-            "selectedStations": Array,
+            "selectedStation": String,
+            //"selectedStations": Array,
             "colors": {
                 type: Array,
                 default: () => ['#5DBE55', '#926DA5', '#2B92BE']
@@ -33,11 +35,11 @@
         ],
         mounted() {
             // start date to query
-            let start = new Date();
-            start.setDate(start.getDate() - 1);
+            this.start = new Date();
+            this.start.setDate(this.start.getDate() - 1);
             // end date to query
-            let end = new Date();
-            end.setDate(end.getDate());
+            this.end = new Date();
+            this.end.setDate(this.end.getDate());
 
             // setup everything
             this.padding = {top: 20, left: 40, right: 40, bottom: 50};
@@ -92,26 +94,39 @@
 
 
             // fake data
-            this.fake_data = generate_fake_data(24 * 12, start);
-            this.update_data(
-                [{"data": this.fake_data}]
-            );
+            //this.fake_data = generate_fake_data(24 * 12, start);
+            //this.update_data(
+            //    [{"data": this.fake_data}]
+            //);
 
-            setInterval(() => {
-                let last_element = this.fake_data[this.fake_data.length - 1];
-                let new_elements = generate_fake_data(1, last_element.time, last_element.pressure, last_element.rainVolume);
-                this.fake_data.push(...new_elements);
-                this.fake_data.shift();
-                this.update_data([{"data": this.fake_data}]);
-            }, 100)
+            //setInterval(() => {
+            //    let last_element = this.fake_data[this.fake_data.length - 1];
+            //    let new_elements = generate_fake_data(1, last_element.time, last_element.pressure, last_element.rainVolume);
+            //    this.fake_data.push(...new_elements);
+            //    this.fake_data.shift();
+            //    this.update_data([{"data": this.fake_data}]);
+            //}, 100)
+
+
 
             // real data
+            //vlinderService.getVlinderData(this.selectedStation, start, end).
+             //   then((d) => this.update_data([d])).catch(console.log)
             //Promise.all(
             //    this.selectedStations.map(
             //        (station_id) => vlinderService.getVlinderDataPromise(station_id, start, end)
             //    )
             //).then(this.update_data)
             //    .catch(error => console.log(error));
+        },
+        watch: {
+            latestVlinderData() {
+            },
+            selectedStation() {
+                // This code is ran when selected station is changed => selectedStation is a variable bound on creation
+                // of this component in Dashboard
+                vlinderService.getVlinderData(this.selectedStation, this.start, this.end).then((d) => this.update_data([d])).catch(console.log)
+            }
         },
         methods: {
             update_data(data) {
