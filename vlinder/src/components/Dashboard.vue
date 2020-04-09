@@ -7,7 +7,7 @@
                 </b-col>
             </b-row>
             <b-row>
-                <timeline v-bind:selectedStations="selectedStations" style="padding: 5em"/>
+                <timeline v-bind:selectedStations="selectedStations" style="padding: 5px"/>
             </b-row>
         </b-container>
     </div>

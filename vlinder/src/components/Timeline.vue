@@ -12,12 +12,12 @@ import vlinderService from "../services/vlinderService";
 import * as d3 from "d3";
 
 
-const dist = 3;
-const ticks = 15;
-const stroke_width = 27;
-const bar_padding = 0.4;
-const paddingleft = 60;
-const paddingtop = 60;
+const dist = 2.5;
+const ticks = 10;
+const stroke_width = 30;
+const bar_padding = 0.1;
+const [paddingleft, paddingright, paddingtop, paddingbottom] =
+      [70, 50, 50, 0]
 let stations = []
 
 async function construct_graph(selectedStations, selectedNames, startDate, endDate) {
@@ -48,18 +48,13 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
   await Promise.all(promises);
   let height = (selectedStations.length + 1) * stroke_width;
 
-  let fixedHeight = 200;
-  let fixedWidth = 1000;
-
 
   graph
   .transition()
   .duration(500)
-  .attr("height", fixedHeight)
-  .attr("width", fixedWidth)
   .attr(
       "viewBox",
-      "0 0 " + (paddingleft + 288 * dist + stroke_width) + " " + (height + paddingtop)
+      "0 0 " + (paddingleft + paddingright + 288 * dist + stroke_width) + " " + (height + paddingtop + paddingbottom)
   )
   .attr("direction", "ltr");
 
@@ -127,6 +122,10 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
     .attr("y", d => yScale(selectedStations.indexOf(d.id)))
     .attr("class", d => "bar " + getClass(d))
     .duration(500)
+    
+    a
+    .on("mouseover", d => handleMouseOver(d, xScale(new Date(d.time)), yScale(selectedStations.indexOf(d.id))))
+    .on("mouseout", handleMouseOut)
 
     a.enter()
     .append("rect")
@@ -134,9 +133,9 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
     .attr("y", d => yScale(selectedStations.indexOf(d.id)))
     .attr("width", dist - bar_padding)
     .attr("height", 0)
+    .attr("class", d => "bar " + getClass(d))
     .on("mouseover", d => handleMouseOver(d, xScale(new Date(d.time)), yScale(selectedStations.indexOf(d.id))))
     .on("mouseout", handleMouseOut)
-    .attr("class", d => "bar " + getClass(d))
     .transition()
     .attr("height", stroke_width - bar_padding)
     .duration(700)
@@ -187,14 +186,31 @@ function handleMouseOver(d, xpos, ypos) {
       .select("#timeline-div #timeline-svg")
       .append("g")
       .attr("id", "temp")
+      .attr("opacity", 0)
+
+  let h = 20;
+  let x = xpos - 60;
+  let y = ypos - stroke_width/4 + 4
+  g.append("rect")
+    .attr("x", x - 3)
+    .attr("y", y - h/2 - 4)
+    .attr("width", 140)
+    .attr("height", h)
+    .attr("fill", "white")
+    .attr("stroke-width", 0.5)
+    .attr("stroke", "black")
 
   g.append("text")
-    .attr("x", xpos - 50)
-    .attr("y", ypos - stroke_width)
+    .attr("x", x)
+    .attr("y", y)
     .text(new Date(d.time).toLocaleString())
     .attr("font-size", "12px")
     .attr("font-family", "sans-serif")
     .attr("class", getClass(d))
+
+  g.transition()
+    .attr("opacity", 1)
+    .duration(50)
 
 }
 
@@ -202,6 +218,9 @@ function handleMouseOut(d) {
   d
   d3.select("#timeline-div #timeline-svg")
     .selectAll("#temp")
+    .transition()
+    .attr("opacity", 0)
+    .duration(50)
     .remove()
 }
 
@@ -337,10 +356,13 @@ export default {
 div #timeline-div {
   overflow: auto;
   direction: rtl;
-  width: 1000px;
   scrollbar-color: #ccdbee #eeeeff; /* thumb and track color */
   scrollbar-width: thin;
-  padding-top: 20px;
+}
+
+#timeline-svg {
+  height: 100%;
+  width: 100%;
 }
 div.status {
   display: inline-block;
