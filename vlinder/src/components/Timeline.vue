@@ -17,6 +17,7 @@ const ticks = 15;
 const stroke_width = 27;
 const bar_padding = 0.4;
 const paddingleft = 60;
+const paddingtop = 60;
 let stations = []
 
 async function construct_graph(selectedStations, selectedNames, startDate, endDate) {
@@ -47,13 +48,18 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
   await Promise.all(promises);
   let height = (selectedStations.length + 1) * stroke_width;
 
+  let fixedHeight = 200;
+  let fixedWidth = 1000;
+
+
   graph
   .transition()
   .duration(500)
-  .attr("height", height)
+  .attr("height", fixedHeight)
+  .attr("width", fixedWidth)
   .attr(
       "viewBox",
-      "0 0 " + (paddingleft + 288 * dist + stroke_width + 20) + " " + height
+      "0 0 " + (paddingleft + 288 * dist + stroke_width) + " " + (height + paddingtop)
   )
   .attr("direction", "ltr");
 
@@ -76,7 +82,7 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
     const yScale = d3
     .scaleLinear()
     .domain([0, selectedStations.length + 1])
-    .range([0, height]);
+    .range([paddingtop, height + paddingtop]);
 
     xScale.ticks(d3.timeMinute, 5);
 
@@ -94,13 +100,13 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
     axis
         .transition()
         .duration(500)
-        .attr("transform", `translate(0, ${height -  stroke_width})`)
+        .attr("transform", `translate(0, ${paddingtop + height -  stroke_width})`)
         .call(xAxis);
 
     yaxis
         .transition()
         .duration(500)
-        .attr("transform", `translate(${paddingleft}, 0)`)
+        .attr("transform", `translate(${paddingleft}, ${paddingtop})`)
         .call(d3.axisLeft(name_axis))
         .selectAll("text")
         .attr("transform", "translate(-5,-10)rotate(-45)");
@@ -113,7 +119,7 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
     .transition()
     .duration(500)
     .attr("height", 0)
-    .attr("y", 0)
+    .attr("y", paddingtop)
     .remove();
 
     a.transition()
@@ -124,15 +130,15 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
 
     a.enter()
     .append("rect")
-    .attr("x", paddingleft)
+    .attr("x", d => xScale(new Date(d.time)))
     .attr("y", d => yScale(selectedStations.indexOf(d.id)))
     .attr("width", dist - bar_padding)
-    .attr("height", stroke_width - bar_padding)
-    .on("mouseover", handleMouseOver)
+    .attr("height", 0)
+    .on("mouseover", d => handleMouseOver(d, xScale(new Date(d.time)), yScale(selectedStations.indexOf(d.id))))
     .on("mouseout", handleMouseOut)
     .attr("class", d => "bar " + getClass(d))
     .transition()
-    .attr("x", d => xScale(new Date(d.time)))
+    .attr("height", stroke_width - bar_padding)
     .duration(700)
 }
 
@@ -175,31 +181,28 @@ function fillMissingData(ddata) {
     return data;
 }
 
-function handleMouseOver(d) {
+function handleMouseOver(d, xpos, ypos) {
   d
-  console.log(d.id)
-  /*let g = d3.select("#timeline-div")
-    .append("div")
-    .attr("id", "temp")
-    .classed("lol", true)
-    .append("svg")
+  let g = d3
+      .select("#timeline-div #timeline-svg")
+      .append("g")
+      .attr("id", "temp")
 
-  g.append("rect")
-    .attr("x", 4)
-    .attr("y", 0)
-    .classed("test", true)
-    .classed("ok", d.status === "ok")
-    .classed("missing", d.status === "missing")
-    .classed("niet-ok", d.status !== "ok" && d.status !== "missing")*/
+  g.append("text")
+    .attr("x", xpos - 50)
+    .attr("y", ypos - stroke_width)
+    .text(new Date(d.time).toLocaleString())
+    .attr("font-size", "12px")
+    .attr("font-family", "sans-serif")
+    .attr("class", getClass(d))
 
 }
 
 function handleMouseOut(d) {
   d
-  /*d
-  d3.select("#timeline-div")
+  d3.select("#timeline-div #timeline-svg")
     .selectAll("#temp")
-    .remove()*/
+    .remove()
 }
 
 
@@ -262,22 +265,21 @@ export default {
 }
 
 .test {
-  width: 150px;
+  width: 300px;
   height: 146px;
 }
 
 .lol {
-  position: absolute;
-  bottom: 2px;
-  left: 2px;
-  width: 300px;
-  height: 150px;
   border: 2px solid black;
   background-color: white;
 }
 
 .ok {
   fill: green;
+}
+
+#temp {
+  pointer-events: none;
 }
 
 #stations-selector {
