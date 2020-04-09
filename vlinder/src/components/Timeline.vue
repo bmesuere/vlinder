@@ -12,18 +12,21 @@ import vlinderService from "../services/vlinderService";
 import * as d3 from "d3";
 
 
-const dist = 4;
-const ticks = 30;
-const stroke_width = 30;
-const bar_padding = 1;
+const dist = 3;
+const ticks = 15;
+const stroke_width = 27;
+const bar_padding = 0.4;
+const paddingleft = 60;
 let stations = []
 
-async function construct_graph(selectedStations, startDate, endDate) {
+async function construct_graph(selectedStations, selectedNames, startDate, endDate) {
 
     const graph = d3
       .select("#timeline-div #timeline-svg")
 
-    const axis = d3.select("#timeline-div #timeline-svg #timeline-axis")
+    const axis = d3.select("#timeline-div #timeline-svg #timeline-x-axis")
+
+    const yaxis = d3.select("#timeline-div #timeline-svg #timeline-y-axis")
     
     var datas = []
     var promises = []
@@ -50,7 +53,7 @@ async function construct_graph(selectedStations, startDate, endDate) {
   .attr("height", height)
   .attr(
       "viewBox",
-      "0 0 " + (288 * dist + stroke_width + 20) + " " + height
+      "0 0 " + (paddingleft + 288 * dist + stroke_width + 20) + " " + height
   )
   .attr("direction", "ltr");
 
@@ -68,7 +71,7 @@ async function construct_graph(selectedStations, startDate, endDate) {
     const xScale = d3
     .scaleTime()
     .domain([startDate, new Date(endDate.getTime() + 5 * 60000)])
-    .range([20, 288 * dist + 20]);
+    .range([paddingleft, 288 * dist + paddingleft]);
 
     const yScale = d3
     .scaleLinear()
@@ -81,11 +84,27 @@ async function construct_graph(selectedStations, startDate, endDate) {
         .scale(xScale); // that uses the domain of the xScale
     xAxis.ticks(ticks);
 
+    const yAxis = d3.axisLeft()
+        .scale(yScale)
+    yAxis.ticks(selectedStations.length + 1)
+    var name_axis = d3.scaleBand()
+    .domain(selectedNames)         // This is what is written on the Axis: from 0 to 100
+    .range([0, height-stroke_width]);
+
     axis
         .transition()
         .duration(500)
         .attr("transform", `translate(0, ${height -  stroke_width})`)
         .call(xAxis);
+
+    yaxis
+        .transition()
+        .duration(500)
+        .attr("transform", `translate(${paddingleft}, 0)`)
+        .call(d3.axisLeft(name_axis))
+        .selectAll("text")
+        .attr("transform", "translate(-5,-10)rotate(-45)");
+
 
 
     let a = graph.selectAll("rect").data(datas);
@@ -105,7 +124,7 @@ async function construct_graph(selectedStations, startDate, endDate) {
 
     a.enter()
     .append("rect")
-    .attr("x", d => 0 - xScale(new Date(d.time)))
+    .attr("x", paddingleft)
     .attr("y", d => yScale(selectedStations.indexOf(d.id)))
     .attr("width", dist - bar_padding)
     .attr("height", stroke_width - bar_padding)
@@ -114,24 +133,24 @@ async function construct_graph(selectedStations, startDate, endDate) {
     .attr("class", d => "bar " + getClass(d))
     .transition()
     .attr("x", d => xScale(new Date(d.time)))
-    .duration(1000)
-    
-    // TODO: names on y axis (might have to do that purely with adding text)
+    .duration(700)
 }
 
 function updateData() {
   var date = new Date(d3.select("#date").property("value"));
   var selectedIds = [];
+  var selectedNames = [];
   for (var station of stations) {
     selectedIds.push(station.value);
+    selectedNames.push(station.text);
   }
   var [start, end] = getBoundaries(date);
-  construct_graph(selectedIds, start, end);
+  construct_graph(selectedIds, selectedNames, start, end);
 }
 
 function getBoundaries(date) {
   var start = new Date(date);
-  start.setTime(start.getTime() - 3600000)
+  start.setTime(start.getTime() - 2*3600000)
   var end = new Date(start);
   end.setDate(start.getDate() + 1);
   console.log(start, end)
@@ -158,6 +177,7 @@ function fillMissingData(ddata) {
 
 function handleMouseOver(d) {
   d
+  console.log(d.id)
   /*let g = d3.select("#timeline-div")
     .append("div")
     .attr("id", "temp")
@@ -218,9 +238,13 @@ export default {
 
     graph
       .append("g")
-      .attr("id", "timeline-axis")
+      .attr("id", "timeline-x-axis")
+
+    graph
+      .append("g")
+      .attr("id", "timeline-y-axis")
     
-    construct_graph(selectedStations, startDate, endDate);
+    construct_graph(selectedStations, [], startDate, endDate);
   },
     watch: {
       async selectedStations() {
