@@ -11,13 +11,13 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
 import vlinderService from "../services/vlinderService";
 import * as d3 from "d3";
 
-
-const dist = 2.5;
+const dist = 2;
 const ticks = 10;
-const stroke_width = 30;
-const bar_padding = 0.1;
-const [paddingleft, paddingright, paddingtop, paddingbottom] =
-      [70, 50, 50, 0]
+const stroke_width = 40;
+const horizontal_bar_padding = 1;
+const vertical_bar_padding = 1;
+const [paddingleft, paddingright, paddingtop, paddingbottom] = [70, 50, 50, 0]
+
 let stations = []
 
 async function construct_graph(selectedStations, selectedNames, startDate, endDate) {
@@ -54,7 +54,7 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
   .duration(500)
   .attr(
       "viewBox",
-      "0 0 " + (paddingleft + paddingright + 288 * dist + stroke_width) + " " + (height + paddingtop + paddingbottom)
+      "0 0 " + (paddingleft + paddingright + 288 * dist) + " " + (height + paddingtop + paddingbottom)
   )
   .attr("direction", "ltr");
 
@@ -72,7 +72,7 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
     const xScale = d3
     .scaleTime()
     .domain([startDate, new Date(endDate.getTime() + 5 * 60000)])
-    .range([paddingleft, 288 * dist + paddingleft]);
+    .range([paddingleft + 3, 288 * dist + paddingleft - paddingright]);
 
     const yScale = d3
     .scaleLinear()
@@ -120,24 +120,36 @@ async function construct_graph(selectedStations, selectedNames, startDate, endDa
     a.transition()
     .attr("x", d => xScale(new Date(d.time)))
     .attr("y", d => yScale(selectedStations.indexOf(d.id)))
+    .attr("width", (dist + 1)- horizontal_bar_padding)
+    .attr("height", stroke_width - vertical_bar_padding)
     .attr("class", d => "bar " + getClass(d))
     .duration(500)
     
     a
-    .on("mouseover", d => handleMouseOver(d, xScale(new Date(d.time)), yScale(selectedStations.indexOf(d.id))))
+    .on("mouseover", 
+            d => handleMouseOver(
+                        d, 
+                        xScale(new Date(d.time)), 
+                        yScale(selectedStations.indexOf(d.id)),
+                        selectedNames[selectedStations.indexOf(d.id)]))
     .on("mouseout", handleMouseOut)
 
     a.enter()
     .append("rect")
     .attr("x", d => xScale(new Date(d.time)))
     .attr("y", d => yScale(selectedStations.indexOf(d.id)))
-    .attr("width", dist - bar_padding)
+    .attr("width", (dist + 1)- horizontal_bar_padding)
     .attr("height", 0)
     .attr("class", d => "bar " + getClass(d))
-    .on("mouseover", d => handleMouseOver(d, xScale(new Date(d.time)), yScale(selectedStations.indexOf(d.id))))
+    .on("mouseover", 
+        d => handleMouseOver(
+                    d, 
+                    xScale(new Date(d.time)), 
+                    yScale(selectedStations.indexOf(d.id)),
+                    selectedNames[selectedStations.indexOf(d.id)]))
     .on("mouseout", handleMouseOut)
     .transition()
-    .attr("height", stroke_width - bar_padding)
+    .attr("height", stroke_width - vertical_bar_padding)
     .duration(700)
 }
 
@@ -154,11 +166,9 @@ function updateData() {
 }
 
 function getBoundaries(date) {
-  var start = new Date(date);
-  start.setTime(start.getTime() - 2*3600000)
+  var start = new Date(date - 2*3600000);
   var end = new Date(start);
-  end.setDate(start.getDate() + 1);
-  console.log(start, end)
+  end.setDate(start.getDate() + 2);
   return [start, end]
 }
 
@@ -180,20 +190,19 @@ function fillMissingData(ddata) {
     return data;
 }
 
-function handleMouseOver(d, xpos, ypos) {
-  d
+function handleMouseOver(d, xpos, ypos, name) {
   let g = d3
       .select("#timeline-div #timeline-svg")
       .append("g")
       .attr("id", "temp")
-      .attr("opacity", 0)
+      .attr("opacity", 0.5)
 
-  let h = 20;
+  let h = 50;
   let x = xpos - 60;
-  let y = ypos - stroke_width/4 + 4
+  let y = ypos - stroke_width + 4
   g.append("rect")
     .attr("x", x - 3)
-    .attr("y", y - h/2 - 4)
+    .attr("y", y - 14)
     .attr("width", 140)
     .attr("height", h)
     .attr("fill", "white")
@@ -201,16 +210,45 @@ function handleMouseOver(d, xpos, ypos) {
     .attr("stroke", "black")
 
   g.append("text")
-    .attr("x", x)
+    .attr("x", x + 20)
     .attr("y", y)
+    .text(name)
+    .attr("font-size", "12px")
+    .attr("font-family", "sans-serif")
+
+  g.append("circle")
+    .attr("cx", x + 5)
+    .attr("cy", y - 4)
+    .attr("r", 5)
+    .attr("fill", "orange")
+    .attr("class", getClass(d))
+
+  g.append("text")
+    .attr("x", x)
+    .attr("y", y + 15)
     .text(new Date(d.time).toLocaleString())
     .attr("font-size", "12px")
     .attr("font-family", "sans-serif")
-    .attr("class", getClass(d))
+
+  if (d.status === "missing") {
+    g.append("text")
+    .attr("x", x)
+    .attr("y", y + 30)
+    .text("no data")
+    .attr("font-size", "12px")
+    .attr("font-family", "sans-serif")
+  } else {
+    g.append("text")
+      .attr("x", x)
+      .attr("y", y + 30)
+      .text("🌡 " + d.temp + "°C\t" + "🌧️ " + d.humidity + "%")
+      .attr("font-size", "12px")
+      .attr("font-family", "sans-serif")
+  }
 
   g.transition()
     .attr("opacity", 1)
-    .duration(50)
+    .duration(30)
 
 }
 
@@ -220,7 +258,7 @@ function handleMouseOut(d) {
     .selectAll("#temp")
     .transition()
     .attr("opacity", 0)
-    .duration(50)
+    .duration(30)
     .remove()
 }
 
@@ -356,14 +394,19 @@ export default {
 div #timeline-div {
   overflow: auto;
   direction: rtl;
+  height: 500px;
   scrollbar-color: #ccdbee #eeeeff; /* thumb and track color */
   scrollbar-width: thin;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #timeline-svg {
   height: 100%;
   width: 100%;
 }
+
 div.status {
   display: inline-block;
   width: 20px;
