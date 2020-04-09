@@ -12,20 +12,20 @@
                 </b-col>
             </b-row>
             <b-row>
-                <example-visualization v-bind:selectedStation="selectedStation1" style="padding: 5em"/>
+                <WindRose v-bind:selectedStation="selectedStation1" style="padding: 5em"/>
             </b-row>
         </b-container>
     </div>
 </template>
 
 <script>
-    import ExampleVisualization from "./ExampleVisualization";
+    import WindRose from "./Wind";
     import vlinderService from "../services/vlinderService";
 
     export default {
         name: "Dashboard",
         components: {
-            ExampleVisualization
+            WindRose
         },
         created() {
             this.$store.dispatch('fetchLatestVlinderData');
