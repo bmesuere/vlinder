@@ -1,6 +1,6 @@
 <template>
     <div id="d3-viz-windrose">
-        <div id="windrose-svg" width="960" height="960" font-family="sans-serif" font-size="10"/>
+        <div id="windrose-svg"/>
         <div id="selected-vlinder" style="font-size: larger"></div>
     </div>
 </template>
@@ -46,7 +46,7 @@
         },
         methods: {
             createPlot(raw_data) {
-                // setup
+                // Convert data to format needed for the windrose
                 const data_csv_format = this.convertData(raw_data);
                 const data = d3.csvParse(data_csv_format, (d, _, columns) => {
                     let total = 0;
@@ -54,12 +54,9 @@
                     d.total = total;
                     return d;
                 });
-                const start = new Date();
-                start.setDate(start.getDate() - 1);
-                const end = new Date();
-                end.setDate(end.getDate());
 
-                const width = 975;
+                // Setup
+                const width = 600;
                 const height = width;
                 const margin = {top: 40, right: 80, bottom: 40, left: 40};
                 const innerRadius = 20;
@@ -76,20 +73,20 @@
 
                         g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-                    var angle = d3.scaleLinear()
+                    const angle = d3.scaleLinear()
                         .range([0, 2 * Math.PI]);
 
-                    var radius = d3.scaleLinear()
+                    const radius = d3.scaleLinear()
                         .range([innerRadius, outerRadius]);
 
-                    var x = d3.scaleBand()
+                    const x = d3.scaleBand()
                         .range([0, 2 * Math.PI])
                         .align(0);
 
-                    var y = d3.scaleLinear() //you can try scaleRadial but it scales differently
+                    const y = d3.scaleLinear() //you can try scaleRadial but it scales differently
                         .range([innerRadius, outerRadius]);
 
-                    var z = d3.scaleOrdinal()
+                    const z = d3.scaleOrdinal()
                         .range(["#4242f4", "#42c5f4", "#42f4ce", "#42f456", "#adf442", "#f4e242", "#f4a142", "#f44242"]);
                 
                 // Insert data
@@ -117,7 +114,7 @@
                         .padRadius(innerRadius))
                     .attr("transform", function() {return "rotate("+ angleOffset + ")"});
 
-                var label = g.append("g")
+                const label = g.append("g")
                     .selectAll("g")
                     .data(data)
                     .enter().append("g")
@@ -137,10 +134,10 @@
                     .call(d3.axisLeft()
                         .scale(radius.copy().range([-innerRadius, -(outerRadius+10)])));
 
-                var yAxis = g.append("g")
+                const yAxis = g.append("g")
                     .attr("text-anchor", "middle");
 
-                var yTick = yAxis
+                const yTick = yAxis
                     .selectAll("g")
                     .data(y.ticks(5).slice(1))
                     .enter().append("g");
@@ -159,7 +156,7 @@
                     .style("font-size",14);
 
 
-                var legend = g.append("g")
+                const legend = g.append("g")
                     .selectAll("g")
                     .data(data.columns.slice(1).reverse())
                     .enter().append("g")
@@ -175,15 +172,11 @@
                     .attr("y", 9)
                     .attr("dy", "0.35em")
                     .text(function(d) { return d; })
-                    .style("font-size",8);
-
-                
+                    .style("font-size",8);                
 
                 return svg.node();
-
             },
             convertData(raw_data){
-                // Arrays have 8 elements: 0-4,4-8,8-12,12-16,16-20,20-24,24-28,28+
                 const wind_values = [
                     ['angle', '0-4' , '4-8' , '8-12', '12-16', '16-20', '20-24', '24-28', '28+'],
                     ['N', 0, 0, 0, 0, 0, 0, 0, 0], // 1
@@ -211,60 +204,12 @@
             },
             convertDegreeIntoAngle(degree) {
                 // 360 degrees are divided into 16 'buckets'
-                // E: (-11.25, 11.25) 
-                // % 16 is needed to fix degrees above 348.5, which resulted in index 16.
-                // let index = Math.floor((parseFloat(degree)+11.25)/22.5) % 16;
-                /* const degreeToAngleMapper = {
-                    0: 'E',
-                    1: 'ENE',
-                    2: 'NE',
-                    3: 'NNE',
-                    4: 'N',
-                    5: 'NNW',
-                    6: 'NW',
-                    7: 'WNW',
-                    8: 'W',
-                    9: 'WSW',
-                    10: 'SW',
-                    11: 'SSW',
-                    12: 'S',
-                    13: 'SSE',
-                    14: 'SE',
-                    15: 'ESE'
-                }; */
-                
-                if (degree < 11.25 || degree > 348.75) return 5;
-                if (degree < 33.75) return 4;
-                if (degree < 56.25) return 3;
-                if (degree < 78.75) return 2;
-                if (degree < 101.25) return 1;
-                if (degree < 123.75) return 16;
-                if (degree < 145.25) return 15;
-                if (degree < 168.75) return 14;
-                if (degree < 191.25) return 13;
-                if (degree < 213.75) return 12;
-                if (degree < 236.25) return 11;
-                if (degree < 258.75) return 10;
-                if (degree < 281.25) return 9;
-                if (degree < 303.75) return 8;
-                if (degree < 326.25) return 7;
-                if (degree < 348.75) return 6;
-                
-                // should never happen
-                return 5;
+                // N: (-11.25, 11.25)
+                let index = Math.floor((parseFloat(degree)+11.25)/22.5) % 16;
+                return index+1;
             },
             convertWindSpeedIntoIndex(windSpeed){
                 const index = Math.min(Math.floor(windSpeed/4), 7);
-                /* const indexToSpeedMapper = {
-                    0: '0-4',
-                    1: '4-8',
-                    2: '8-12',
-                    3: '12-16',
-                    4: '16-20',
-                    5: '20-24',
-                    6: '24-28',
-                    7: '28+'
-                } */
                 return index+1; 
             },
             getHeighestPercentage(wind_values){
