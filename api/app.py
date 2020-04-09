@@ -81,7 +81,7 @@ def station(ID, VLINDER, lat, lon,
                                         {"type": "paved", "value": verhard500}]
              },
         ],
-        "measurements": f"{base_url}/measurements/{ID}"
+        "measurements": f"{base_url}measurements/{ID}"
     }
 
 
