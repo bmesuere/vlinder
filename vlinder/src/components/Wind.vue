@@ -1,8 +1,7 @@
 <template>
-    <div id="d3-viz-windrose" style="width:auto">
-        <div id="windrose-svg"></div>
+    <div id="d3-viz-windrose">
+        <div id="windrose-svg" width="960" height="960" font-family="sans-serif" font-size="10"/>
         <div id="selected-vlinder" style="font-size: larger"></div>
-        <svg width="960" height="960" font-family="sans-serif" font-size="10"></svg>
     </div>
 </template>
 
@@ -55,30 +54,26 @@
                     d.total = total;
                     return d;
                 });
-            
-
-                /* const padding = {top: 40, right: 80, bottom: 40, left: 40};
-                const width = window.innerWidth * 0.8;
-                const height = window.innerHeight * 0.8;
-                const chartWidth = width - padding.left - padding.right;
-                const chartHeight = height - padding.top - padding.bottom;
-                const innerRadius = 20;
-                const outerRadius = (Math.min(chartWidth, chartHeight)/2) */
                 const start = new Date();
                 start.setDate(start.getDate() - 1);
                 const end = new Date();
                 end.setDate(end.getDate());
 
-                d3.select('#temperature-svg').selectAll("svg").remove();
+                const width = 975;
+                const height = width;
+                const margin = {top: 40, right: 80, bottom: 40, left: 40};
+                const innerRadius = 20;
+                const chartWidth = width - margin.left - margin.right;
+                const chartHeight= height - margin.top - margin.bottom;
+                const outerRadius = (Math.min(chartWidth, chartHeight) / 2);
+                
+                d3.select('#windrose-svg').selectAll("svg").remove();
+                const svg = d3.select("#windrose-svg")
+                    .append("svg")
+                    .style("width", width)
+                    .style("height", height)
+                    .style("font", "10px sans-serif"),
 
-                var svg = d3.select("svg"),
-                        width = +svg.attr("width"),
-                        height = +svg.attr("height"),
-                        margin = {top: 40, right: 80, bottom: 40, left: 40},
-                        innerRadius = 20,
-                        chartWidth = width - margin.left - margin.right,
-                        chartHeight= height - margin.top - margin.bottom,
-                        outerRadius = (Math.min(chartWidth, chartHeight) / 2),
                         g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
                     var angle = d3.scaleLinear()
@@ -99,7 +94,6 @@
                 
                 // Insert data
                 x.domain(data.map(function(d) { return d.angle; }));
-                console.log(data.map(function(d) { return d.angle; }));
                 y.domain([0, d3.max(data, function(d) { return d.total; })]);
                 z.domain(data.columns.slice(1));
                 // Extend the domain slightly to match the range of [0, 2π].
@@ -169,7 +163,6 @@
                     .selectAll("g")
                     .data(data.columns.slice(1).reverse())
                     .enter().append("g")
-        //            .attr("transform", function(d, i) { return "translate(-40," + (i - (data.columns.length - 1) / 2) * 20 + ")"; });
                     .attr("transform", function(d, i) { return "translate(" + (outerRadius+0) + "," + (-outerRadius + 40 +(i - (data.columns.length - 1) / 2) * 20) + ")"; });
 
                 legend.append("rect")
@@ -182,7 +175,7 @@
                     .attr("y", 9)
                     .attr("dy", "0.35em")
                     .text(function(d) { return d; })
-                    .style("font-size",12);
+                    .style("font-size",8);
 
                 
 
