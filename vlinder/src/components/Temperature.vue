@@ -23,7 +23,7 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
         ],
         props: {
             // Declare properties where a parent component can bind information to
-            selectedStation: String,
+            selectedStations: Array,
             startDate: {
                 type: Date,
                 default: function () {
@@ -34,6 +34,13 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
                 type: Date,
                 default: function () {
                     return new Date(2020, 1, 16, 10, 0, 0, 0);
+                }
+            },
+            colors: {
+                type: Array,
+                default: function () {
+                    return ['blue', 'green', 'orange', 'purple']
+
                 }
             }
         },
@@ -49,21 +56,22 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
                 let vlinderDiv = d3.select('#latest-vlinder');
                 vlinderDiv.html(this.latestVlinderData[0]['temp'])
             },
-            selectedStation() {
-                // This code is ran when selected station is changed => selectedStation is a variable bound on creation
-                // of this component in Dashboard
-                if (this.selectedStation !== '') {
-                    //let vlinderDiv = d3.select('#latest-vlinder');
-                    let nameDiv = d3.select('#selected-vlinder');
-                    nameDiv.html('Selected Station: ' + this.selectedStation);
-                    vlinderService.getVlinderData(this.selectedStation,
-                        this.startDate,
-                        this.endDate,
-                    ).then(d => this.createPlot(d.data));
+            async selectedStations() {
+                let promises = []
+                let datas = []
+
+                for (var i of this.selectedStations) {
+                    promises.push(
+                        vlinderService.getVlinderData(i.value,
+                            this.startDate,
+                            this.endDate
+                        ).then(d => datas.push(d.data)));
                 }
+
+                await Promise.all(promises);
+                this.createPlot(datas);
             }
         },
-
 
         methods: {
             /**
@@ -95,7 +103,8 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
             /**
              * Create a plot based on the given data
              */
-            createPlot(data) {
+            createPlot(datas) {
+                const data = datas[0]
                 console.log(data);
                 const padding = {top: 20, left: 45, right: 40, bottom: 55};
                 const width = window.innerWidth * 0.7;
@@ -169,13 +178,33 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
                 document.getElementById('avgTempCheckbox').style.visibility = "visible";
                 document.getElementById('avgTempLabel').style.visibility = "visible";
 
-                // add perceived temperature line if checked
-                if(document.getElementById('perceivedTempCheckbox').checked) {
-                    this.addPerceivedTemperature(data, graph);
+                if (datas.length>1){
+                    document.getElementById('perceivedTempCheckbox').checked = false;
+                    document.getElementById('avgTempCheckbox').checked = false;
+                    document.getElementById('perceivedTempCheckbox').disabled = true;
+                    document.getElementById('avgTempCheckbox').disabled = true;
+                    for (let i = 1; i < datas.length; i++) {
+                        const lineReal = d3.line()
+                            .x(d => this.xScale(new Date(d['time'])))
+                            .y(d => this.yScale(d['temp']));
+
+                        graph.append("path")
+                            .datum(datas[i])
+                            .attr("class", "lineRealTemp")
+                            .style("stroke", this.colors[i-1])
+                            .attr("d", lineReal);
+                    }
+
+                } else {
+                    // add perceived temperature line if checked
+                    if (document.getElementById('perceivedTempCheckbox').checked) {
+                        this.addPerceivedTemperature(data, graph);
+                    }
+                    if (document.getElementById('avgTempCheckbox').checked) {
+                        //todo
+                    }
                 }
-                if(document.getElementById('avgTempCheckbox').checked) {
-                    //todo
-                }
+
 
                 return graph.node();
             }

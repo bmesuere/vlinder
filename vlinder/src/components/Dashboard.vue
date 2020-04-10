@@ -10,7 +10,7 @@
                 <example-visualization v-bind:selectedStations="selectedStations" style="padding: 5em"/>
                         </b-row>
             <b-row align-v="center" style="height: 100%">
-                <temperature v-bind:selectedStation="selectedStation1"/>
+                <temperature v-bind:selectedStations="selectedStations" style="padding: 5em"/>
             </b-row>
         </b-container>
     </div>
