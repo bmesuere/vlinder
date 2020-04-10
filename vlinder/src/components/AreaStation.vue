@@ -17,14 +17,12 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
         ],
         props: {
             // Declare properties where a parent component can bind information to
-            selectedStation: String,
+            selectedStations: Array,
         },
         mounted() {
             // This is code is ran on creation of the component
             let stationsDiv = d3.select('#stations');
             vlinderService.getStations().then(d => stationsDiv.html(d.data[0]['name']));
-            vlinderService.getStations().
-                    then(d => this.createPlot(d.data));
         },
 
         watch: {
@@ -33,16 +31,17 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
                 let vlinderDiv = d3.select('#latest-vlinder');
                 vlinderDiv.html(this.latestVlinderData[0]['temp'])
             },
-            selectedStation() {
-                // This code is ran when selected station is changed => selectedStation is a variable bound on creation
-                // of this component in Dashboard
-                if (this.selectedStation !== '') {
-                    //let vlinderDiv = d3.select('#latest-vlinder');
-                    let nameDiv = d3.select('#selected-vlinder');
-                    nameDiv.html('Selected Station: ' + this.selectedStation);
-                    vlinderService.getStations().
-                    then(d => this.createPlot(d.data));
-                }
+            async selectedStations() {
+
+                let promises = []
+                let datas = []
+
+                promises.push(
+                    vlinderService.getStations().then(d => datas.push(d.data)));
+
+                await Promise.all(promises);
+                this.createPlot(datas);
+
             }
         },
 
@@ -53,14 +52,8 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
              * Create a plot based on the given data
              */
             createPlot(data) {
-                console.log(data);
-                console.log(this.selectedStation);
-                const filteredData = data.filter(d=>d['id']==='jvy7zdAPZ5ymI2hydh6tvnmm');
-                console.log(filteredData);
+                const filteredData = data[0].filter(d=>d['id']===this.selectedStations[0]['value']);
                 const landUse = filteredData[0]["landUse"];
-                //const station = filteredData[0];
-                console.log(landUse);
-                console.log(landUse.length);
                 const padding = {top: 20, left: 45, right: 40, bottom: 55};
                 const width = window.innerWidth * 0.7;
                 const height = window.innerHeight * 0.5;
