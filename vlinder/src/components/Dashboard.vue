@@ -28,6 +28,7 @@
                         :width="400"
                         :height="250"
                 />
+                <WindRose v-bind:selectedStation="selectedStation1" style="padding: 5em"/>
             </b-row>
 
         </b-container>
@@ -37,6 +38,7 @@
 <script>
     //    import ExampleVisualization from "./ExampleVisualization";
     import LineChartVisualization from "./LineChartVisualization";
+    import WindRose from "./Wind";
     import vlinderService from "../services/vlinderService";
     import Multiselect from 'vue-multiselect'
 
@@ -45,7 +47,8 @@
         components: {
             LineChartVisualization,
             //  ExampleVisualization,
-            Multiselect
+            Multiselect,
+            WindRose
         },
         created() {
             this.$store.dispatch('fetchLatestVlinderData');
