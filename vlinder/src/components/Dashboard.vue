@@ -3,25 +3,48 @@
         <b-container style="height: 100%">
             <b-row align-h="center" style="padding: 5em">
                 <b-col>
-                     <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false" :multiple="true" :options="options" :searchable="true" :close-on-select="false" :show-labels="false" placeholder="No stations selected"></multiselect>
+                    <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false"
+                                 :multiple="true" :options="options" :searchable="true" :close-on-select="false"
+                                 :show-labels="false" placeholder="No stations selected"></multiselect>
                 </b-col>
             </b-row>
-            <b-row>
+            <!--<b-row>
                 <example-visualization v-bind:selectedStations="selectedStations" style="padding: 5em"/>
             </b-row>
+            -->
+            <b-row>
+                <line-chart-visualization
+                        v-bind:selected-stations="selectedStations"
+                        y-axis-label="Luchtdruk"
+                        :y-axis-getter="(d) => d.pressure"
+                        :width="400"
+                        :height="250"
+                />
+                <line-chart-visualization
+                        v-bind:selected-stations="selectedStations"
+                        y-axis-label="Neerslagsom"
+                        :y-axis-getter="(d) => d.rainVolume"
+                        :enable-area=true
+                        :width="400"
+                        :height="250"
+                />
+            </b-row>
+
         </b-container>
     </div>
 </template>
 
 <script>
-    import ExampleVisualization from "./ExampleVisualization";
+    //    import ExampleVisualization from "./ExampleVisualization";
+    import LineChartVisualization from "./LineChartVisualization";
     import vlinderService from "../services/vlinderService";
     import Multiselect from 'vue-multiselect'
 
     export default {
         name: "Dashboard",
         components: {
-            ExampleVisualization,
+            LineChartVisualization,
+            //  ExampleVisualization,
             Multiselect
         },
         created() {
