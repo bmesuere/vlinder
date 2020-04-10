@@ -10,6 +10,8 @@
             </b-row>
             <!--<b-row>
                 <example-visualization v-bind:selectedStations="selectedStations" style="padding: 5em"/>
+            <b-row>
+                <timeline v-bind:selectedStations="selectedStations" style="padding: 5px"/>
             </b-row>
             -->
             <b-row>
@@ -39,6 +41,8 @@
     //    import ExampleVisualization from "./ExampleVisualization";
     import LineChartVisualization from "./LineChartVisualization";
     import WindRose from "./Wind";
+    //import ExampleVisualization from "./ExampleVisualization";
+    import Timeline from "./Timeline"
     import vlinderService from "../services/vlinderService";
     import Multiselect from 'vue-multiselect'
 
@@ -47,8 +51,9 @@
         components: {
             LineChartVisualization,
             //  ExampleVisualization,
-            Multiselect,
-            WindRose
+            WindRose,
+            Timeline,
+            Multiselect
         },
         created() {
             this.$store.dispatch('fetchLatestVlinderData');
