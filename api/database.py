@@ -69,12 +69,11 @@ def add_status(vlinder_data, start_time):
     prev_time = start_time
     for d in vlinder_data:
         d['status'] = 'Ok'
-        if prev_time < d['time'] - timedelta(minutes=9) or (
-                prev is not None and prev['temp'] == d['temp'] and prev['humidity'] == d['humidity'] and
+        if (prev is not None and prev['temp'] == d['temp'] and prev['humidity'] == d['humidity'] and
                 prev['pressure'] == d['pressure'] and prev['windSpeed'] == d['windSpeed'] and
                 prev['windDirection'] == d['windDirection']):
-            d['status'] = 'server_failure'
-        else:
+            d['status'] = 'Server Failure'
+        elif prev_time < d['time'] - timedelta(minutes=9):
             d['status'] = 'Offline'
         prev_time = d['time']
         prev = d
