@@ -8,11 +8,6 @@
                                  :show-labels="false" placeholder="No stations selected"/>
                 </b-col>
             </b-row>
-            <!--<b-row>
-                <example-visualization v-bind:selectedStations="selectedStations" style="padding: 5em"/>
-                        -->
-            <b-row>
-            </b-row>
             <b-row>
                 <line-chart-visualization
                         v-bind:selected-stations="selectedStations"
@@ -34,17 +29,20 @@
             <b-row align-v="center" style="height: 100%">
                 <area-station v-bind:selectedStations="selectedStations" style="padding: 5em"/>
             </b-row>
+            <b-row align-v="center" style="height: 100%">
+                <temperature v-bind:selectedStations="selectedStations" style="padding: 5em"/>
+            </b-row>
         </b-container>
     </div>
 </template>
 
 <script>
-    //    import ExampleVisualization from "./ExampleVisualization";
     import LineChartVisualization from "./LineChartVisualization";
     import WindRose from "./Wind";
-    //import ExampleVisualization from "./ExampleVisualization";
     import vlinderService from "../services/vlinderService";
     import AreaStation from "./AreaStation";
+
+    import Temperature from "./Temperature";
     import Multiselect from 'vue-multiselect'
 
     export default {
@@ -53,7 +51,7 @@
             LineChartVisualization,
             WindRose,
             AreaStation,
-            ExampleVisualization,
+            Temperature,
             Multiselect
         },
         created() {
