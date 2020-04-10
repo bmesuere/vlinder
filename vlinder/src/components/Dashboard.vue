@@ -5,15 +5,14 @@
                 <b-col>
                     <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false"
                                  :multiple="true" :options="options" :searchable="true" :close-on-select="false"
-                                 :show-labels="false" placeholder="No stations selected"></multiselect>
+                                 :show-labels="false" placeholder="No stations selected"/>
                 </b-col>
             </b-row>
             <!--<b-row>
                 <example-visualization v-bind:selectedStations="selectedStations" style="padding: 5em"/>
+                        -->
             <b-row>
-                <timeline v-bind:selectedStations="selectedStations" style="padding: 5px"/>
             </b-row>
-            -->
             <b-row>
                 <line-chart-visualization
                         v-bind:selected-stations="selectedStations"
@@ -42,7 +41,6 @@
     import LineChartVisualization from "./LineChartVisualization";
     import WindRose from "./Wind";
     //import ExampleVisualization from "./ExampleVisualization";
-    import Timeline from "./Timeline"
     import vlinderService from "../services/vlinderService";
     import Multiselect from 'vue-multiselect'
 
@@ -50,17 +48,10 @@
         name: "Dashboard",
         components: {
             LineChartVisualization,
-            //  ExampleVisualization,
             WindRose,
-            Timeline,
             Multiselect
         },
         created() {
-            this.$store.dispatch('fetchLatestVlinderData');
-            setInterval(() => {
-                this.$store.dispatch('fetchLatestVlinderData')
-            }, 300000);
-
             let self = this;
             vlinderService.getStations().then(
                 d => {
@@ -78,7 +69,7 @@
         }
     }
 </script>
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"/>
 <style scoped>
 
 </style>

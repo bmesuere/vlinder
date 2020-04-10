@@ -28,7 +28,7 @@ export default new Vuex.Store({
     },
     actions: {
         loadStations({commit}) {
-            vlinderService.getStations(response => {
+            vlinderService.getStations().then(response => {
                 commit('setStations', response.data)
             })
         },
