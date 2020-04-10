@@ -31,7 +31,9 @@
                 />
                 <WindRose v-bind:selectedStation="selectedStation1" style="padding: 5em"/>
             </b-row>
-
+            <b-row align-v="center" style="height: 100%">
+                <area-station v-bind:selectedStations="selectedStations" style="padding: 5em"/>
+            </b-row>
         </b-container>
     </div>
 </template>
@@ -42,6 +44,7 @@
     import WindRose from "./Wind";
     //import ExampleVisualization from "./ExampleVisualization";
     import vlinderService from "../services/vlinderService";
+    import AreaStation from "./AreaStation";
     import Multiselect from 'vue-multiselect'
 
     export default {
@@ -49,6 +52,8 @@
         components: {
             LineChartVisualization,
             WindRose,
+            AreaStation,
+            ExampleVisualization,
             Multiselect
         },
         created() {
