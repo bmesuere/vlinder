@@ -166,9 +166,9 @@ function updateData() {
 }
 
 function getBoundaries(date) {
-  var start = new Date(date - 2*3600000);
+  var start = new Date(date - 3600000);
   var end = new Date(start);
-  end.setDate(start.getDate() + 2);
+  end.setDate(start.getDate() + 1);
   return [start, end]
 }
 
