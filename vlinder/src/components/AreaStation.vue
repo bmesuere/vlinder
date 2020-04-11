@@ -86,7 +86,14 @@
                     .attr("transform", `translate(${padding.left}, 0)`)
                     .call(yAxis);
 
-                // todo fout in scale + synchr.
+                this.showLabel = function(element, value, type){{
+                        d3.select(element).attr("stroke", "black");
+                        graph
+                            .append("svg:title")
+                            .text(Math.round(100*value)+ '% ' + type) // todo afrondingsfouten waardoor som niet altijd 100 is
+                    }
+                }
+
                 let bars = graph
                     .selectAll("rect")
                     .data(landUse)
@@ -99,21 +106,56 @@
                     .attr("y", padding.top)
                     .attr("width", width / (this.xLabels.length + 1) * 0.8)
                     .attr("height", d => this.dataScale(d['usage'][0]['value']))
-                    .attr("fill", "lightskyblue");
+                    .attr("fill", "lightskyblue")
+                    .on("mouseover", function (d) {
+                        d3.select(this)
+                            .attr("stroke", "black");
+                        graph
+                            .append("svg:title")
+                            .text((100*d['usage'][0]['value']).toFixed(2)+ '% water')
+                    })
+                    .on("mouseout", function () {
+                        d3.select(this).attr("stroke", "none");
+                        graph.selectAll("title").remove();
+                    });
 
                 bars.append("rect")
                     .attr("x", (d, i) => this.xScale(i + 0.6))
                     .attr("y", d => padding.top + this.dataScale(d['usage'][0]['value']))
                     .attr("width", width / (this.xLabels.length + 1) * 0.8)
                     .attr("height", d => this.dataScale((d['usage'][1]['value'])))
-                    .attr("fill", "limegreen");
+                    .attr("fill", "limegreen")
+                    .on("mouseover", function (d) {
+                        d3.select(this)
+                            .attr("stroke", "black");
+                        graph
+                            .append("svg:title")
+                            .text((100*d['usage'][1]['value']).toFixed(2)+ '% groen')
+                    })
+                    .on("mouseout", function () {
+                        d3.select(this).attr("stroke", "none");
+                        graph.selectAll("title").remove();
+                    })
+                ;
 
                 bars.append("rect")
                     .attr("x", (d, i) => this.xScale(i + 0.6))
                     .attr("y", d => padding.top + this.dataScale(d['usage'][0]['value']) + this.dataScale(d['usage'][1]['value']))
                     .attr("width", width / (this.xLabels.length + 1) * 0.8)
                     .attr("height", d => this.dataScale(d['usage'][2]['value']))
-                    .attr("fill", "saddlebrown");
+                    .attr("fill", "saddlebrown")
+                    .on("mouseover", function (d) {
+                        d3.select(this)
+                            .attr("stroke", "black");
+                        graph
+                            .append("svg:title")
+                            .text((100*d['usage'][2]['value']).toFixed(2)+ '% asfalt')
+                    })
+                    .on("mouseout", function () {
+                        d3.select(this).attr("stroke", "none");
+                        graph.selectAll("title").remove();
+                    })
+                ;
 
                 return graph.node();
             }
