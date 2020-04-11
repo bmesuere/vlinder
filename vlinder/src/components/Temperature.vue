@@ -1,10 +1,12 @@
 <template>
     <div id="d3-viz-temperature" style="width:auto">
         <div id="temperature-svg" style="width:auto"/>
-        <input type="checkbox" id="perceivedTempCheckbox" checked="checked" value="showPerceivedTempCheckbox" style="visibility: hidden">
+        <input type="checkbox" id="perceivedTempCheckbox" checked="checked" value="showPerceivedTempCheckbox"
+               style="visibility: hidden">
         <label id="perceivedTempLabel" for="perceivedTempCheckbox" style="visibility: hidden">
             Gevoelstemperatuur **Only semi implemented**</label><br>
-        <input type="checkbox" id="avgTempCheckbox" checked="checked" value="showAvgTempCheckbox" style="visibility: hidden">
+        <input type="checkbox" id="avgTempCheckbox" checked="checked" value="showAvgTempCheckbox"
+               style="visibility: hidden">
         <label id="avgTempLabel" for="avgTempCheckbox" style="visibility: hidden">
             Gemiddelde **Not implemented yet**</label><br>
     </div>
@@ -12,13 +14,13 @@
 
 
 <script>
-import VisualizationMixin from "../mixins/VisualizationMixin";
+    import VisualizationMixin from "../mixins/VisualizationMixin";
     import vlinderService from "../services/vlinderService";
     import * as d3 from 'd3'
 
     export default {
         name: "Temperature",
-                mixins: [
+        mixins: [
             VisualizationMixin
         ],
         props: {
@@ -44,18 +46,7 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
                 }
             }
         },
-        mounted() {
-            // This is code is ran on creation of the component
-            let stationsDiv = d3.select('#stations');
-            vlinderService.getStations().then(d => stationsDiv.html(d.data[0]['name']));
-        },
-
         watch: {
-            latestVlinderData() {
-                // This code is ran when there is new latestVlinderData
-                let vlinderDiv = d3.select('#latest-vlinder');
-                vlinderDiv.html(this.latestVlinderData[0]['temp'])
-            },
             async selectedStations() {
                 let promises = []
                 let datas = []
@@ -83,13 +74,13 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
              */
             computePerceivedTemperature(T, V) {
                 const V0_16 = Math.pow(V, 0.16);
-                return 13.12 + 0.6215*T - 11.37 * V0_16 + 0.3965*T*V0_16;
+                return 13.12 + 0.6215 * T - 11.37 * V0_16 + 0.3965 * T * V0_16;
             },
 
             /**
              * Adds a line to the plot that shows the perceived temperature of the data
              */
-            addPerceivedTemperature(data, graph){
+            addPerceivedTemperature(data, graph) {
                 const linePerceived = d3.line()
                     .x(d => this.xScale(new Date(d['time'])))
                     .y(d => this.yScale(this.computePerceivedTemperature(d['temp'], d['windSpeed'])));
@@ -178,7 +169,7 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
                 document.getElementById('avgTempCheckbox').style.visibility = "visible";
                 document.getElementById('avgTempLabel').style.visibility = "visible";
 
-                if (datas.length>1){
+                if (datas.length > 1) {
                     document.getElementById('perceivedTempCheckbox').checked = false;
                     document.getElementById('avgTempCheckbox').checked = false;
                     document.getElementById('perceivedTempCheckbox').disabled = true;
@@ -191,7 +182,7 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
                         graph.append("path")
                             .datum(datas[i])
                             .attr("class", "lineRealTemp")
-                            .style("stroke", this.colors[i-1])
+                            .style("stroke", this.colors[i - 1])
                             .attr("d", lineReal);
                     }
 
@@ -214,17 +205,19 @@ import VisualizationMixin from "../mixins/VisualizationMixin";
     }
 </script>
 
-<style >
+<style>
     .lineRealTemp {
         fill: none;
         stroke: #ff0000;
         stroke-width: 1.5;
     }
+
     .linePerceivedTemp {
         fill: none;
         stroke: #ffc6e0;
         stroke-width: 1;
     }
+
     .lineAvgTemp {
         fill: none;
         stroke: rgba(0, 0, 0, 0.24);

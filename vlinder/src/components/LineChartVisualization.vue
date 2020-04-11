@@ -7,16 +7,17 @@
     //import vlinderService from "../services/vlinderService";
     import * as d3 from 'd3'
     import {uuidv4} from "../utils";
-    import vlinderService from "../services/vlinderService";
 
     export default {
         name: "LineChartVisualization",
         data: function () {
-            return {id: "id" + uuidv4()}
+            return {
+                id: "id" + uuidv4(),
+                width: 0,
+                height: 0
+            }
         },
         props: {
-            "width": Number,
-            "height": Number,
             "yAxisLabel": String,
             "yAxisGetter": Function,
             "lineStrokeWidth": {
@@ -34,6 +35,15 @@
             VisualizationMixin
         ],
         mounted() {
+            let div = d3.select("#" + this.id);
+
+            this.width = div.node().getBoundingClientRect()['width'];
+            this.height = div.node().getBoundingClientRect()['height'];
+
+            this.svg = div.append("svg", 0)
+                .attr("width", this.width)
+                .attr("height", this.height);
+
             // start date to query
             this.start = new Date();
             this.start.setDate(this.start.getDate() - 1);
@@ -42,7 +52,7 @@
             this.end.setDate(this.end.getDate());
 
             // setup everything
-            this.padding = {top: 20, left: 40, right: 40, bottom: 50};
+            this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             this.xScale = d3.scaleTime()
                 .range([this.padding.left + this.lineStrokeWidth / 2, this.width - this.padding.right]);
 
@@ -73,11 +83,6 @@
                 .scaleExtent([1, Infinity])  // This control how much you can unzoom (x0.5) and zoom (x20)
                 .extent([[this.padding.left, this.padding.top], [this.width - this.padding.left - this.padding.right, this.height - this.padding.top - this.padding.bottom]])
                 .on("zoom", this.updateChart);
-
-            this.svg = d3.select("#" + this.id)
-                .append("svg", 0)
-                .attr("width", this.width)
-                .attr("height", this.height);
 
             this.clip = this.svg.append("defs").append("SVG:clipPath")
                 .attr("id", "clip")
@@ -126,11 +131,10 @@
 
         },
         watch: {
-            latestVlinderData() {
-            },
             selectedStations() {
                 // This code is ran when selected station is changed => selectedStation is a variable bound on creation
                 // of this component in Dashboard
+                /*
                 Promise.all(
                     this.selectedStations.map(
                         station => vlinderService.getVlinderData(station.value, this.start, this.end)
@@ -138,11 +142,15 @@
                 )
                     .then(this.update_data)
                     .catch(console.log);
+                 */
+            },
+            focusedVlinderData() {
+                this.update_data([this.focusedVlinderData])
             }
         },
         methods: {
             update_data(data) {
-                data = data.map(x => x.data);
+                //data = data.map(x => x.data);
                 let flattened_data = data.flat(1);
 
                 // update scales
@@ -166,7 +174,7 @@
 
                 this.data = this.selected
                     .enter()
-                        .append("path")
+                    .append("path")
                     .merge(this.selected);
 
                 this.paths = this.data

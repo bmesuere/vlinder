@@ -1,15 +1,19 @@
 <template>
     <div>
         <b-container style="height: 100%">
-            <b-row align-h="center" style="padding: 5em">
+            <b-row align-h="center" align-v="center" style="padding: 1em">
                 <b-col>
                     <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false"
                                  :multiple="true" :options="options" :searchable="true" :close-on-select="false"
                                  :show-labels="false" placeholder="No stations selected"/>
                 </b-col>
+                <b-col>
+                    <b-form-datepicker v-model="selectedDate" value-as-date/>
+                </b-col>
             </b-row>
             <b-row align-h="center">
-                <timeline v-bind:selectedStations="selectedStations" style="padding: 5px"/>
+                <timeline v-bind:selectedStations="selectedStations" v-bind:selectedDate="selectedDate"
+                          style="padding: 5px"/>
             </b-row>
         </b-container>
     </div>
@@ -31,7 +35,8 @@
         data() {
             return {
                 selectedStations: [],
-                options: []
+                options: [],
+                selectedDate: new Date()
             }
         },
         computed: {
@@ -49,7 +54,8 @@
                 let self = this;
                 this.stations.forEach(station => {
                     self.options.push({value: station['id'], text: station['name']})
-                })
+                });
+                this.selectedStations = [this.options[0]]
             }
         }
     }

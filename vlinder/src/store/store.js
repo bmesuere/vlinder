@@ -33,7 +33,7 @@ export default new Vuex.Store({
             })
         },
         loadVlinderData({commit}, id, start, end) {
-            vlinderService.getVlinderData(id, start, end, response => {
+            vlinderService.getVlinderData(id, start, end).then(response => {
                 commit('setVlinderData', response.data)
             })
         },
@@ -41,7 +41,7 @@ export default new Vuex.Store({
             commit('setFocusedVlinderData', data)
         },
         fetchLatestVlinderData({commit}) {
-            vlinderService.getLatestVlinderData(response => {
+            vlinderService.getLatestVlinderData().then(response => {
                 commit('setLatestVlinderData', response.data)
             })
         }
