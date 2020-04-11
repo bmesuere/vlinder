@@ -85,7 +85,7 @@
                 .on("zoom", this.updateChart);
 
             this.clip = this.svg.append("defs").append("SVG:clipPath")
-                .attr("id", "clip")
+                .attr("id", "clip" + this._uid)
                 .append("rect")
                 .attr("width", this.width - this.padding.right - this.padding.left)
                 .attr("height", this.height - this.padding.bottom - this.padding.top)
@@ -178,7 +178,7 @@
                     .merge(this.selected);
 
                 this.paths = this.data
-                    .attr("clip-path", "url(#clip)")
+                    .attr("clip-path", "url(#clip"+this._uid+")")
                     .attr("stroke", (d, i) => this.colors[i])
                     .attr("fill", "white")
                     .attr("fill-opacity", 0)
