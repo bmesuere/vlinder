@@ -144,9 +144,9 @@
                     .catch(console.log);
                  */
             },
-            focusedVlinderData() {
-                this.update_data([this.focusedVlinderData])
-            }
+            //focusedVlinderData() {
+            //    this.update_data([this.focusedVlinderData])
+            //}
         },
         methods: {
             update_data(data) {

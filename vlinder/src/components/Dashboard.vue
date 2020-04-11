@@ -17,6 +17,7 @@
                 <b-col>
                     <line-chart-visualization
                             v-bind:selected-stations="selectedStations"
+                            ref="pressureChart"
                             y-axis-label="Luchtdruk"
                             :y-axis-getter="(d) => d.pressure"
                             style="width: 100%; height: 100%"
@@ -25,6 +26,7 @@
                 <b-col>
                     <line-chart-visualization
                             v-bind:selected-stations="selectedStations"
+                            ref="rainChart"
                             y-axis-label="Neerslagsom"
                             :y-axis-getter="(d) => d.rainVolume"
                             :enable-area=true
@@ -37,10 +39,8 @@
                     <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
                 </b-col>
                 <b-col>
-                    <line-chart-visualization
+                    <temperature
                             v-bind:selected-stations="selectedStations"
-                            y-axis-label="Temperatuur"
-                            :y-axis-getter="(d) => d.temp"
                             style="width: 100%; height: 100%"
                     />
                     <!--<temperature v-bind:selectedStations="undefined" style="width: 100%; height: 100%"/>-->
@@ -55,18 +55,23 @@
     import WindRose from "./Wind";
     import AreaStation from "./AreaStation";
 
-    //import Temperature from "./Temperature";
+    import Temperature from "./Temperature";
     import Multiselect from 'vue-multiselect'
+    import VisualizationMixin from "../mixins/VisualizationMixin";
 
     export default {
         name: "Dashboard",
         components: {
+            Temperature,
             LineChartVisualization,
             WindRose,
             AreaStation,
             //Temperature,
             Multiselect
         },
+        mixins: [
+            VisualizationMixin
+        ],
         created() {
             this.stationsToOptions();
         },
@@ -81,12 +86,18 @@
                 return this.$store.getters.stations;
             }
         },
+        mounted() {
+            this.updateLineCharts();
+        },
         watch: {
             stations() {
                 this.stationsToOptions();
             },
             selectedStations() {
                 this.$store.dispatch('loadVlinderData', this.selectedStations[0].value);
+            },
+            focusedVlinderData() {
+                this.updateLineCharts();
             }
         },
         methods: {
@@ -96,6 +107,10 @@
                     self.options.push({value: station['id'], text: station['name']})
                 });
                 this.selectedStations = [this.options[0]]
+            },
+            updateLineCharts(){
+                this.$refs.rainChart.update_data([this.focusedVlinderData]);
+                this.$refs.pressureChart.update_data([this.focusedVlinderData]);
             }
         }
     }
