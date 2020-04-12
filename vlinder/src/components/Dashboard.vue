@@ -1,5 +1,6 @@
 <template>
     <div>
+        <Map style="padding: 5em"/>
         <b-container style="height: 100%">
             <b-row align-h="center" align-v="center" style="padding: 1em; height: 200px">
                 <b-col cols="6">
@@ -54,9 +55,9 @@
     import LineChartVisualization from "./LineChartVisualization";
     import WindRose from "./Wind";
     import AreaStation from "./AreaStation";
-
     //import Temperature from "./Temperature";
     import Multiselect from 'vue-multiselect'
+    import Map from "./Map";
 
     export default {
         name: "Dashboard",
@@ -65,7 +66,8 @@
             WindRose,
             AreaStation,
             //Temperature,
-            Multiselect
+            Multiselect,
+            Map,
         },
         created() {
             this.stationsToOptions();
