@@ -8,7 +8,7 @@
                                  :show-labels="false" placeholder="No stations selected"/>
                 </b-col>
                 <b-col>
-                    <b-form-datepicker v-model="selectedDate" value-as-date/>
+                    <b-form-datepickerorigin v-model="selectedDate" value-as-date/>
                 </b-col>
             </b-row>
             <b-row align-h="center">
