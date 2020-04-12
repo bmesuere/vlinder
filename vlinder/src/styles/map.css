@@ -1,0 +1,33 @@
+.continent {
+	fill: #DDDDDD;
+	stroke: #AFAFAF;
+	stroke-width: 0.5;
+}
+.map {
+    background-color: #222222;
+}
+
+.circles {
+    stroke: #3c373d;
+	fill: #77b58c;
+	cursor: pointer;
+    vector-effect: non-scaling-stroke;
+}
+
+.circles:hover {
+	stroke: #004477;
+    stroke-width: 4px;
+}
+
+.circles[selected*=true]{
+	stroke: #0066cc;
+    stroke-width: 4px;
+}
+
+.circles[status*="abnormal"]{
+    fill: #FF8888;
+}
+
+.circles[status*="offline"]{
+    fill: #999999;
+}
