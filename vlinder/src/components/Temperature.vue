@@ -97,7 +97,7 @@
                    let self = this;
                    let perceivedTemp = data.map(function (d) {
                        return {
-                           "temp": self.computePerceivedTemperatureHumindex(d['temp'], d['windSpeed']),
+                           "temp": self.computePerceivedTemperatureHumindex(d['temp'], d['humidity']),
                            "time": d['time']
                        };
                    });
