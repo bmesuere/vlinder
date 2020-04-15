@@ -1,7 +1,7 @@
 <template>
     <div>
-        <Map style="padding: 5em"/>
         <b-container style="height: 100%">
+            <Map/>
             <b-row align-h="center" align-v="center" style="padding: 1em; height: 200px">
                 <b-col cols="6">
                     Selected Station:
@@ -56,7 +56,6 @@
     import WindRose from "./Wind";
     import AreaStation from "./AreaStation";
     import Temperature from "./Temperature";
-    import Multiselect from 'vue-multiselect'
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import Multiselect from 'vue-multiselect'
     import Map from "./Map";
@@ -97,7 +96,9 @@
                 this.stationsToOptions();
             },
             selectedStations() {
-                this.$store.dispatch('loadVlinderData', this.selectedStations[0].value);
+                if (this.selectedStations[0]) {
+                    this.$store.dispatch('loadVlinderData', this.selectedStations[0].value);
+                }
             },
             focusedVlinderData() {
                 this.updateLineCharts();
@@ -111,7 +112,7 @@
                 });
                 this.selectedStations = [this.options[0]]
             },
-            updateLineCharts(){
+            updateLineCharts() {
                 this.$refs.rainChart.update_data([this.focusedVlinderData]);
                 this.$refs.pressureChart.update_data([this.focusedVlinderData]);
             }

@@ -4,7 +4,6 @@
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
-    import vlinderService from "../services/vlinderService";
     import * as d3 from "d3";
 
     const dist = 2;
@@ -14,10 +13,7 @@
     const vertical_bar_padding = 1;
     const [paddingleft, paddingright, paddingtop, paddingbottom] = [70, 50, 50, 0];
 
-    let stations = [];
-    let date = new Date();
-
-    async function construct_graph(selectedStations, selectedNames, startDate, endDate) {
+    async function construct_graph(datas, selectedStations, selectedNames) {
 
         const graph = d3
             .select("#timeline-div #timeline-svg");
@@ -26,6 +22,8 @@
 
         const yaxis = d3.select("#timeline-div #timeline-svg #timeline-y-axis");
 
+        let startDate, endDate;
+        /*
         var datas = [];
         var promises = [];
         var i = 0;
@@ -43,6 +41,8 @@
         }
 
         await Promise.all(promises);
+
+         */
         let height = (selectedStations.length + 1) * stroke_width;
 
 
@@ -58,11 +58,11 @@
         if (datas.length > 0) {
             let dates = [];
 
-            for (i = 0; i < datas.length; i++) {
+            for (let i = 0; i < datas.length; i++) {
                 dates.push(new Date(datas[i].time))
             }
 
-            startDate = new Date(Math.min.apply(null, dates))
+            startDate = new Date(Math.min.apply(null, dates));
             endDate = new Date(Math.max.apply(null, dates))
         }
 
@@ -148,17 +148,16 @@
             .duration(700)
     }
 
-    function updateData() {
-        var selectedIds = [];
-        var selectedNames = [];
-        for (var station of stations) {
+    function updateData(datas, selectedStations) {
+        let selectedIds = [];
+        let selectedNames = [];
+        for (let station of selectedStations) {
             selectedIds.push(station.value);
             selectedNames.push(station.text);
         }
-        var [start, end] = getBoundaries(date);
-        construct_graph(selectedIds, selectedNames, start, end);
+        construct_graph(datas, selectedIds, selectedNames);
     }
-
+/*
     function getBoundaries(date) {
         if (date === undefined) {
             date = new Date();
@@ -168,24 +167,7 @@
         end.setDate(start.getDate() + 1);
         return [start, end]
     }
-
-    function fillMissingData(ddata) {
-        let data = [];
-        data.push(ddata[0]);
-        for (var i = 0; i < ddata.length - 1; i++) {
-            let diff = new Date(ddata[i + 1].time).getTime() - new Date(ddata[i].time).getTime();
-            if (diff > 300000) {
-                let inserts = (diff / 300000);
-                var date = new Date(ddata[i].time);
-                for (var j = 0; j < inserts - 1; j++) {
-                    date.setTime(date.getTime() + 300000);
-                    data.push({time: new Date(date), status: "missing", id: ddata[i].id})
-                }
-            }
-            data.push(ddata[i + 1])
-        }
-        return data;
-    }
+ */
 
     function handleMouseOver(d, xpos, ypos, name) {
         let g = d3
@@ -249,8 +231,7 @@
 
     }
 
-    function handleMouseOut(d) {
-        d
+    function handleMouseOut() {
         d3.select("#timeline-div #timeline-svg")
             .selectAll("#temp")
             .transition()
@@ -270,38 +251,26 @@
         name: "Timeline",
         mixins: [VisualizationMixin],
         props: {
-            // Declare properties where a parent component can bind information to
-            selectedStations: Array,
-            selectedDate: Date
+            datas: Array,
+            selectedStations: Array
         },
         async mounted() {
-            // This is code is ran on creation of the component
-            var [startDate, endDate] = getBoundaries(date);
-            let selectedStations = [];
-
             const graph = d3
                 .select("#timeline-div")
                 .append("svg")
-                .attr("id", "timeline-svg")
+                .attr("id", "timeline-svg");
 
             graph
                 .append("g")
-                .attr("id", "timeline-x-axis")
+                .attr("id", "timeline-x-axis");
 
             graph
                 .append("g")
-                .attr("id", "timeline-y-axis")
-
-            construct_graph(selectedStations, [], startDate, endDate);
+                .attr("id", "timeline-y-axis");
         },
         watch: {
-            async selectedStations() {
-                stations = this.selectedStations;
-                updateData();
-            },
-            async selectedDate() {
-                date = this.selectedDate;
-                updateData();
+            datas() {
+                updateData(this.datas, this.selectedStations);
             }
         }
     };
