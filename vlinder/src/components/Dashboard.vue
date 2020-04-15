@@ -8,6 +8,19 @@
                     <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false"
                                  :multiple="true" :options="options" :searchable="true" :close-on-select="false"
                                  :show-labels="false" placeholder="No stations selected"/>
+                    <b-row align-h="center">
+                        <b-col>
+                            From:
+                            <datetime v-model="selectedStartDateString" type="datetime"/>
+                        </b-col>
+                        <b-col>
+                            Until:
+                            <datetime v-model="selectedEndDateString" type="datetime"/>
+                        </b-col>
+                        <b-col>
+                            <b-button @click="loadVlinderData">Load</b-button>
+                        </b-col>
+                    </b-row>
                 </b-col>
                 <b-col cols="6" style="height: 100%">
                     <area-station v-bind:selectedStations="selectedStations"
@@ -59,6 +72,7 @@
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import Multiselect from 'vue-multiselect'
     import Map from "./Map";
+    import {Datetime} from "vue-datetime";
 
     export default {
         name: "Dashboard",
@@ -70,17 +84,26 @@
             //Temperature,
             Multiselect,
             Map,
+            Datetime
         },
         mixins: [
             VisualizationMixin
         ],
         created() {
             this.stationsToOptions();
+
+            let today = new Date();
+            let yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+            this.selectedStartDateString = yesterday.toISOString();
+            this.selectedEndDateString = today.toISOString();
         },
         data() {
             return {
                 selectedStations: [],
-                options: []
+                options: [],
+                selectedStartDateString: '',
+                selectedEndDateString: ''
             }
         },
         computed: {
@@ -94,11 +117,6 @@
         watch: {
             stations() {
                 this.stationsToOptions();
-            },
-            selectedStations() {
-                if (this.selectedStations[0]) {
-                    this.$store.dispatch('loadVlinderData', this.selectedStations[0].value);
-                }
             },
             focusedVlinderData() {
                 this.updateLineCharts();
@@ -115,6 +133,16 @@
             updateLineCharts() {
                 this.$refs.rainChart.update_data([this.focusedVlinderData]);
                 this.$refs.pressureChart.update_data([this.focusedVlinderData]);
+            },
+            loadVlinderData() {
+                if (this.selectedStations[0]) {
+                    this.$store.dispatch('loadVlinderData', {
+                            id: this.selectedStations[0].value,
+                            start: new Date(this.selectedStartDateString),
+                            end: new Date(this.selectedEndDateString)
+                        }
+                    );
+                }
             }
         }
     }

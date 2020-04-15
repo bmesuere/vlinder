@@ -22,7 +22,7 @@
         mounted() {
             const zoomed = () => {
                 const t = d3.event.transform;
-                map.attr('transform', t)
+                this.map.attr('transform', t)
             };
 
             // Main
@@ -34,38 +34,50 @@
                 viewBox: `0 0 ${w} ${h}`,
             });
 
-            const map = svg.append("g");
+            this.map = svg.append("g");
 
-            map.w = w;
-            map.h = h;
+            this.map.w = w;
+            this.map.h = h;
 
-            map.projection = d3.geoMercator();
-            map.path = d3.geoPath().projection(map.projection);
-            map.zoom = d3.zoom().scaleExtent([1, 12]).on("zoom", zoomed);
+            this.map.projection = d3.geoMercator();
+            this.map.path = d3.geoPath().projection(this.map.projection);
+            this.map.zoom = d3.zoom().scaleExtent([1, 12]).on("zoom", zoomed);
 
-            const selection = new Set();
+            svg.call(this.map.zoom).on("dblclick.zoom", null);
+        },
+        data() {
+            return {
+                map: {}
+            }
+        },
+        watch: {
+            stations() {
+                this.addStationsToMap();
+            }
+        },
+        methods: {
+            addStationsToMap() {
+                const selection = new Set();
+                const stations_component = new Stations();
 
-            svg.call(map.zoom).on("dblclick.zoom", null);
+                this.map.datum({regions: belgium, stations: this.stations});
+                this.map.call(Regions);
+                this.map.call(stations_component);
 
-            const stations_component = new Stations();
-
-            map.datum({regions: belgium, stations: this.stations});
-            map.call(Regions);
-            map.call(stations_component);
-
-            stations_component.join(enter => {
-                enter.select("circle").on("click.select", function (d) {
-                    const el = d3.select(this);
-                    const cond = el.attr("selected") === "false";
-                    selection.toggle(d, cond);
-                    el.attr("selected", (cond))
-                });
-                enter.attr("debug", 1)
-            })
+                stations_component.join(enter => {
+                    enter.select("circle").on("click.select", function (d) {
+                        const el = d3.select(this);
+                        const cond = el.attr("selected") === "false";
+                        selection.toggle(d, cond);
+                        el.attr("selected", (cond))
+                    });
+                    enter.attr("debug", 1)
+                })
+            }
         }
     }
 </script>
 
 <style scoped>
-    @import "../styles/map.css"
+    @import "../styles/map.css";
 </style>
