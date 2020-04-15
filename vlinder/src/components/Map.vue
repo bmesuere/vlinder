@@ -9,7 +9,6 @@
     import "d3-selection-multi";
     // import * as topojson from "topojson-client";
     import VisualizationMixin from "../mixins/VisualizationMixin";
-    import vlinderService from "../services/vlinderService";
     import belgium from "../local/belgium.geo.json.js";
     import Regions from "../d3components/continents.js";
     import Stations from "../d3components/stations.js";
@@ -20,8 +19,7 @@
         mixins: [
             VisualizationMixin
         ],
-        mounted () {
-
+        mounted() {
             const zoomed = () => {
                 const t = d3.event.transform;
                 map.attr('transform', t)
@@ -38,7 +36,8 @@
 
             const map = svg.append("g");
 
-            map.w = w; map.h = h;
+            map.w = w;
+            map.h = h;
 
             map.projection = d3.geoMercator();
             map.path = d3.geoPath().projection(map.projection);
@@ -48,30 +47,25 @@
 
             svg.call(map.zoom).on("dblclick.zoom", null);
 
-            vlinderService.getStations(d=>d).then((d) => {
-                const stations_component = new Stations()
+            const stations_component = new Stations();
 
-                map.datum({regions:belgium,stations:d.data})
-                map.call(Regions)
-                map.call(stations_component)
+            map.datum({regions: belgium, stations: this.stations});
+            map.call(Regions);
+            map.call(stations_component);
 
-                stations_component.join(enter => {
-                    enter.select("circle").on("click.select", function(d) {
-                        const el = d3.select(this)
-                        const cond = el.attr("selected")=="false"
-                        selection.toggle(d,cond)
-                        el.attr("selected", (cond))
-                    })
-                    console.log("o/")
-                    enter.attr("debug",1)
-                })
-
+            stations_component.join(enter => {
+                enter.select("circle").on("click.select", function (d) {
+                    const el = d3.select(this);
+                    const cond = el.attr("selected") === "false";
+                    selection.toggle(d, cond);
+                    el.attr("selected", (cond))
+                });
+                enter.attr("debug", 1)
             })
-
         }
     }
 </script>
 
 <style scoped>
- @import "../styles/map.css"
+    @import "../styles/map.css"
 </style>
