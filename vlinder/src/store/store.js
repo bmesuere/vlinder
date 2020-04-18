@@ -32,8 +32,8 @@ export default new Vuex.Store({
                 commit('setStations', response.data)
             })
         },
-        loadVlinderData({commit}, id, start, end) {
-            vlinderService.getVlinderData(id, start, end).then(response => {
+        loadVlinderData({commit}, object) {
+            vlinderService.getVlinderData(object.id, object.start, object.end).then(response => {
                 commit('setVlinderData', response.data)
             })
         },

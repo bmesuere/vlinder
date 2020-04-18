@@ -37,7 +37,6 @@
                 const size = Math.min(divBox['height'], divBox['width']);
                 const width = size;
                 const height = size;
-                console.log(width);
                 const margin = {top: 40, right: 80, bottom: 40, left: 40};
                 const innerRadius = 20;
                 const chartWidth = width - margin.left - margin.right;

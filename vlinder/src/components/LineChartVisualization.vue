@@ -44,13 +44,6 @@
                 .attr("width", this.width)
                 .attr("height", this.height);
 
-            // start date to query
-            this.start = new Date();
-            this.start.setDate(this.start.getDate() - 1);
-            // end date to query
-            this.end = new Date();
-            this.end.setDate(this.end.getDate());
-
             // setup everything
             this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             this.xScale = d3.scaleTime()
@@ -154,7 +147,11 @@
                 let flattened_data = data.flat(1);
 
                 // update scales
-                this.xScale.domain([this.start, this.end]);
+                let dates = data[0].map(x => new Date(x.time));
+                let start = new Date(Math.min.apply(null, dates));
+                let end = new Date(Math.max.apply(null, dates));
+
+                this.xScale.domain([start, end]);
                 let [min, max] = d3.extent(flattened_data, this.yAxisGetter);
                 this.yScale.domain([min, min === max ? min + 1 : max]);
 
