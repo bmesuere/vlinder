@@ -149,7 +149,7 @@
                             .attr("stroke", "black");
                         graph
                             .append("svg:title")
-                            .text((100*d['usage'][2]['value']).toFixed(2)+ '% asfalt')
+                            .text((100*d['usage'][2]['value']).toFixed(2)+ '% verhard')
                     })
                     .on("mouseout", function () {
                         d3.select(this).attr("stroke", "none");
