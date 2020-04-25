@@ -335,9 +335,10 @@
     div #timeline-div {
         overflow: auto;
         direction: rtl;
-        height: 500px;
         scrollbar-color: #ccdbee #eeeeff; /* thumb and track color */
         scrollbar-width: thin;
+        height: 100%;
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
