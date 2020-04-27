@@ -66,9 +66,9 @@
                 });
 
                 // Setup
-                const legendWidth = 150;
-                const legendMargin = 50;
-                const width = 600 + legendWidth;
+                const width = 750;
+                const legendWidth = width/5;
+                const legendMargin = legendWidth/3;
                 const height = width;
                 const margin = {top: 40, right: 80, bottom: 40, left: 40};
                 const innerRadius = 20;
