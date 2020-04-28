@@ -22,7 +22,7 @@
             "yAxisGetter": Function,
             "lineStrokeWidth": {
                 type: Number,
-                default: 3
+                default: 1.5
             },
             //"selectedStation": String,
             "selectedStations": Array,
@@ -114,35 +114,34 @@
             this.yAxisGroup.call(this.yAxis);
             this.pathGroup = this.svg.append("g");
 
+            this.tooltip_dots = d3.select({});  // Avoid errors when not data is selectd
+            this.tooltip_line = this.svg.append("line")
+                .attr("x1", 50)
+                .attr("x2", 50)
+                .attr("y1", this.padding.top)
+                .attr("y2", this.yScale(0)) //TODO: checken wat dit geeft voor negatieve waarden
+                .style("opacity", 0)
+                .style("stroke", "gray");
+            this.tooltip_box = this.svg.append("g").style('display', 'none');
+            this.tooltip_box.append("text").attr("class", "title");
+            this.tooltip_box.append("rect")
+                .attr("class", "legend-background")
+                .attr("fill", "gray");
+
             this.svg.append("rect")
                 .attr("width", this.width - this.padding.left - this.padding.right)
                 .attr("height", this.height - this.padding.top - this.padding.bottom)
                 .style("fill", "none")
                 .style("pointer-events", "all")
                 .attr('transform', 'translate(' + this.padding.left + ',' + this.padding.top + ')')
-                .call(this.zoom);
-
-        },
-        watch: {
-            selectedStations() {
-                // This code is ran when selected station is changed => selectedStation is a variable bound on creation
-                // of this component in Dashboard
-                /*
-                Promise.all(
-                    this.selectedStations.map(
-                        station => vlinderService.getVlinderData(station.value, this.start, this.end)
-                    )
-                )
-                    .then(this.update_data)
-                    .catch(console.log);
-                 */
-            },
-            //focusedVlinderData() {
-            //    this.update_data([this.focusedVlinderData])
-            //}
+                .call(this.zoom)
+                .on("mouseover", this.showToolTips)
+                .on("mouseout", this.hideToolTips)
+                .on("mousemove", this.updateToolTips);
         },
         methods: {
             update_data(data) {
+                this.data = data;
                 //data = data.map(x => x.data);
                 let flattened_data = data.flat(1);
 
@@ -169,12 +168,12 @@
                     .selectAll("path")
                     .data(data);
 
-                this.data = this.selected
+                let path_data = this.selected
                     .enter()
                     .append("path")
                     .merge(this.selected);
 
-                this.paths = this.data
+                this.paths = path_data
                     .attr("clip-path", "url(#clip"+this._uid+")")
                     .attr("stroke", (d, i) => this.colors[i])
                     .attr("fill", "white")
@@ -187,27 +186,107 @@
                     //     .duration(1000)
                     //    .ease(d3.easeLinear)
                     .remove();
+                // Add tooltip dots to graph
+                this.tooltip_dots = this.svg
+                    .selectAll(".tooltip-dots")
+                    .data(data);
+                this.tooltip_dots = this.tooltip_dots
+                    .enter()
+                    .append("circle")
+                    .merge(this.tooltip_dots)
+                    .attr("class", "tooltip-dots")
+                    .attr("r", 3)
+                    .attr("fill", (d, i) => this.colors[i])
+                    .attr("stroke", "black")
+                    .style("display", "none")
+                this.tooltip_dots.exit().remove();
+                // Add tooltip legend entries
+                var legend_entries = this.tooltip_box
+                    .selectAll("g.entry")
+                    .data(data);
+                legend_entries.exit().remove();
+                var new_entries = legend_entries
+                    .enter()
+                    .append("g")
+                    .attr("class", "entry")
+                    .attr("height",20);
+                new_entries.append("circle")
+                    .attr("class", "color-dot")
+                    .attr("r", 2);
+                new_entries.append("text")
+                    .attr("class", "y-value")
+                    .attr("fill", "black");
 
-                // delete all children
-                //groups.selectAll("*").remove();
+                legend_entries.merge(new_entries)
+                    .attr("transform", (d, i) => "translate(0, " + (i+1)*20 + ")");
+            },
+            showToolTips() {
+                if (this.data.length > 0 && this.data[0].length > 0) {
+                    this.tooltip_dots.style("display", null);
+                    this.tooltip_line.style("opacity", 1);
+                    this.tooltip_box.style("display", null);
+                }
+            },
+            hideToolTips() {
+                if (this.data.length > 0 && this.data[0].length > 0) {
+                    this.tooltip_dots.style("display", "none");
+                    this.tooltip_line.style("opacity", 0);
+                    this.tooltip_box.style("display", "none");
+                }
+            },
+            updateToolTips() {
+                if (this.data.length > 0 && this.data[0].length > 0) {
+                    // Update position of tooltip elements according to mouse position
+                    let mousePosition = d3.mouse(this.svg.node())
+                    let currentXScale = this.xAxis.scale(); // Get zoomed scale
+                    let mouseX = currentXScale.invert(mousePosition[0]); // waardevqn x-as, hier dus datum
+                    let bisectTime = d3.bisector(function (d) {
+                        return new Date(d.time);
+                    }).left;
+                    let i = bisectTime(this.data[0], mouseX, 1); //hier zou punt muis moeten komen
+                    let d0 = this.data[0][i - 1],
+                        d1 = this.data[0][i];
+                    let selectedIndex = mouseX - d0.time > d1.time - mouseX ? i : i - 1;
 
-                //let entered = groups
-                //    .enter()
-                //    .append("g")
-                //    .attr("class", "data")
-                //    .attr("clip-path", "url(#clip)")
-                //    .merge(groups);
+                    let x_value = new Date(this.data[0][selectedIndex].time);
+                    let toolTipX = currentXScale(x_value);
+                    let y_values = this.data.map(d => this.yAxisGetter(d[selectedIndex]));
 
-                //this.path = entered
-                //    .append("path")
-                //    .attr("stroke", (d, i) => this.colors[i])
-                //    .attr("fill", "white")
-                //    .attr("fill-opacity", 0)
-                //    .attr("stroke-width", this.lineStrokeWidth)
-                //    .attr("d", this.line);
+                    // Update tooltip dots
+                    let self = this;
+                    this.tooltip_dots
+                        .attr("transform", function (d, i) {
+                            let toolTipY = self.yScale(y_values[i]);
+                            return "translate(" + toolTipX + ", " + toolTipY + ")";
+                        });
+                    // Update tooltip line
+                    this.tooltip_line
+                        .attr("x1", toolTipX)
+                        .attr("x2", toolTipX);
+                    // Update tooltip information box
+                    this.tooltip_box.select("text.title")
+                        .text("Date");
 
-                //groups.exit().transition().remove();
+                    //this.tooltip_box
+                    //    .attr("x", mousePosition[0] + 10)
+                    //    .attr("y", mousePosition[1] + 10)
+                    //    .attr("height", 20*(this.data.length+1));
 
+                    this.tooltip_box.attr("transform", function (d, i) {
+                            let toolTipY = self.yScale(y_values[i]);
+                            return "translate(" + mousePosition[0] + ", " + mousePosition[1] + ")";
+                        });
+
+                    this.tooltip_box
+                        .selectAll("g.entry text.y-value")
+                        .data(y_values)
+                        .attr("fill", "black")
+                        .text(d => d);
+                    this.tooltip_box
+                        .selectAll("g.entry circle.color-dot")
+                        .data(y_values)
+                        .attr("fill", (d, i) => this.colors[i]);
+                }
             },
             updateChart() {
 
@@ -237,6 +316,7 @@
                 this.paths.attr("d", this.line);
                 //if (this.path)
                 //    this.path.attr("d", this.line);
+                this.updateToolTips();
             }
 
 
