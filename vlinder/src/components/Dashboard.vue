@@ -33,6 +33,7 @@
                             v-bind:selected-stations="selectedStations"
                             ref="pressureChart"
                             y-axis-label="Luchtdruk"
+                            x-axis-unit=" hPa"
                             :y-axis-getter="(d) => d.pressure"
                             style="width: 100%; height: 100%"
                     />
@@ -42,6 +43,7 @@
                             v-bind:selected-stations="selectedStations"
                             ref="rainChart"
                             y-axis-label="Neerslagsom"
+                            x-axis-unit=" l/m²"
                             :y-axis-getter="(d) => d.rainVolume"
                             :enable-area=true
                             style="width: 100%; height: 100%"

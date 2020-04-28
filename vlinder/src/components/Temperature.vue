@@ -7,6 +7,7 @@
                     ref="tempchart"
                     v-bind:selected-stations="selectedStations"
                     y-axis-label="Temperatuur"
+                    x-axis-unit=" °C"
                     :y-axis-getter="(d) => d.temp"
                     style="width: 100%; height: 100%"
                 />

@@ -22,7 +22,9 @@
             }
         },
         props: {
+
             "yAxisLabel": String,
+            "xAxisUnit": String,
             "yAxisGetter": Function,
             "lineStrokeWidth": {
                 type: Number,
@@ -285,7 +287,7 @@
                         .attr("fill", "black")
                         .attr("dx", 2*this.paddingLegend)
                         .style("font-size", this.textSizeLegend + "px")
-                        .text(d => d);
+                        .text(d => d+this.xAxisUnit);
                     this.tooltip_box
                         .selectAll("g.entry circle.color-dot")
                         .data(y_values)
@@ -304,8 +306,6 @@
                     var width = Math.max(width_entries, width_title);
 
                     var height = (1+textElements.nodes().length)*20 + this.paddingLegend;
-                    console.log(height);
-                    console.log(textElements);
 
                     this.tooltip_box.select('rect')
                         .attr("y", -20)
