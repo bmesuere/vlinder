@@ -112,8 +112,7 @@
             >
                 <temperature
                         v-bind:selected-stations="selectedStations"
-                        style="width: 100%; height: 100%"
-                />
+                        style="width: 100%; height: 100%"/>
             </grid-item>
         </grid-layout>
 
@@ -140,7 +139,6 @@
             LineChartVisualization,
             WindRose,
             AreaStation,
-            //Temperature,
             Multiselect,
             Map,
             Datetime
