@@ -28,12 +28,12 @@ export default new Vuex.Store({
     },
     actions: {
         loadStations({commit}) {
-            vlinderService.getStations(response => {
+            vlinderService.getStations().then(response => {
                 commit('setStations', response.data)
             })
         },
-        loadVlinderData({commit}, id, start, end) {
-            vlinderService.getVlinderData(id, start, end, response => {
+        loadVlinderData({commit}, object) {
+            vlinderService.getVlinderData(object.id, object.start, object.end).then(response => {
                 commit('setVlinderData', response.data)
             })
         },
@@ -41,7 +41,7 @@ export default new Vuex.Store({
             commit('setFocusedVlinderData', data)
         },
         fetchLatestVlinderData({commit}) {
-            vlinderService.getLatestVlinderData(response => {
+            vlinderService.getLatestVlinderData().then(response => {
                 commit('setLatestVlinderData', response.data)
             })
         }

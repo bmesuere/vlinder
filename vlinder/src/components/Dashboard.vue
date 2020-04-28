@@ -1,57 +1,153 @@
 <template>
     <div>
         <b-container style="height: 100%">
-            <b-row align-h="center" style="padding: 5em">
-                <b-col>
-                    First station selection:
-                    <b-form-select v-model="selectedStation1" :options="options"/>
+            <Map/>
+            <b-row align-h="center" align-v="center" style="padding: 1em; height: 200px">
+                <b-col cols="6">
+                    Selected Station:
+                    <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false"
+                                 :multiple="true" :options="options" :searchable="true" :close-on-select="false"
+                                 :show-labels="false" placeholder="No stations selected"/>
+                    <b-row align-h="center">
+                        <b-col>
+                            From:
+                            <datetime v-model="selectedStartDateString" type="datetime"/>
+                        </b-col>
+                        <b-col>
+                            Until:
+                            <datetime v-model="selectedEndDateString" type="datetime"/>
+                        </b-col>
+                        <b-col>
+                            <b-button @click="loadVlinderData">Load</b-button>
+                        </b-col>
+                    </b-row>
                 </b-col>
-                <b-col>
-                    Second station selection:
-                    <b-form-select v-model="selectedStation2" :options="options"/>
+                <b-col cols="6" style="height: 100%">
+                    <area-station v-bind:selectedStations="selectedStations"
+                                  style="height: 100%; width: 100%"/>
                 </b-col>
             </b-row>
-            <b-row>
-                <WindRose v-bind:selectedStation="selectedStation1" style="padding: 5em"/>
+            <b-row align-h="center" style="height: 250px">
+                <b-col>
+                    <line-chart-visualization
+                            v-bind:selected-stations="selectedStations"
+                            ref="pressureChart"
+                            y-axis-label="Luchtdruk"
+                            :y-axis-getter="(d) => d.pressure"
+                            style="width: 100%; height: 100%"
+                    />
+                </b-col>
+                <b-col>
+                    <line-chart-visualization
+                            v-bind:selected-stations="selectedStations"
+                            ref="rainChart"
+                            y-axis-label="Neerslagsom"
+                            :y-axis-getter="(d) => d.rainVolume"
+                            :enable-area=true
+                            style="width: 100%; height: 100%"
+                    />
+                </b-col>
+            </b-row>
+            <b-row align-h="center" style="height: 400px">
+                <b-col>
+                    <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
+                </b-col>
+                <b-col>
+                    <temperature
+                            v-bind:selected-stations="selectedStations"
+                            style="width: 100%; height: 100%"
+                    />
+                    <!--<temperature v-bind:selectedStations="undefined" style="width: 100%; height: 100%"/>-->
+                </b-col>
             </b-row>
         </b-container>
     </div>
 </template>
 
 <script>
+    import LineChartVisualization from "./LineChartVisualization";
     import WindRose from "./Wind";
-    import vlinderService from "../services/vlinderService";
+    import AreaStation from "./AreaStation";
+    import Temperature from "./Temperature";
+    import VisualizationMixin from "../mixins/VisualizationMixin";
+    import Multiselect from 'vue-multiselect'
+    import Map from "./Map";
+    import {Datetime} from "vue-datetime";
 
     export default {
         name: "Dashboard",
         components: {
-            WindRose
+            Temperature,
+            LineChartVisualization,
+            WindRose,
+            AreaStation,
+            //Temperature,
+            Multiselect,
+            Map,
+            Datetime
         },
+        mixins: [
+            VisualizationMixin
+        ],
         created() {
-            this.$store.dispatch('fetchLatestVlinderData');
-            setInterval(() => {
-                this.$store.dispatch('fetchLatestVlinderData')
-            }, 300000);
+            this.stationsToOptions();
 
-            let self = this;
-            vlinderService.getStations().then(
-                d => {
-                    d.data.forEach(station => {
-                        self.options.push({value: station['id'], text: station['name']})
-                    })
-                }
-            )
+            let today = new Date();
+            let yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+            this.selectedStartDateString = yesterday.toISOString();
+            this.selectedEndDateString = today.toISOString();
         },
         data() {
             return {
-                selectedStation1: '',
-                selectedStation2: '',
-                options: []
+                selectedStations: [],
+                options: [],
+                selectedStartDateString: '',
+                selectedEndDateString: ''
+            }
+        },
+        computed: {
+            stations() {
+                return this.$store.getters.stations;
+            }
+        },
+        mounted() {
+            this.updateLineCharts();
+        },
+        watch: {
+            stations() {
+                this.stationsToOptions();
+            },
+            focusedVlinderData() {
+                this.updateLineCharts();
+            }
+        },
+        methods: {
+            stationsToOptions() {
+                let self = this;
+                this.stations.forEach(station => {
+                    self.options.push({value: station['id'], text: station['name']})
+                });
+                this.selectedStations = [this.options[0]]
+            },
+            updateLineCharts() {
+                this.$refs.rainChart.update_data([this.focusedVlinderData]);
+                this.$refs.pressureChart.update_data([this.focusedVlinderData]);
+            },
+            loadVlinderData() {
+                if (this.selectedStations[0]) {
+                    this.$store.dispatch('loadVlinderData', {
+                            id: this.selectedStations[0].value,
+                            start: new Date(this.selectedStartDateString),
+                            end: new Date(this.selectedEndDateString)
+                        }
+                    );
+                }
             }
         }
     }
 </script>
-
+<style src="vue-multiselect/dist/vue-multiselect.min.css"/>
 <style scoped>
 
 </style>
