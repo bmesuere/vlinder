@@ -65,14 +65,15 @@
                 .attr("class", "y axis")
                 .attr("transform", `translate(${this.padding.left}, 0)`);
 
-            this.svg.select(".y.axis")
+            // title in zelfde stijl als line charts
+            /*this.svg.select(".y.axis")
                 .append("text")
                 .text('Landgebruik')
                 .style("text-anchor", "end")
                 .attr("dx", -this.padding.top)
                 .attr("dy", "1em")
                 .attr("transform", "rotate(-90)")
-                .attr("fill", "black");
+                .attr("fill", "black"); */
 
             this.xAxisGroup.call(this.xAxis)
                 .selectAll("text")
@@ -83,11 +84,50 @@
 
             this.yAxisGroup.call(this.yAxis);
 
+            // titel prominenter
+            this.svg.append("text")
+                .attr("class", 'title')
+                .attr("x", (this.width / 2))
+                .attr("y", 15)//this.padding.top)
+                .attr("text-anchor", "middle")
+                .style("font-size", "14px")
+                .on("mouseover", () => {this.info_box.raise();
+                                        this.info_box.style("display", null)})
+                .on("mouseout", () => {this.info_box.style("display", "none")})
+                .text("Landgebruik");
+
+
+            // infobox
+            this.info_box = this.svg
+                .append("g")
+                .attr('y', 20)
+                .attr('x', this.width/2-50)
+                .style('display', 'none');
+            this.info_box.append("rect")
+                .attr("class", "legend-background")
+                .attr("fill", "#b6b6b6")
+                .attr("opacity", 0.8)
+                .attr("rx", '3')
+                .attr("ry", '3')
+                .attr('stroke', 'black');
+            this.info_box.append("text")
+                .text("** korte uitleg **")
+                .style("font-size", "11px")
+                .attr('height', 10)
+                .attr('width', 100)
+                .attr('y', 37)
+                .attr('x', this.width/2-35);
+
+            this.info_box.select("rect")
+                .attr("x", this.info_box.node().getBBox().x)
+                .attr("y", this.info_box.node().getBBox().y)
+                .attr("width", this.info_box.node().getBBox().width)
+                .attr("height", this.info_box.node().getBBox().height);
         },
 
         methods: {
             update_data() {
-                this.svg.selectAll("rect").remove();
+                this.svg.selectAll("rect.bar").remove();
 
                 if(this.selectedStations.length===0){
                     return ;
@@ -111,7 +151,7 @@
                 }
 
                 let bars = this.svg
-                    .selectAll("rect")
+                    .selectAll("rect.bar")
                     .data(landUse)
                     .enter()
                     .append("g")
@@ -121,6 +161,7 @@
                 const types = ['water', 'groen', 'verhard'];
                 for(let k = 0; k < landUse[0]['usage'].length; k++){
                     bars.append("rect")
+                    .attr('class', 'bar')
                     .attr("x", (d, i) => this.xScale(i + 0.6))
                     .attr("y", (d) => {
                         let y = this.padding.top;
@@ -135,6 +176,20 @@
                     .on("mouseout", function () { removeLabel(this); })
                 ;
                 }
+
+                // update title
+                this.svg.selectAll("text.title").remove();
+                console.log(filteredData);
+                this.svg.append("text")
+                    .attr('class', 'title')
+                    .attr("x", (this.width / 2))
+                    .attr("y", 15)//this.padding.top)
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "14px")
+                    .on("mouseover", () => {this.info_box.raise();
+                                            this.info_box.style("display", null)})
+                    .on("mouseout", () => {this.info_box.style("display", "none")})
+                    .text("Landgebruik - "+ filteredData[0].name);
                 return this.svg.node();
             },
 
