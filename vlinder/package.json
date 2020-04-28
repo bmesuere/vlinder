@@ -17,6 +17,7 @@
     "topojson-client": "^3.1.0",
     "vue": "^2.6.11",
     "vue-datetime": "^1.0.0-beta.11",
+    "vue-grid-layout": "^2.3.7",
     "vue-multiselect": "^2.1.6",
     "vue-router": "^3.1.5",
     "vuex": "^3.1.3",

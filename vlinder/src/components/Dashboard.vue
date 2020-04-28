@@ -1,66 +1,122 @@
 <template>
-    <div>
-        <b-container style="height: 100%">
-            <Map/>
-            <b-row align-h="center" align-v="center" style="padding: 1em; height: 200px">
-                <b-col cols="6">
-                    Selected Station:
-                    <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false"
-                                 :multiple="true" :options="options" :searchable="true" :close-on-select="false"
-                                 :show-labels="false" placeholder="No stations selected"/>
-                    <b-row align-h="center">
-                        <b-col>
-                            From:
-                            <datetime v-model="selectedStartDateString" type="datetime"/>
-                        </b-col>
-                        <b-col>
-                            Until:
-                            <datetime v-model="selectedEndDateString" type="datetime"/>
-                        </b-col>
-                        <b-col>
-                            <b-button @click="loadVlinderData">Load</b-button>
-                        </b-col>
-                    </b-row>
-                </b-col>
-                <b-col cols="6" style="height: 100%">
-                    <area-station v-bind:selectedStations="selectedStations"
-                                  style="height: 100%; width: 100%"/>
-                </b-col>
-            </b-row>
-            <b-row align-h="center" style="height: 250px">
-                <b-col>
-                    <line-chart-visualization
-                            v-bind:selected-stations="selectedStations"
-                            ref="pressureChart"
-                            y-axis-label="Luchtdruk"
-                            :y-axis-getter="(d) => d.pressure"
-                            style="width: 100%; height: 100%"
-                    />
-                </b-col>
-                <b-col>
-                    <line-chart-visualization
-                            v-bind:selected-stations="selectedStations"
-                            ref="rainChart"
-                            y-axis-label="Neerslagsom"
-                            :y-axis-getter="(d) => d.rainVolume"
-                            :enable-area=true
-                            style="width: 100%; height: 100%"
-                    />
-                </b-col>
-            </b-row>
-            <b-row align-h="center" style="height: 400px">
-                <b-col>
-                    <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
-                </b-col>
-                <b-col>
-                    <temperature
-                            v-bind:selected-stations="selectedStations"
-                            style="width: 100%; height: 100%"
-                    />
-                    <!--<temperature v-bind:selectedStations="undefined" style="width: 100%; height: 100%"/>-->
-                </b-col>
-            </b-row>
-        </b-container>
+    <div style="margin-left: 10%; margin-right: 10%; margin-top: 10px;">
+        <Map style="width: 70%; margin: auto;"/>
+
+        <grid-layout :layout.sync="layout"
+                     :col-num="12"
+                     :is-draggable="true"
+                     :is-resizable="true"
+                     :vertical-compact="true"
+                     :prevent-collision="false"
+                     :use-css-transforms="true"
+
+                     :responsive="true"
+                     style="width: 100%"
+        >
+
+            <grid-item
+                    :x="layout[0].x"
+                    :y="layout[0].y"
+                    :w="layout[0].w"
+                    :h="layout[0].h"
+                    :i="layout[0].i"
+                    :key="layout[0].i"
+            >
+                Selected Station:
+                <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false"
+                             :multiple="true" :options="options" :searchable="true" :close-on-select="false"
+                             :show-labels="false" placeholder="No stations selected"/>
+                <b-row align-h="center">
+                    <b-col>
+                        From:
+                        <datetime v-model="selectedStartDateString" type="datetime"/>
+                    </b-col>
+                    <b-col>
+                        Until:
+                        <datetime v-model="selectedEndDateString" type="datetime"/>
+                    </b-col>
+                    <b-col>
+                        <b-button @click="loadVlinderData">Load</b-button>
+                    </b-col>
+                </b-row>
+            </grid-item>
+
+            <grid-item
+                    :x="layout[1].x"
+                    :y="layout[1].y"
+                    :w="layout[1].w"
+                    :h="layout[1].h"
+                    :i="layout[1].i"
+                    :key="layout[1].i"
+            >
+                <area-station v-bind:selectedStations="selectedStations"
+                              style="height: 100%; width: 100%"/>
+            </grid-item>
+
+            <grid-item
+                    :x="layout[2].x"
+                    :y="layout[2].y"
+                    :w="layout[2].w"
+                    :h="layout[2].h"
+                    :i="layout[2].i"
+                    :key="layout[2].i"
+                    drag-ignore-from="svg rect"
+            >
+
+                <line-chart-visualization
+                        v-bind:selected-stations="selectedStations"
+                        ref="pressureChart"
+                        y-axis-label="Luchtdruk"
+                        :y-axis-getter="(d) => d.pressure"
+                        style="width: 100%; height: 100%"
+                />
+            </grid-item>
+            <grid-item
+                    :x="layout[3].x"
+                    :y="layout[3].y"
+                    :w="layout[3].w"
+                    :h="layout[3].h"
+                    :i="layout[3].i"
+                    :key="layout[3].i"
+                    drag-ignore-from="svg rect"
+            >
+
+                <line-chart-visualization
+                        v-bind:selected-stations="selectedStations"
+                        ref="rainChart"
+                        y-axis-label="Neerslagsom"
+                        :y-axis-getter="(d) => d.rainVolume"
+                        :enable-area=true
+                        style="width: 100%; height: 100%"
+                />
+            </grid-item>
+            <grid-item
+                    :x="layout[4].x"
+                    :y="layout[4].y"
+                    :w="layout[4].w"
+                    :h="layout[4].h"
+                    :i="layout[4].i"
+                    :key="layout[4].i"
+            >
+
+                <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
+            </grid-item>
+            <grid-item
+                    :x="layout[5].x"
+                    :y="layout[5].y"
+                    :w="layout[5].w"
+                    :h="layout[5].h"
+                    :i="layout[5].i"
+                    :key="layout[5].i"
+                    drag-ignore-from="svg rect"
+            >
+                <temperature
+                        v-bind:selected-stations="selectedStations"
+                        style="width: 100%; height: 100%"
+                />
+            </grid-item>
+        </grid-layout>
+
     </div>
 </template>
 
@@ -73,10 +129,13 @@
     import Multiselect from 'vue-multiselect'
     import Map from "./Map";
     import {Datetime} from "vue-datetime";
+    import VueGridLayout from 'vue-grid-layout';
 
     export default {
         name: "Dashboard",
         components: {
+            GridLayout: VueGridLayout.GridLayout,
+            GridItem: VueGridLayout.GridItem,
             Temperature,
             LineChartVisualization,
             WindRose,
@@ -103,7 +162,16 @@
                 selectedStations: [],
                 options: [],
                 selectedStartDateString: '',
-                selectedEndDateString: ''
+                selectedEndDateString: '',
+                layout: [
+                    {"x": 0, "y": 0, "w": 6, "h": 1, "i": "0"},
+                    {"x": 6, "y": 0, "w": 6, "h": 2, "i": "1"},
+                    {"x": 0, "y": 1, "w": 6, "h": 3, "i": "2"},
+                    {"x": 6, "y": 1, "w": 6, "h": 3, "i": "3"},
+                    {"x": 0, "y": 2, "w": 6, "h": 3, "i": "4"},
+                    {"x": 6, "y": 2, "w": 6, "h": 3, "i": "5"},
+                ]
+
             }
         },
         computed: {
@@ -144,6 +212,9 @@
                     );
                 }
             }
+            ,resizeEvent (i, newH, newW, newHPx, newWPx){
+                console.log("RESIZE i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
+            },
         }
     }
 </script>

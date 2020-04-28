@@ -1,10 +1,9 @@
 <template>
-    <div :id="id" style="display: inline-block"></div>
+    <div :id="id" style="height: 100%; width: 100%"></div>
 </template>
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
-    //import vlinderService from "../services/vlinderService";
     import * as d3 from 'd3'
     import {uuidv4} from "../utils";
 
@@ -37,8 +36,11 @@
         mounted() {
             let div = d3.select("#" + this.id);
 
-            this.width = div.node().getBoundingClientRect()['width'];
-            this.height = div.node().getBoundingClientRect()['height'];
+            div.selectAll("*").remove();
+            //console.log(this.height());
+
+            this.width = 400; //console.log(div.node().getBoundingClientRect()['width']);
+            this.height = 400; //console.log(div.node().getBoundingClientRect()['height']);
 
             this.svg = div.append("svg", 0)
                 .attr("width", this.width)
@@ -66,10 +68,6 @@
                 .x(d => this.xScale(new Date(d.time)))
                 .y(d => this.yScale(this.yAxisGetter(d)));
 
-            this.area = d3.area()
-                .x(d => this.xScale(new Date(d.time)))
-                .y0(this.height - this.padding.bottom)
-                .y1(d => this.yScale(this.yAxisGetter(d)));
 
             this.zoom = d3.zoom()
                 .translateExtent([[this.padding.left, this.padding.top], [this.width - this.padding.right - this.padding.left, this.height - this.padding.bottom - this.padding.top]])
@@ -143,7 +141,6 @@
         },
         methods: {
             update_data(data) {
-                //data = data.map(x => x.data);
                 let flattened_data = data.flat(1);
 
                 // update scales
@@ -163,7 +160,6 @@
                     .attr("transform", "rotate(-45)");
 
                 this.yAxisGroup.call(this.yAxis);
-                //let groups = this.pathGroup.selectAll("g.data").data(data);
 
                 this.selected = this.pathGroup
                     .selectAll("path")
@@ -182,44 +178,15 @@
                     .attr("stroke-width", this.lineStrokeWidth)
                     .attr("d", this.line);
 
-                this.selected.exit()
-                    //.transition()
-                    //     .duration(1000)
-                    //    .ease(d3.easeLinear)
-                    .remove();
-
-                // delete all children
-                //groups.selectAll("*").remove();
-
-                //let entered = groups
-                //    .enter()
-                //    .append("g")
-                //    .attr("class", "data")
-                //    .attr("clip-path", "url(#clip)")
-                //    .merge(groups);
-
-                //this.path = entered
-                //    .append("path")
-                //    .attr("stroke", (d, i) => this.colors[i])
-                //    .attr("fill", "white")
-                //    .attr("fill-opacity", 0)
-                //    .attr("stroke-width", this.lineStrokeWidth)
-                //    .attr("d", this.line);
-
-                //groups.exit().transition().remove();
+                this.selected.exit().remove();
 
             },
             updateChart() {
 
                 // recover the new scale
                 var newX = d3.event.transform.rescaleX(this.xScale);
-                //var newY = d3.event.transform.rescaleY(this.yScale);
 
                 this.xAxis.scale(newX);
-                //let xAxis = d3.axisBottom()
-                //    .scale(newX)
-                //    .ticks(12)
-                //    .tickFormat(d3.timeFormat("%H:%M"));
 
                 // update axes with these new boundaries
                 this.xAxisGroup.call(this.xAxis)
