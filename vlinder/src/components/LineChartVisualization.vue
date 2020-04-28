@@ -14,7 +14,11 @@
             return {
                 id: "id" + uuidv4(),
                 width: 0,
-                height: 0
+                height: 0,
+                format: d3.timeFormat("%H:%M"),
+                textSizeLegend: 12,
+                titleSizeLegend: 16,
+                paddingLegend: 5
             }
         },
         props: {
@@ -55,7 +59,7 @@
             this.xAxis = d3.axisBottom()
                 .scale(this.xScale)
                 .ticks(24)
-                .tickFormat(d3.timeFormat("%H:%M"));
+                .tickFormat(this.format);
 
             this.yAxis = d3.axisLeft()
                 .scale(this.yScale)
@@ -114,7 +118,7 @@
             this.yAxisGroup.call(this.yAxis);
             this.pathGroup = this.svg.append("g");
 
-            this.tooltip_dots = d3.select({});  // Avoid errors when not data is selectd
+            this.tooltip_dots = d3.select({});  // Avoid errors when no data is selected
             this.tooltip_line = this.svg.append("line")
                 .attr("x1", 50)
                 .attr("x2", 50)
@@ -122,11 +126,18 @@
                 .attr("y2", this.yScale(0)) //TODO: checken wat dit geeft voor negatieve waarden
                 .style("opacity", 0)
                 .style("stroke", "gray");
-            this.tooltip_box = this.svg.append("g").style('display', 'none');
-            this.tooltip_box.append("text").attr("class", "title");
+            this.tooltip_box = this.svg
+                .append("g")
+                .style('display', 'none');
             this.tooltip_box.append("rect")
                 .attr("class", "legend-background")
-                .attr("fill", "gray");
+                .attr("fill", "#b3b3b3")
+                .attr("opacity", 0.6)
+                .attr("rx", '3')
+                .attr("ry", '3')
+                .attr('stroke', 'black');
+
+            this.tooltip_box.append("text").attr("class", "title");
 
             this.svg.append("rect")
                 .attr("width", this.width - this.padding.left - this.padding.right)
@@ -239,14 +250,14 @@
                     // Update position of tooltip elements according to mouse position
                     let mousePosition = d3.mouse(this.svg.node())
                     let currentXScale = this.xAxis.scale(); // Get zoomed scale
-                    let mouseX = currentXScale.invert(mousePosition[0]); // waardevqn x-as, hier dus datum
+                    let mouseX = currentXScale.invert(mousePosition[0]); // waarde van x-as, hier dus datum
                     let bisectTime = d3.bisector(function (d) {
                         return new Date(d.time);
                     }).left;
                     let i = bisectTime(this.data[0], mouseX, 1); //hier zou punt muis moeten komen
                     let d0 = this.data[0][i - 1],
                         d1 = this.data[0][i];
-                    let selectedIndex = mouseX - d0.time > d1.time - mouseX ? i : i - 1;
+                    let selectedIndex = mouseX - new Date(d0.time) > new Date(d1.time) - mouseX ? i : i - 1;
 
                     let x_value = new Date(this.data[0][selectedIndex].time);
                     let toolTipX = currentXScale(x_value);
@@ -259,33 +270,56 @@
                             let toolTipY = self.yScale(y_values[i]);
                             return "translate(" + toolTipX + ", " + toolTipY + ")";
                         });
+
                     // Update tooltip line
                     this.tooltip_line
                         .attr("x1", toolTipX)
                         .attr("x2", toolTipX);
+
                     // Update tooltip information box
-                    this.tooltip_box.select("text.title")
-                        .text("Date");
-
-                    //this.tooltip_box
-                    //    .attr("x", mousePosition[0] + 10)
-                    //    .attr("y", mousePosition[1] + 10)
-                    //    .attr("height", 20*(this.data.length+1));
-
-                    this.tooltip_box.attr("transform", function (d, i) {
-                            let toolTipY = self.yScale(y_values[i]);
-                            return "translate(" + mousePosition[0] + ", " + mousePosition[1] + ")";
-                        });
+                    this.tooltip_box.attr("transform", "translate(" + (mousePosition[0]+ 5) + ", " + (mousePosition[1]+25) + ")");
 
                     this.tooltip_box
                         .selectAll("g.entry text.y-value")
                         .data(y_values)
                         .attr("fill", "black")
+                        .attr("dx", 2*this.paddingLegend)
+                        .style("font-size", this.textSizeLegend + "px")
                         .text(d => d);
                     this.tooltip_box
                         .selectAll("g.entry circle.color-dot")
                         .data(y_values)
-                        .attr("fill", (d, i) => this.colors[i]);
+                        .attr("r", 2)
+                        .attr("transform", "translate(" + (1+this.paddingLegend) + ", "+ (1-this.paddingLegend) + ")")
+                        .attr("fill", (d, i) => this.colors[i])
+                        .attr("stroke", "black")
+                    ;
+
+                    // Update rectangle size
+                    var textElements = this.tooltip_box
+                        .selectAll("text.y-value");
+
+                    var width_entries = d3.max(textElements.nodes(), y => y.getComputedTextLength()) + 3*this.paddingLegend;
+                    var width_title = this.tooltip_box.select("text.title").node().getComputedTextLength() + 2*this.paddingLegend;
+                    var width = Math.max(width_entries, width_title);
+
+                    var height = (1+textElements.nodes().length)*20 + this.paddingLegend;
+                    console.log(height);
+                    console.log(textElements);
+
+                    this.tooltip_box.select('rect')
+                        .attr("y", -20)
+                        .attr("x", 0)
+                        .attr("height", height)
+                        .attr("width", width);
+
+                    this.tooltip_box.select("text.title")
+                        .text(this.format(new Date(x_value)))
+                        .style("font-size", this.titleSizeLegend+"px")
+                        .attr("dx", this.paddingLegend)
+                        .attr("dy", 0)
+                    ;
+
                 }
             },
             updateChart() {
