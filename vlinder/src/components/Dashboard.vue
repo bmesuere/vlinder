@@ -109,6 +109,7 @@
                     :i="layout[5].i"
                     :key="layout[5].i"
                     drag-ignore-from="svg rect"
+
             >
                 <temperature
                         v-bind:selected-stations="selectedStations"
@@ -162,12 +163,12 @@
                 selectedStartDateString: '',
                 selectedEndDateString: '',
                 layout: [
-                    {"x": 0, "y": 0, "w": 6, "h": 1, "i": "0"},
-                    {"x": 6, "y": 0, "w": 6, "h": 2, "i": "1"},
-                    {"x": 0, "y": 1, "w": 6, "h": 3, "i": "2"},
-                    {"x": 6, "y": 1, "w": 6, "h": 3, "i": "3"},
-                    {"x": 0, "y": 2, "w": 6, "h": 3, "i": "4"},
-                    {"x": 6, "y": 2, "w": 6, "h": 3, "i": "5"},
+                    {"x": 0, "y": 0, "w": 12, "h": 1, "i": "0"},
+                    {"x": 3, "y": 3, "w": 2, "h": 2, "i": "1"},
+                    {"x": 0, "y": 1, "w": 4, "h": 2, "i": "2"},
+                    {"x": 4, "y": 1, "w": 4, "h": 2, "i": "3"},
+                    {"x": 0, "y": 3, "w": 3, "h": 2, "i": "4"},
+                    {"x": 8, "y": 1, "w": 4, "h": 2, "i": "5"},
                 ]
 
             }

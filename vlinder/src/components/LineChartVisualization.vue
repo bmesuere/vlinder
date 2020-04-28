@@ -34,111 +34,124 @@
             VisualizationMixin
         ],
         mounted() {
-            let div = d3.select("#" + this.id);
+            //this.$nextTick(this.create_graph);
+            this.div = d3.select("#" + this.id);
+            let observer = new ResizeObserver(this.create_graph);
+            observer.observe(this.div.node());
 
-            div.selectAll("*").remove();
-            //console.log(this.height());
-
-            this.width = 400;
-            this.height = 400;
-
-            this.svg = div.append("svg", 0)
-                .attr("width", this.width)
-                .attr("height", this.height);
-
-            // setup everything
-            this.padding = {top: 20, left: 40, right: 20, bottom: 50};
-            this.xScale = d3.scaleTime()
-                .range([this.padding.left + this.lineStrokeWidth / 2, this.width - this.padding.right]);
-
-            this.yScale = d3.scaleLinear()
-                .range([this.height - this.padding.bottom, this.padding.top]);
-
-            this.xAxis = d3.axisBottom()
-                .scale(this.xScale)
-                .ticks(24)
-                .tickFormat(d3.timeFormat("%H:%M"));
-
-            this.yAxis = d3.axisLeft()
-                .scale(this.yScale)
-                .ticks(10);
-
-            this.line = d3
-                .line()
-                .x(d => this.xScale(new Date(d.time)))
-                .y(d => this.yScale(this.yAxisGetter(d)));
-
-
-            this.zoom = d3.zoom()
-                .translateExtent([[this.padding.left, this.padding.top], [this.width - this.padding.right - this.padding.left, this.height - this.padding.bottom - this.padding.top]])
-                .scaleExtent([1, Infinity])  // This control how much you can unzoom (x0.5) and zoom (x20)
-                .extent([[this.padding.left, this.padding.top], [this.width - this.padding.left - this.padding.right, this.height - this.padding.top - this.padding.bottom]])
-                .on("zoom", this.updateChart);
-
-            this.clip = this.svg.append("defs").append("SVG:clipPath")
-                .attr("id", "clip" + this.id)
-                .append("rect")
-                .attr("width", this.width - this.padding.right - this.padding.left)
-                .attr("height", this.height - this.padding.bottom - this.padding.top)
-                .attr("x", this.padding.left)
-                .attr("y", this.padding.top);
-
-            this.xAxisGroup = this.svg.append("g")
-                .attr("class", "x axis")
-                .attr("transform", `translate(0, ${this.height - this.padding.bottom})`)
-                .attr("stroke-width", 1);
-
-            this.yAxisGroup = this.svg.append("g")
-                .attr("class", "y axis")
-                .attr("transform", `translate(${this.padding.left}, 0)`)
-                .attr("stroke-this.width", 1);
-
-            this.svg.select(".y.axis")
-                .append("text")
-                .text(this.yAxisLabel)
-                .style("text-anchor", "end")
-                .attr("dx", -this.padding.top)
-                .attr("dy", "1em")
-                .attr("transform", "rotate(-90)")
-                .attr("fill", "black");
-
-            this.xAxisGroup.call(this.xAxis)
-                .selectAll("text")
-                .style("text-anchor", "end")
-                .attr("dx", "-.8em")
-                .attr("dy", ".15em")
-                .attr("transform", "rotate(-45)");
-
-            this.yAxisGroup.call(this.yAxis);
-            this.pathGroup = this.svg.append("g");
-
-            this.tooltip_dots = d3.select({});  // Avoid errors when not data is selectd
-            this.tooltip_line = this.svg.append("line")
-                .attr("x1", 50)
-                .attr("x2", 50)
-                .attr("y1", this.padding.top)
-                .attr("y2", this.yScale(0)) //TODO: checken wat dit geeft voor negatieve waarden
-                .style("opacity", 0)
-                .style("stroke", "gray");
-            this.tooltip_box = this.svg.append("g").style('display', 'none');
-            this.tooltip_box.append("text").attr("class", "title");
-            this.tooltip_box.append("rect")
-                .attr("class", "legend-background")
-                .attr("fill", "gray");
-
-            this.svg.append("rect")
-                .attr("width", this.width - this.padding.left - this.padding.right)
-                .attr("height", this.height - this.padding.top - this.padding.bottom)
-                .style("fill", "none")
-                .style("pointer-events", "all")
-                .attr('transform', 'translate(' + this.padding.left + ',' + this.padding.top + ')')
-                .call(this.zoom)
-                .on("mouseover", this.showToolTips)
-                .on("mouseout", this.hideToolTips)
-                .on("mousemove", this.updateToolTips);
+            this.create_graph();
 
         },
         methods: {
+            create_graph(){
+                let div = d3.select("#" + this.id);
+
+                this.div.selectAll("*").remove();
+
+                let divBox = this.div.node().getBoundingClientRect();
+                this.width = Math.max(divBox.width, 100);
+                this.height = Math.max(divBox.height, 100);
+
+                this.svg = div.append("svg", 0)
+                    .attr("width", this.width)
+                    .attr("height", this.height);
+
+                // setup everything
+                this.padding = {top: 20, left: 40, right: 20, bottom: 50};
+                this.xScale = d3.scaleTime()
+                    .range([this.padding.left + this.lineStrokeWidth / 2, this.width - this.padding.right]);
+
+                this.yScale = d3.scaleLinear()
+                    .range([this.height - this.padding.bottom, this.padding.top]);
+
+                this.xAxis = d3.axisBottom()
+                    .scale(this.xScale)
+                    .ticks(24)
+                    .tickFormat(d3.timeFormat("%H:%M"));
+
+                this.yAxis = d3.axisLeft()
+                    .scale(this.yScale)
+                    .ticks(10);
+
+                this.line = d3
+                    .line()
+                    .x(d => this.xScale(new Date(d.time)))
+                    .y(d => this.yScale(this.yAxisGetter(d)));
+
+
+                this.zoom = d3.zoom()
+                    .translateExtent([[this.padding.left, this.padding.top], [this.width - this.padding.right - this.padding.left, this.height - this.padding.bottom - this.padding.top]])
+                    .scaleExtent([1, Infinity])  // This control how much you can unzoom (x0.5) and zoom (x20)
+                    .extent([[this.padding.left, this.padding.top], [this.width - this.padding.left - this.padding.right, this.height - this.padding.top - this.padding.bottom]])
+                    .on("zoom", this.updateChart);
+
+                this.clip = this.svg.append("defs").append("SVG:clipPath")
+                    .attr("id", "clip" + this.id)
+                    .append("rect")
+                    .attr("width", this.width - this.padding.right - this.padding.left)
+                    .attr("height", this.height - this.padding.bottom - this.padding.top)
+                    .attr("x", this.padding.left)
+                    .attr("y", this.padding.top);
+
+                this.xAxisGroup = this.svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", `translate(0, ${this.height - this.padding.bottom})`)
+                    .attr("stroke-width", 1);
+
+                this.yAxisGroup = this.svg.append("g")
+                    .attr("class", "y axis")
+                    .attr("transform", `translate(${this.padding.left}, 0)`)
+                    .attr("stroke-this.width", 1);
+
+                this.svg.select(".y.axis")
+                    .append("text")
+                    .text(this.yAxisLabel)
+                    .style("text-anchor", "end")
+                    .attr("dx", -this.padding.top)
+                    .attr("dy", "1em")
+                    .attr("transform", "rotate(-90)")
+                    .attr("fill", "black");
+
+                this.xAxisGroup.call(this.xAxis)
+                    .selectAll("text")
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-45)");
+
+                this.yAxisGroup.call(this.yAxis);
+                this.pathGroup = this.svg.append("g");
+
+                this.tooltip_dots = d3.select({});  // Avoid errors when not data is selectd
+                this.tooltip_line = this.svg.append("line")
+                    .attr("x1", 50)
+                    .attr("x2", 50)
+                    .attr("y1", this.padding.top)
+                    .attr("y2", this.yScale(0)) //TODO: checken wat dit geeft voor negatieve waarden
+                    .style("opacity", 0)
+                    .style("stroke", "gray");
+                this.tooltip_box = this.svg.append("g").style('display', 'none');
+                this.tooltip_box.append("text").attr("class", "title");
+                this.tooltip_box.append("rect")
+                    .attr("class", "legend-background")
+                    .attr("fill", "gray");
+
+                this.svg.append("rect")
+                    .attr("width", this.width - this.padding.left - this.padding.right)
+                    .attr("height", this.height - this.padding.top - this.padding.bottom)
+                    .style("fill", "none")
+                    .style("pointer-events", "all")
+                    .attr('transform', 'translate(' + this.padding.left + ',' + this.padding.top + ')')
+                    .call(this.zoom)
+                    .on("mouseover", this.showToolTips)
+                    .on("mouseout", this.hideToolTips)
+                    .on("mousemove", this.updateToolTips);
+
+                if(this.current_data !== undefined){
+                    this.update_data(this.current_data);
+                }
+
+            },
             update_data(data) {
                 this.current_data = data;
                 let flattened_data = data.flat(1);
@@ -215,21 +228,21 @@
                     .attr("transform", (d, i) => "translate(0, " + (i+1)*20 + ")");
             },
             showToolTips() {
-                if (this.current_data.length > 0 && this.current_data[0].length > 0) {
+                if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     this.tooltip_dots.style("display", null);
                     this.tooltip_line.style("opacity", 1);
                     this.tooltip_box.style("display", null);
                 }
             },
             hideToolTips() {
-                if (this.current_data.length > 0 && this.current_data[0].length > 0) {
+                if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     this.tooltip_dots.style("display", "none");
                     this.tooltip_line.style("opacity", 0);
                     this.tooltip_box.style("display", "none");
                 }
             },
             updateToolTips() {
-                if (this.current_data.length > 0 && this.current_data[0].length > 0) {
+                if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     // Update position of tooltip elements according to mouse position
                     let mousePosition = d3.mouse(this.svg.node());
                     let currentXScale = this.xAxis.scale(); // Get zoomed scale
@@ -240,6 +253,8 @@
                     let i = bisectTime(this.current_data[0], mouseX, 1); //hier zou punt muis moeten komen
                     let d0 = this.current_data[0][i - 1],
                         d1 = this.current_data[0][i];
+                    console.log(d0);
+                    console.log(d1);
                     let selectedIndex = mouseX - d0.time > d1.time - mouseX ? i : i - 1;
 
                     let x_value = new Date(this.current_data[0][selectedIndex].time);
@@ -283,7 +298,7 @@
                 }
             },
             updateChart() {
-                if (this.current_data.length <= 0 || this.current_data[0].length <= 0){
+                if (this.current_data && this.current_data.length <= 0 || this.current_data[0].length <= 0){
                     console.log(this.current_data);
                     return
                 }
