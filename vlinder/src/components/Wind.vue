@@ -21,8 +21,16 @@
                 this.createPlot(this.focusedVlinderData);
             }
         },
+        mounted (){
+            this.div = d3.select('#d3-viz-windrose');
+            this.raw_data = [];
+            let observer = new ResizeObserver(() => this.createPlot(this.raw_data));
+            observer.observe(this.div.node());
+            this.createPlot(this.raw_data);
+        },
         methods: {
             createPlot(raw_data) {
+                this.raw_data = raw_data;
                 // Convert data to format needed for the windrose
                 const data_csv_format = this.convertData(raw_data);
                 const data = d3.csvParse(data_csv_format, (d, _, columns) => {
@@ -33,10 +41,10 @@
                 });
 
                 // Setup
-                let divBox = d3.select('#d3-viz-windrose').node().getBoundingClientRect();
-                const size = Math.min(divBox['height'], divBox['width']);
-                const width = size;
-                const height = size;
+                let divBox = this.div.node().getBoundingClientRect();
+                const size = Math.min(divBox.height, divBox.width);
+                const width = divBox.width;
+                const height = divBox.height;
                 const margin = {top: 40, right: 80, bottom: 40, left: 40};
                 const innerRadius = 20;
                 const chartWidth = width - margin.left - margin.right;
@@ -50,7 +58,7 @@
                         .attr("height", height)
                         .style("font", "10px sans-serif"),
 
-                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                    g = svg.append("g").attr("transform", "translate(" + (width) / 2 + "," + height / 2 + ")");
 
                 const angle = d3.scaleLinear()
                     .range([0, 2 * Math.PI]);
@@ -174,7 +182,7 @@
                     .data(data.columns.slice(1).reverse())
                     .enter().append("g")
                     .attr("transform", function (d, i) {
-                        return "translate(" + (outerRadius + 0) + "," + (-outerRadius + 40 + (i - (data.columns.length - 1) / 2) * 20) + ")";
+                        return "translate(" + (outerRadius ) + "," + (-outerRadius + 40 + (i - (data.columns.length - 1) / 2) * 20) + ")";
                     });
 
                 legend.append("rect")
