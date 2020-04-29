@@ -253,9 +253,7 @@
                     let i = bisectTime(this.current_data[0], mouseX, 1); //hier zou punt muis moeten komen
                     let d0 = this.current_data[0][i - 1],
                         d1 = this.current_data[0][i];
-                    console.log(d0);
-                    console.log(d1);
-                    let selectedIndex = mouseX - d0.time > d1.time - mouseX ? i : i - 1;
+                    let selectedIndex = (d1 !== undefined) && mouseX - d0.time > d1.time - mouseX ? i : i - 1;
 
                     let x_value = new Date(this.current_data[0][selectedIndex].time);
                     let toolTipX = currentXScale(x_value);
