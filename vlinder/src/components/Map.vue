@@ -12,6 +12,7 @@
     import belgium from "../local/belgium.geo.json.js";
     import Regions from "../d3components/continents.js";
     import Stations from "../d3components/stations.js";
+    import Popup from '../d3components/stationpopup.js'
     import '../utils/extentions.js'
 
     export default {
@@ -69,10 +70,14 @@
                         const el = d3.select(this);
                         const cond = el.attr("selected") === "false";
                         selection.toggle(d, cond);
-                        el.attr("selected", (cond))
+                        el.attr("selected", (cond));
                     });
-                    enter.attr("debug", 1)
                 })
+
+                stations_component.join(enter => {
+                    console.log("gello");
+                    Popup(enter.select("circle"));
+                });
             }
         }
     }
