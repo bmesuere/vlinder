@@ -1,7 +1,7 @@
 <template>
     <div id="d3-viz-temperature" style="display: inline-block">
         <b-container style="width: 100%; height: 100%">
-            <b-row align-h="center" align-v="start" style="height: 90%">
+            <b-row align-h="center" align-v="start" style="height: 85%">
                 <b-col style="height: 100%">
                 <line-chart-visualization
                     ref="tempchart"
@@ -12,27 +12,30 @@
                 />
                 </b-col>
             </b-row>
-            <b-row align-v="end">
-                <b-col>
-                <input type="checkbox" id="perceived-checkbox" v-model="showPerceivedTemp"/>
-                <label for="perceived-checkbox">Toon gevoelstemperatuur</label>
-                </b-col>
+            <b-row align-v="center" align-h="center" style="padding-left:40px; padding-right: 25px">
+                    <multiselect v-model="typePerceivedTemperature" :options="options" placeholder="Gevoelstemperatuur"/>
             </b-row>
         </b-container>
     </div>
 </template>
 
+this.padding = {top: 20, left: 40, right: 20, bottom: 50};
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import LineChartVisualization from "./LineChartVisualization";
+    import Multiselect from 'vue-multiselect'
 
     export default {
         name: "Temperature",
-        components: {LineChartVisualization},
+        components: {
+            LineChartVisualization,
+            Multiselect
+        },
         data: function() {
             return {
-                showPerceivedTemp: false
+                typePerceivedTemperature: null,
+                options: ['Humindex', 'WCTI']
             }
         },
         props: {
@@ -45,7 +48,7 @@
             focusedVlinderData() {
                 this.updateLineChart();
             },
-            showPerceivedTemp() {
+            typePerceivedTemperature() {
                 this.updateLineChart();
             }
         },
@@ -93,14 +96,24 @@
             },
 
             temperatureData(data) {
-                if (this.showPerceivedTemp) {
+                if (this.typePerceivedTemperature) {
                    let self = this;
-                   let perceivedTemp = data.map(function (d) {
-                       return {
-                           "temp": self.computePerceivedTemperatureHumindex(d['temp'], d['windSpeed']),
-                           "time": d['time']
-                       };
-                   });
+                   let perceivedTemp;
+                   if(this.typePerceivedTemperature === 'Humindex') {
+                       perceivedTemp = data.map(function (d) {
+                           return {
+                               "temp": self.computePerceivedTemperatureHumindex(d['temp'], d['humidity']),
+                               "time": d['time']
+                           };
+                       });
+                   } else {
+                       perceivedTemp = data.map(function (d) {
+                           return {
+                               "temp": self.computePerceivedTemperatureWCTI(d['temp'], d['windSpeed']),
+                               "time": d['time']
+                           };
+                       });
+                   }
                    return [data, perceivedTemp];
                 } else {
                     return [data];
@@ -112,6 +125,8 @@
         }
     }
 </script>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css"/>
 
 <style scoped>
 </style>

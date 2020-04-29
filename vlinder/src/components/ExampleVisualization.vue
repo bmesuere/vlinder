@@ -35,8 +35,8 @@
             },
             async selectedStations() {
 
-                let promises = []
-                let datas = []
+                let promises = [];
+                let datas = [];
 
                 for (var i of this.selectedStations) {
                     promises.push(
@@ -49,7 +49,7 @@
                 await Promise.all(promises);
 
                 let nameDiv = d3.select('#selected-vlinder').selectAll('text').data(datas);
-                nameDiv.exit().remove()
+                nameDiv.exit().remove();
                 nameDiv.transition().text(d => "the temperature at station " + d.id + " is " + d.temp + ", ")
                 nameDiv.enter()
                        .append("text")
