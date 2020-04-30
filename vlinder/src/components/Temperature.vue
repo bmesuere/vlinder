@@ -6,6 +6,7 @@
                 <line-chart-visualization
                     ref="tempchart"
                     y-axis-label="Temperatuur"
+                    x-axis-unit=" °C"
                     :y-axis-getter="(d) => d.temp"
                     style="width: 100%; height: 100%"
                 />
@@ -65,7 +66,7 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
              */
             computePerceivedTemperatureWCTI(T, V) {
                 const V0_16 = Math.pow(V*3.6*1.5, 0.16);
-                return 13.12 + 0.6215 * T - 11.37 * V0_16 + 0.3965 * T * V0_16;
+                return Math.round(10*(13.12 + 0.6215 * T - 11.37 * V0_16 + 0.3965 * T * V0_16))/10;
             },
 
             /**
@@ -77,7 +78,7 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
              */
             computePerceivedTemperatureHumindex(T, H) {
                 const tDew = this.dewPointTemperature(T, H);
-                return T+ 5/9*(6.11 * Math.pow(Math.E, (5417.7530*(1/273.16 - 1/(273.15+tDew)))) -10 );
+                return Math.round(10*(T+ 5/9*(6.11 * Math.pow(Math.E, (5417.7530*(1/273.16 - 1/(273.15+tDew)))) -10)) )/10;
             },
 
             /**
