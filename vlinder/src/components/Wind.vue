@@ -60,8 +60,8 @@
                 const legendModifier = width/600 // trial and error
                 const margin = {top: 40, right: 80, bottom: 40, left: 40};
                 const innerRadius = 20;
-                const chartWidth = width - margin.left - margin.right - legendWidth;
-                const chartHeight = height - margin.top - margin.bottom - legendWidth;
+                const chartWidth = width - margin.left - margin.right - legendWidth*legendModifier;
+                const chartHeight = height - margin.top - margin.bottom - legendWidth*legendModifier;
                 const outerRadius = (Math.min(chartWidth, chartHeight) / 2);
 
                 d3.select('#windrose-svg').selectAll("svg").remove();
