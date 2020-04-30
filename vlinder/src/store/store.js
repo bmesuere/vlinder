@@ -25,7 +25,7 @@ export default new Vuex.Store({
         },
         addVlinderData(state, vlinderData) {
             // state.vlinderData.push(...vlinderData);
-            state.focusedVlinderData.push(...vlinderData);
+            state.focusedVlinderData.push(...[vlinderData]);
         },
         setFocusedVlinderData(state, focusedVlinderData) {
             state.focusedVlinderData = focusedVlinderData

@@ -82,11 +82,13 @@
                 this.stations.forEach(station => {
                     self.options.push({value: station['id'], text: station['name']})
                 });
+                console.log(this.options);
                 this.selection = [this.options[0]]
             },
             async loadData() {
                 let self = this;
                 let datas = [];
+                console.log(self.selection);
                 let promises = [];
                 for (let i = 0; i < self.selection.length; i++) {
                     promises.push(vlinderService.getVlinderData(

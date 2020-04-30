@@ -172,16 +172,12 @@
                     {"x": 1, "y": 4, "w": 4, "h": 2, "i": "4"},
                     {"x": 0, "y": 1, "w": 6, "h": 3, "i": "5"},
                 ]
-
             }
         },
         computed: {
             stations() {
                 return this.$store.getters.stations;
             }
-        },
-        mounted() {
-            this.updateLineCharts();
         },
         watch: {
             stations() {
@@ -204,9 +200,6 @@
                     )
                 }
             },
-            focusedVlinderData() {
-                this.updateLineCharts();
-            }
         },
         methods: {
             stationsToOptions() {
@@ -215,19 +208,15 @@
                     self.options.push({value: station['id'], text: station['name']})
                 });
             },
-            updateLineCharts() {
-                this.$refs.rainChart.update_data([this.focusedVlinderData]);
-                this.$refs.pressureChart.update_data([this.focusedVlinderData]);
-            },
             loadVlinderData() {
-                if (this.selectedStations[0]) {
+                //if (this.selectedStations[0]) {
                     this.$store.dispatch('loadVlinderData', {
                             ids: this.selectedStations.map(x => x['id']),
                             start: new Date(this.selectedStartDateString),
                             end: new Date(this.selectedEndDateString)
                         }
                     );
-                }
+               // }
             }
         }
     }

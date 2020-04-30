@@ -38,8 +38,12 @@
         mixins: [
             VisualizationMixin
         ],
+        watch: {
+            focusedVlinderData() {
+                    this.update_data(this.focusedVlinderData);
+            }
+        },
         mounted() {
-            //this.$nextTick(this.create_graph);
             this.div = d3.select("#" + this.id);
             let observer = new ResizeObserver(this.create_graph);
             observer.observe(this.div.node());
@@ -164,11 +168,11 @@
 
             },
             update_data(data) {
-                this.current_data = data;
+                this.current_data = Array.from(data);
                 let flattened_data = data.flat(1);
 
                 // update scales
-                let dates = data[0].map(x => new Date(x.time));
+                let dates = flattened_data.map(x => new Date(x.time));
                 let start = new Date(Math.min.apply(null, dates));
                 let end = new Date(Math.max.apply(null, dates));
 
