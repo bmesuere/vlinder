@@ -57,6 +57,7 @@
                 const height = size;
                 const legendWidth = width/5;
                 const legendMargin = legendWidth/3;
+                const legendModifier = width/600 // trial and error
                 const margin = {top: 40, right: 80, bottom: 40, left: 40};
                 const innerRadius = 20;
                 const chartWidth = width - margin.left - margin.right - legendWidth;
@@ -194,19 +195,20 @@
                     .selectAll("g")
                     .data(data.columns.slice(1).reverse())
                     .enter().append("g")
-                    .attr("transform", function(d, i) { return "translate(" + (outerRadius+legendMargin) + "," + ((i - (data.columns.length - 1) / 2) * 20) + ")"; });
+                    .attr("transform", function(d, i) { return "translate(" + (outerRadius+legendMargin) + "," + ((i - (data.columns.length - 1) / 2) * (20*legendModifier)) + ")"; });
 
                 legend.append("rect")
-                    .attr("width", 18)
-                    .attr("height", 18)
+                    .attr("width", 18*legendModifier)
+                    .attr("height", 18*legendModifier)
+                    .attr("dy", "100em")
                     .attr("fill", z);
 
                 legend.append("text")
-                    .attr("x", 24)
-                    .attr("y", 9)
+                    .attr("x", 24*legendModifier)
+                    .attr("y", 9*legendModifier)
                     .attr("dy", "0.35em")
                     .text(function(d) { return d.toString() + " m/s"; })
-                    .style("font-size",10);                
+                    .style("font-size",10*legendModifier);                
 
                 return svg.node();
             },
