@@ -71,6 +71,9 @@
         watch: {
             stations() {
                 this.stationsToOptions();
+            },
+            selection() {
+                this.loadData();
             }
         },
         methods: {

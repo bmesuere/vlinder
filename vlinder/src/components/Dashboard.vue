@@ -32,11 +32,15 @@
                         <b-col>
                             <b-row style="padding: 1vh" align-v="center">
                                 <b-col cols="2">Van:</b-col>
-                                <b-col><datetime v-model="selectedStartDateString" type="datetime"/></b-col>
+                                <b-col>
+                                    <datetime v-model="selectedStartDateString" type="datetime"/>
+                                </b-col>
                             </b-row>
                             <b-row style="padding: 1vh" align-v="center">
                                 <b-col cols="2">Tot:</b-col>
-                                <b-col><datetime v-model="selectedEndDateString" type="datetime"/></b-col>
+                                <b-col>
+                                    <datetime v-model="selectedEndDateString" type="datetime"/>
+                                </b-col>
                             </b-row>
                         </b-col>
                         <b-col cols="3">
@@ -95,7 +99,7 @@
                     :h="layout[4].h"
                     :i="layout[4].i"
                     :key="layout[4].i">
-                <b-card style="height: 100%">
+                <b-card id="windRoseCard" style="height: 100%;">
                     <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
                 </b-card>
             </grid-item>
@@ -159,12 +163,12 @@
                 selectedStartDateString: '',
                 selectedEndDateString: '',
                 layout: [
-                    {"x": 0, "y": 0, "w": 5, "h": 1, "i": "0"},
-                    {"x": 5, "y": 0, "w": 5, "h": 1, "i": "1"},
-                    {"x": 0, "y": 1, "w": 4, "h": 2, "i": "2"},
-                    {"x": 4, "y": 1, "w": 4, "h": 2, "i": "3"},
-                    {"x": 0, "y": 3, "w": 3, "h": 2, "i": "4"},
-                    {"x": 8, "y": 1, "w": 4, "h": 2, "i": "5"},
+                    {"x": 0, "y": 0, "w": 6, "h": 1, "i": "0"},
+                    {"x": 6, "y": 0, "w": 4, "h": 1, "i": "1"},
+                    {"x": 6, "y": 1, "w": 4, "h": 2, "i": "2"},
+                    {"x": 6, "y": 1, "w": 4, "h": 2, "i": "3"},
+                    {"x": 1, "y": 4, "w": 4, "h": 2, "i": "4"},
+                    {"x": 0, "y": 1, "w": 6, "h": 3, "i": "5"},
                 ]
 
             }
@@ -188,6 +192,7 @@
                         return {value: x['id'], text: x['name']}
                     })
                 }
+                this.loadVlinderData();
             },
             multiSelectValues() {
                 let ids = this.multiSelectValues.map(x => x['value']);
@@ -227,5 +232,7 @@
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"/>
 <style scoped>
-
+    #windRoseCard .card-body {
+        padding: 0.5rem;
+    }
 </style>

@@ -1,6 +1,6 @@
 <template>
     <div id="d3-viz-windrose" style="height: 100%; width: 100%">
-        <div id="windrose-svg" style="height: 100%; width: 100%"/>
+        <div id="windrose-svg" style="height: 100%; width: 100%; text-align: center"/>
     </div>
 </template>
 
@@ -30,7 +30,6 @@
         },
         methods: {
             createPlot(raw_data) {
-
                 const tooltip = d3.select("body")
                     .append("div")
                     .style("position", "absolute")
@@ -57,7 +56,7 @@
                 const height = size;
                 const legendWidth = width/5;
                 const legendMargin = legendWidth/3;
-                const legendModifier = width/600 // trial and error
+                const legendModifier = width/600; // trial and error
                 const margin = {top: 40, right: 80, bottom: 40, left: 40};
                 const innerRadius = 20;
                 const chartWidth = width - margin.left - margin.right - legendWidth*legendModifier;
@@ -67,8 +66,8 @@
                 d3.select('#windrose-svg').selectAll("svg").remove();
                 const svg = d3.select("#windrose-svg")
                     .append("svg")
-                    .style("width", width)
-                    .style("height", height)
+                    .style("width", width + 'px')
+                    .style("height", height + 'px')
                     .style("font", "10px sans-serif");
 
                 const g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
