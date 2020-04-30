@@ -284,7 +284,7 @@
                         .attr("x2", toolTipX);
 
                     // Update tooltip information box
-                    this.tooltip_box.attr("transform", "translate(" + (mousePosition[0]+ 5) + ", " + (mousePosition[1]+25) + ")");
+                    this.tooltip_box.attr("transform", "translate(" + (mousePosition[0]+ 5) + ", " + (mousePosition[1] - 100) + ")");
 
                     this.tooltip_box
                         .selectAll("g.entry text.y-value")
