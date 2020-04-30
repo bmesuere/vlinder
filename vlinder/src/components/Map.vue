@@ -87,7 +87,7 @@
                 this.setSelectedStations([this.stations[0]]);
 
                 this.stations_component.join(enter => {
-                    Popup(enter.select("circle"));
+                    Popup(enter.select("circle"), this.map);
                 });
             }
         }
