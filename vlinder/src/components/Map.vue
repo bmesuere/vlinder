@@ -12,6 +12,7 @@
     import belgium from "../local/belgium.geo.json.js";
     import Regions from "../d3components/continents.js";
     import Stations from "../d3components/stations.js";
+    import Popup from '../d3components/stationpopup.js'
     import '../utils/extentions.js'
 
     export default {
@@ -47,32 +48,47 @@
         },
         data() {
             return {
-                map: {}
+                map: {},
+                stations_component: {}
             }
         },
         watch: {
             stations() {
                 this.addStationsToMap();
+            },
+            selectedStations () {
+                let self = this;
+                this.stations_component.join(enter => {
+                    enter.select("circle")
+                    .attr("selected", d => self.selectedStations.includes(d))
+                });
             }
         },
         methods: {
             addStationsToMap() {
-                const selection = new Set();
-                const stations_component = new Stations();
+                let self = this;
+                this.stations_component = new Stations();
 
                 this.map.datum({regions: belgium, stations: this.stations});
                 this.map.call(Regions);
-                this.map.call(stations_component);
+                this.map.call(this.stations_component);
 
-                stations_component.join(enter => {
+                this.stations_component.join(enter => {
                     enter.select("circle").on("click.select", function (d) {
-                        const el = d3.select(this);
-                        const cond = el.attr("selected") === "false";
-                        selection.toggle(d, cond);
-                        el.attr("selected", (cond))
+                        let index = self.selectedStations.findIndex(el => el === d);
+                        if (index !== -1) {
+                            self.selectedStations.splice(index, 1);
+                        } else {
+                            self.selectedStations.push(d);
+                        }
                     });
-                    enter.attr("debug", 1)
-                })
+                });
+
+                this.setSelectedStations([this.stations[0]]);
+
+                this.stations_component.join(enter => {
+                    Popup(enter.select("circle"));
+                });
             }
         }
     }
