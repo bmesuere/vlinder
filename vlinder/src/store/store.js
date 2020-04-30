@@ -7,6 +7,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         stations: [],
+        selectedStations: [],
         vlinderData: [],
         focusedVlinderData: [],
         latestVlinderData: []
@@ -15,9 +16,16 @@ export default new Vuex.Store({
         setStations(state, stations) {
             state.stations = stations
         },
+        setSelectedStations(state, selectedStations) {
+            state.selectedStations = selectedStations
+        },
         setVlinderData(state, vlinderData) {
             state.vlinderData = vlinderData;
             state.focusedVlinderData = vlinderData
+        },
+        addVlinderData(state, vlinderData) {
+            // state.vlinderData.push(...vlinderData);
+            state.focusedVlinderData.push(...vlinderData);
         },
         setFocusedVlinderData(state, focusedVlinderData) {
             state.focusedVlinderData = focusedVlinderData
@@ -33,12 +41,18 @@ export default new Vuex.Store({
             })
         },
         loadVlinderData({commit}, object) {
-            vlinderService.getVlinderData(object.id, object.start, object.end).then(response => {
-                commit('setVlinderData', response.data)
+            commit('setVlinderData', []);
+            object.ids.forEach(id => {
+                vlinderService.getVlinderData(id, object.start, object.end).then(response => {
+                    commit('addVlinderData', response.data)
+                })
             })
         },
         updateFocusedVlinderdata({commit}, data) {
             commit('setFocusedVlinderData', data)
+        },
+        updateSelectedStations({commit}, data) {
+            commit('setSelectedStations', data)
         },
         fetchLatestVlinderData({commit}) {
             vlinderService.getLatestVlinderData().then(response => {
@@ -49,6 +63,9 @@ export default new Vuex.Store({
     getters: {
         stations: state => {
             return state.stations
+        },
+        selectedStations: state => {
+            return state.selectedStations
         },
         vlinderData: state => {
             return state.vlinderData

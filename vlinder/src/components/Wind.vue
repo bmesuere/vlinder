@@ -1,12 +1,13 @@
 <template>
     <div id="d3-viz-windrose" style="height: 100%; width: 100%">
-        <div id="windrose-svg" style="height: 100%; width: 100%"/>
+        <div id="windrose-svg" style="height: 100%; width: 100%; text-align: center"/>
     </div>
 </template>
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import * as d3 from 'd3'
+    import ResizeObserver from 'resize-observer-polyfill';
 
     export default {
         name: "WindRose",
@@ -21,8 +22,25 @@
                 this.createPlot(this.focusedVlinderData);
             }
         },
+        mounted (){
+            this.div = d3.select('#d3-viz-windrose');
+            this.raw_data = [];
+            let observer = new ResizeObserver(() => this.createPlot(this.raw_data));
+            observer.observe(this.div.node());
+            this.createPlot(this.raw_data);
+        },
         methods: {
             createPlot(raw_data) {
+                const tooltip = d3.select("body")
+                    .append("div")
+                    .style("position", "absolute")
+                    .style("z-index", "10")
+                    .style("visibility", "hidden")
+                    .style("padding", "5px")
+                    .style("border-radius", "10px")
+                    .style("background", "#fff");
+
+                this.raw_data = raw_data;
                 // Convert data to format needed for the windrose
                 const data_csv_format = this.convertData(raw_data);
                 const data = d3.csvParse(data_csv_format, (d, _, columns) => {
@@ -37,24 +55,27 @@
                 const size = Math.min(divBox['height'], divBox['width']);
                 const width = size;
                 const height = size;
+                const legendWidth = width/5;
+                const legendMargin = legendWidth/3;
+                const legendModifier = width/600; // trial and error
                 const margin = {top: 40, right: 80, bottom: 40, left: 40};
                 const innerRadius = 20;
-                const chartWidth = width - margin.left - margin.right;
-                const chartHeight = height - margin.top - margin.bottom;
+                const chartWidth = width - margin.left - margin.right - legendWidth*legendModifier;
+                const chartHeight = height - margin.top - margin.bottom - legendWidth*legendModifier;
                 const outerRadius = (Math.min(chartWidth, chartHeight) / 2);
 
                 d3.select('#windrose-svg').selectAll("svg").remove();
                 const svg = d3.select("#windrose-svg")
-                        .append("svg")
-                        .attr("width", width)
-                        .attr("height", height)
-                        .style("font", "10px sans-serif"),
+                    .append("svg")
+                    .style("width", width + 'px')
+                    .style("height", height + 'px')
+                    .style("font", "10px sans-serif");
 
-                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                const g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
                 const angle = d3.scaleLinear()
                     .range([0, 2 * Math.PI]);
-
+                
                 const radius = d3.scaleLinear()
                     .range([innerRadius, outerRadius]);
 
@@ -111,9 +132,10 @@
                         })
                         .padAngle(0.01)
                         .padRadius(innerRadius))
-                    .attr("transform", function () {
-                        return "rotate(" + angleOffset + ")"
-                    });
+                    .attr("transform", function() {return "rotate("+ angleOffset + ")"})
+                    .on("mouseover", function(d){ tooltip.text((Math.round(((d[1] - d[0]) + Number.EPSILON) * 100) / 100).toString() + "%"); return tooltip.style("visibility", "visible");})
+                        .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+                        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
                 const label = g.append("g")
                     .selectAll("g")
@@ -173,23 +195,20 @@
                     .selectAll("g")
                     .data(data.columns.slice(1).reverse())
                     .enter().append("g")
-                    .attr("transform", function (d, i) {
-                        return "translate(" + (outerRadius + 0) + "," + (-outerRadius + 40 + (i - (data.columns.length - 1) / 2) * 20) + ")";
-                    });
+                    .attr("transform", function(d, i) { return "translate(" + (outerRadius+legendMargin) + "," + ((i - (data.columns.length - 1) / 2) * (20*legendModifier)) + ")"; });
 
                 legend.append("rect")
-                    .attr("width", 18)
-                    .attr("height", 18)
+                    .attr("width", 18*legendModifier)
+                    .attr("height", 18*legendModifier)
+                    .attr("dy", "100em")
                     .attr("fill", z);
 
                 legend.append("text")
-                    .attr("x", 24)
-                    .attr("y", 9)
+                    .attr("x", 24*legendModifier)
+                    .attr("y", 9*legendModifier)
                     .attr("dy", "0.35em")
-                    .text(function (d) {
-                        return d;
-                    })
-                    .style("font-size", 8);
+                    .text(function(d) { return d.toString() + " m/s"; })
+                    .style("font-size",10*legendModifier);                
 
                 return svg.node();
             },

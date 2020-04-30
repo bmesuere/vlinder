@@ -11,7 +11,7 @@
         mixins: [VisualizationMixin],
         props: {
             datas: Array,
-            selectedStations: Array
+            selection: Array
         },
         async mounted() {
             let div = d3.select("#timeline-div")
@@ -55,18 +55,18 @@
                 updateData() {
                     let selectedIds = [];
                     let selectedNames = [];
-                    for (let station of this.selectedStations) {
+                    for (let station of this.selection) {
                         selectedIds.push(station.value);
                         selectedNames.push(station.text);
                     }
                     this.construct_graph(this.datas, selectedIds, selectedNames);
                 },
 
-                construct_graph(datas, selectedStations, selectedNames) {
-                    const height = (selectedStations.length + 1) * this.bars.height;
+                construct_graph(datas, selection, selectedNames) {
+                    const height = (selection.length + 1) * this.bars.height;
 
                     this.updateXScale(datas)
-                    this.updateYScale(selectedStations, height)
+                    this.updateYScale(selection, height)
 
                     this.rescaleViewBox(height)
                     this.constructAxes(selectedNames, height);
@@ -83,7 +83,7 @@
                     status_bars.enter()
                         .append("rect")
                         .attr("x", d => this.xScale(new Date(d.time)))
-                        .attr("y", d => this.yScale(selectedStations.indexOf(d.id)))
+                        .attr("y", d => this.yScale(selection.indexOf(d.id)))
                         .attr("width", (this.bars.width + 1) - this.bars.h_padding)
                         .attr("height", 0)
                         .attr("class", d => "bar " + this.getClass(d))
@@ -91,14 +91,14 @@
                         .on("mouseover", d => this.handleMouseOver(
                                             d,
                                             this.xScale(new Date(d.time)),
-                                            this.yScale(selectedStations.indexOf(d.id)),
-                                            selectedNames[selectedStations.indexOf(d.id)]
+                                            this.yScale(selection.indexOf(d.id)),
+                                            selectedNames[selection.indexOf(d.id)]
                                         )
                             )
                         .on("mouseout", this.handleMouseOut)
                         .transition()
                         .attr("x", d => this.xScale(new Date(d.time)))
-                        .attr("y", d => this.yScale(selectedStations.indexOf(d.id)))
+                        .attr("y", d => this.yScale(selection.indexOf(d.id)))
                         .attr("width", (this.bars.width + 1) - this.bars.h_padding)
                         .attr("height", this.bars.height - this.bars.v_padding)
                         .attr("class", d => "bar " + this.getClass(d))
@@ -160,9 +160,9 @@
                         return this.xScale;
                     },
 
-                    updateYScale(selectedStations, height) {
+                    updateYScale(selection, height) {
                         this.yScale
-                            .domain([0, selectedStations.length + 1])
+                            .domain([0, selection.length + 1])
                             .range([this.padding.top, height + this.padding.top]);
                     },
 

@@ -6,6 +6,7 @@
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
+    import ResizeObserver from 'resize-observer-polyfill';
     import * as d3 from 'd3'
 
     export default {
@@ -13,88 +14,115 @@
         mixins: [
             VisualizationMixin
         ],
-        props: {
-            selectedStations: Array
-        },
         watch: {
-            selectedStations() {
-                this.createPlot();
+            focusedVlinderData() {
+                this.update_data()
             }
+        },
+
+        mounted() {
+            this.div = d3.select('#d3-viz-area');
+            let observer = new ResizeObserver(this.create_area_chart);
+            observer.observe(this.div.node());
+
+            this.create_area_chart();
         },
 
 
         methods: {
-            /**
-             * Create a plot based on the given data
-             */
-            createPlot() {
-                // Computer property from mixin
-                let data = this.stations;
+            create_area_chart() {
 
-                let div = d3.select('#d3-viz-area');
-                const filteredData = data.filter(d => d['id'] === this.selectedStations[0]['value']);
-                const landUse = filteredData[0]["landUse"];
-                const padding = {top: 20, left: 45, right: 40, bottom: 25};
+                let divBox = this.div.node().getBoundingClientRect();
+                this.width = Math.max(divBox.width, 100);
+                this.height = Math.max(divBox.height, 100);
 
-                const width = div.node().getBoundingClientRect()['width'];
-                const height = div.node().getBoundingClientRect()['height'];
+                this.div.selectAll("*").remove();
 
-                d3.select('#d3-viz-area').html('');
-                const graph = d3.select('#d3-viz-area')
-                    .append("svg")
-                    .attr("width", width)
-                    .attr("height", height);
+                this.svg = this.div.append("svg", 0)
+                    .attr("width", this.width)
+                    .attr("height", this.height);
 
-                this.xLabels = ["0", "20", "50", "100", "250", "500"];
 
-                //create x scale and axis
+                // setup everything
+                this.xLabels = ["0m", "20m", "50m", "100m", "250m", "500m"];
+                this.padding = {top: 20, left: 45, right: 20, bottom: 30};
+
                 this.xScale = d3.scaleLinear()
-                    .domain([0, landUse.length + 1])
-                    .range([padding.left, width - padding.right]);
+                    .domain([0, this.xLabels.length])
+                    .range([this.padding.left, this.width - this.padding.right]);
 
-                const xAxis = d3.axisBottom()
+                this.yScale = d3.scaleLinear()
+                    .domain([0, 1])
+                    .range([this.height - this.padding.bottom, this.padding.top]);
+
+                this.dataScale = d3.scaleLinear()
+                    .domain([0, 1])
+                    .range([0, this.height - this.padding.bottom - this.padding.top]);
+
+                this.xAxis = d3.axisBottom()
                     .scale(this.xScale)
                     .ticks(5)
                     .tickFormat(d => this.xLabels[d]);
 
-                // create y scale and axis
-                this.yScale = d3.scaleLinear()
-                    .domain([0, 1])
-                    .range([height - padding.bottom, padding.top]);
-
-                this.dataScale = d3.scaleLinear()
-                    .domain([0, 1])
-                    .range([0, height- padding.bottom - padding.top]);
-
-                const yAxis = d3.axisLeft()
+                this.yAxis = d3.axisLeft()
                     .scale(this.yScale)
                     .ticks(5);
 
-                // add axes to plot
-                graph.append("g")
+                this.xAxisGroup = this.svg.append("g")
                     .attr("class", "x axis")
-                    .attr("transform", `translate(0, ${height - padding.bottom})`)
-                    .call(xAxis)
+                    .attr("transform", `translate(0, ${this.height - this.padding.bottom})`);
+
+                this.yAxisGroup = this.svg.append("g")
+                    .attr("class", "y axis")
+                    .attr("transform", `translate(${this.padding.left}, 0)`);
+
+                this.svg.select(".y.axis")
+                    .append("text")
+                    .text('Landgebruik')
+                    .style("text-anchor", "end")
+                    .attr("dx", -this.padding.top)
+                    .attr("dy", "1em")
+                    .attr("transform", "rotate(-90)")
+                    .attr("fill", "black");
+
+                this.xAxisGroup.call(this.xAxis)
                     .selectAll("text")
                     .style("text-anchor", "end")
                     .attr("dx", "-.8em")
                     .attr("dy", ".15em")
                     .attr("transform", "rotate(-45)");
 
-                graph.append("g")
-                    .attr("class", "y axis")
-                    .attr("transform", `translate(${padding.left}, 0)`)
-                    .call(yAxis);
+                this.yAxisGroup.call(this.yAxis);
+                this.update_data()
 
-                this.showLabel = function(element, value, type){{
-                        d3.select(element).attr("stroke", "black");
-                        graph
-                            .append("svg:title")
-                            .text(Math.round(100*value)+ '% ' + type) // todo afrondingsfouten waardoor som niet altijd 100 is
-                    }
+
+            },
+            update_data() {
+                this.svg.selectAll("rect").remove();
+
+                if (this.selectedStations === undefined
+                    || this.selectedStations.length === 0
+                    || this.stations === undefined
+                    || this.stations.length === 0) {
+                    return;
                 }
+                const landUse = this.selectedStations[0]["landUse"];
 
-                let bars = graph
+                let showLabel = function (element, value, type) {
+                    d3.select(element).attr("stroke", "black");
+                    d3.select('#d3-viz-area')
+                        .select('svg')
+                        .append("svg:title")
+                        .text((100 * value).toFixed(2) + '% ' + type)
+                };
+
+                let removeLabel = function (element) {
+                    d3.select(element).attr("stroke", "none");
+                    d3.select('#d3-viz-area')
+                        .select('svg').selectAll("title").remove();
+                };
+
+                let bars = this.svg
                     .selectAll("rect")
                     .data(landUse)
                     .enter()
@@ -103,65 +131,49 @@
 
                 bars.append("rect")
                     .attr("x", (d, i) => this.xScale(i + 0.6))
-                    .attr("y", padding.top)
-                    .attr("width", width / (this.xLabels.length + 1) * 0.8)
+                    .attr("y", this.padding.top)
+                    .attr("width", this.width / (this.xLabels.length + 1) * 0.8)
                     .attr("height", d => this.dataScale(d['usage'][0]['value']))
                     .attr("fill", "lightskyblue")
                     .on("mouseover", function (d) {
-                        d3.select(this)
-                            .attr("stroke", "black");
-                        graph
-                            .append("svg:title")
-                            .text((100*d['usage'][0]['value']).toFixed(2)+ '% water')
+                        showLabel(this, d['usage'][0]['value'], 'water');
                     })
                     .on("mouseout", function () {
-                        d3.select(this).attr("stroke", "none");
-                        graph.selectAll("title").remove();
-                    });
+                        removeLabel(this);
+                    })
+                ;
 
                 bars.append("rect")
                     .attr("x", (d, i) => this.xScale(i + 0.6))
-                    .attr("y", d => padding.top + this.dataScale(d['usage'][0]['value']))
-                    .attr("width", width / (this.xLabels.length + 1) * 0.8)
+                    .attr("y", d => this.padding.top + this.dataScale(d['usage'][0]['value']))
+                    .attr("width", this.width / (this.xLabels.length + 1) * 0.8)
                     .attr("height", d => this.dataScale((d['usage'][1]['value'])))
                     .attr("fill", "limegreen")
                     .on("mouseover", function (d) {
-                        d3.select(this)
-                            .attr("stroke", "black");
-                        graph
-                            .append("svg:title")
-                            .text((100*d['usage'][1]['value']).toFixed(2)+ '% groen')
+                        showLabel(this, d['usage'][1]['value'], 'groen');
                     })
                     .on("mouseout", function () {
-                        d3.select(this).attr("stroke", "none");
-                        graph.selectAll("title").remove();
+                        removeLabel(this);
                     })
                 ;
 
                 bars.append("rect")
                     .attr("x", (d, i) => this.xScale(i + 0.6))
-                    .attr("y", d => padding.top + this.dataScale(d['usage'][0]['value']) + this.dataScale(d['usage'][1]['value']))
-                    .attr("width", width / (this.xLabels.length + 1) * 0.8)
+                    .attr("y", d => this.padding.top + this.dataScale(d['usage'][0]['value']) + this.dataScale(d['usage'][1]['value']))
+                    .attr("width", this.width / (this.xLabels.length + 1) * 0.8)
                     .attr("height", d => this.dataScale(d['usage'][2]['value']))
                     .attr("fill", "saddlebrown")
                     .on("mouseover", function (d) {
-                        d3.select(this)
-                            .attr("stroke", "black");
-                        graph
-                            .append("svg:title")
-                            .text((100*d['usage'][2]['value']).toFixed(2)+ '% asfalt')
+                        showLabel(this, d['usage'][2]['value'], 'verhard')
                     })
                     .on("mouseout", function () {
-                        d3.select(this).attr("stroke", "none");
-                        graph.selectAll("title").remove();
+                        removeLabel(this);
                     })
                 ;
 
-                return graph.node();
-            }
+                return this.svg.node();
+            },
         }
-
-
     }
 </script>
 

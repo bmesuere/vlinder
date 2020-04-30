@@ -19,7 +19,7 @@
         </b-navbar>
         <Dashboard :class="shown === 'dashboard' ? '' : 'disabled'" style="flex: 1;"/>
         <Status :class="shown === 'status' ? '' : 'disabled'" style="flex: 1;"/>
-        <footer style="text-align: center; width: 100%; color: grey; font-size: small">
+        <footer style="text-align: center; width: 100%; color: grey; font-size: small; padding-top: 2vh">
             Project Datavisualisatie UGent
         </footer>
     </div>
