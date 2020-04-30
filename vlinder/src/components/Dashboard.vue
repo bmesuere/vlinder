@@ -5,7 +5,7 @@
             <div style="position: absolute; z-index: 9; margin-left: auto; padding: 4vh">
                 <multiselect v-model="multiSelectValues" label="text" track-by="text" :clear-on-select="false"
                              :multiple="true" :options="options" :searchable="true" :close-on-select="false"
-                             :show-labels="false" placeholder="No stations selected"/>
+                             :show-labels="false" placeholder="Selecteer een station"/>
             </div>
         </div>
 
@@ -26,7 +26,7 @@
                     :w="layout[0].w"
                     :h="layout[0].h"
                     :i="layout[0].i"
-                    :key="layout[0].i">
+                    :key="layout[0].i" style="z-index: 8">
                 <b-card style="height: 100%">
                     <b-row style="height: 100%" align-h="center" align-v="center">
                         <b-col>
