@@ -1,7 +1,7 @@
 <template>
     <div style="margin-left: 10%; margin-right: 10%; margin-top: 10px;">
-        <div style="position: relative; display: flex;">
-            <Map style="margin: auto;"/>
+        <div style="position: relative; display: flex; width: 100%">
+            <Map style="margin: auto; width: 100%; height: 100%;"/>
             <div style="position: absolute; z-index: 9; margin-left: auto; padding: 4vh">
                 <multiselect v-model="multiSelectValues" label="text" track-by="text" :clear-on-select="false"
                              :multiple="true" :options="options" :searchable="true" :close-on-select="false"
