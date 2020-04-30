@@ -6,6 +6,7 @@
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
+    import ResizeObserver from 'resize-observer-polyfill';
     import * as d3 from 'd3'
 
     export default {

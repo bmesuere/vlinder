@@ -7,6 +7,7 @@
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import * as d3 from 'd3'
+    import ResizeObserver from 'resize-observer-polyfill';
 
     export default {
         name: "WindRose",

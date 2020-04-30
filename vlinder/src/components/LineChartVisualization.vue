@@ -4,6 +4,7 @@
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
+    import ResizeObserver from 'resize-observer-polyfill';
     import * as d3 from 'd3'
     import {uuidv4} from "../utils";
 
@@ -255,7 +256,7 @@
                 if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     // Update position of tooltip elements according to mouse position
                     //if ($.)
-                    let mousePosition =  [d3.event.offsetX, d3.event.offsetY];  //d3.mouse(this.svg.node());
+                    let mousePosition = [d3.event.offsetX, d3.event.offsetY];  //d3.mouse(this.svg.node());
                     let currentXScale = this.xAxis.scale(); // Get zoomed scale
                     let mouseX = currentXScale.invert(mousePosition[0]); // waarde van x-as, hier dus datum
                     let bisectTime = d3.bisector(function (d) {
