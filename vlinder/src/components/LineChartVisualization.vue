@@ -168,7 +168,6 @@
 
             },
             update_data(data) {
-                console.log(data);
                 this.current_data = Array.from(data);
                 let flattened_data = data.flat(1);
 

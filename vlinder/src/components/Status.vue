@@ -82,7 +82,6 @@
                 this.stations.forEach(station => {
                     self.options.push({value: station['id'], text: station['name']})
                 });
-                console.log(this.options);
                 this.selection = [this.options[0]]
             },
             async loadData() {
