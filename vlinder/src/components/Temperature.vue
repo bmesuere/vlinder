@@ -5,7 +5,6 @@
                 <b-col style="height: 100%">
                 <line-chart-visualization
                     ref="tempchart"
-                    v-bind:selected-stations="selectedStations"
                     y-axis-label="Temperatuur"
                     :y-axis-getter="(d) => d.temp"
                     style="width: 100%; height: 100%"
@@ -37,9 +36,6 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
                 typePerceivedTemperature: null,
                 options: ['Humindex', 'WCTI']
             }
-        },
-        props: {
-            "selectedStations": Array,
         },
         mixins: [
             VisualizationMixin

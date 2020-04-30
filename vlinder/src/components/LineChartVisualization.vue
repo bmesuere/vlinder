@@ -23,8 +23,6 @@
                 type: Number,
                 default: 1.5
             },
-            //"selectedStation": String,
-            "selectedStations": Array,
             "colors": {
                 type: Array,
                 default: () => ['#5DBE55', '#926DA5', '#2B92BE']
@@ -297,12 +295,11 @@
             },
             updateChart() {
                 if (this.current_data && this.current_data.length <= 0 || this.current_data[0].length <= 0){
-                    console.log(this.current_data);
                     return
                 }
 
                 // recover the new scale
-                var newX = d3.event.transform.rescaleX(this.xScale);
+                let newX = d3.event.transform.rescaleX(this.xScale);
 
                 this.xAxis.scale(newX);
 

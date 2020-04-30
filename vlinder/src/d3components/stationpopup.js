@@ -1,12 +1,8 @@
 import * as d3 from "d3"
 import "d3-selection-multi";
 
-function make_popup(root){
-    console.log("wello");
-    console.log(root)
-    const g = root.append("g").attr("id","popup");
-
-
+function make_popup(root) {
+    const g = root.append("g").attr("id", "popup");
 
     const h = 50;
     const x = 2.5;
@@ -47,12 +43,11 @@ function remove_popup(root) {
     root.selectAll("#popup").remove();
 }
 
-
 export default function popup(selection) {
-    console.log("hello");
-    console.log({selection});
-    console.log(selection.parentNode);
-    selection.on("mouseover.debug",() => console.log("qello"));
-    selection.on("mouseover.popup",function () {make_popup(d3.select(this.parentNode));});
-    selection.on("mouseout.popup" ,function () { remove_popup(d3.select(this.parentNode));});
+    selection.on("mouseover.popup", function () {
+        make_popup(d3.select(this.parentNode));
+    });
+    selection.on("mouseout.popup", function () {
+        remove_popup(d3.select(this.parentNode));
+    });
 }

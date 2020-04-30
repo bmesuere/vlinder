@@ -13,9 +13,6 @@
         mixins: [
             VisualizationMixin
         ],
-        props: {
-            selectedStations: Array,
-        },
         watch: {
             focusedVlinderData() {
                 this.update_data()
@@ -108,8 +105,7 @@
                     || this.stations.length === 0) {
                     return;
                 }
-                const filteredData = this.stations.filter(d => d['id'] === this.selectedStations[0]['value']);
-                const landUse = filteredData[0]["landUse"];
+                const landUse = this.selectedStations[0]["landUse"];
 
                 let showLabel = function (element, value, type) {
                     d3.select(element).attr("stroke", "black");
@@ -176,10 +172,7 @@
 
                 return this.svg.node();
             },
-
         }
-
-
     }
 </script>
 

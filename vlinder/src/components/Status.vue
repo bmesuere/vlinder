@@ -4,7 +4,7 @@
             <b-row align-h="center" align-v="center" style="padding: 1em">
                 <b-col>
                     Vlinderstations to display:
-                    <multiselect v-model="selectedStations" label="text" track-by="text" :clear-on-select="false"
+                    <multiselect v-model="selection" label="text" track-by="text" :clear-on-select="false"
                                  :multiple="true" :options="options" :searchable="true" :close-on-select="false"
                                  :show-labels="false" placeholder="No stations selected"/>
                 </b-col>
@@ -25,7 +25,7 @@
                 </b-col>
             </b-row>
             <b-row align-h="center">
-                <timeline :datas="data" :selected-stations="selectedStations" style="padding: 5px"/>
+                <timeline :datas="data" :selection="selection" style="padding: 5px"/>
             </b-row>
         </b-container>
     </div>
@@ -56,7 +56,7 @@
         },
         data() {
             return {
-                selectedStations: [],
+                selection: [],
                 options: [],
                 selectedStartDateString: '',
                 selectedEndDateString: '',
@@ -79,15 +79,15 @@
                 this.stations.forEach(station => {
                     self.options.push({value: station['id'], text: station['name']})
                 });
-                this.selectedStations = [this.options[0]]
+                this.selection = [this.options[0]]
             },
             async loadData() {
                 let self = this;
                 let datas = [];
                 let promises = [];
-                for (let i = 0; i < self.selectedStations.length; i++) {
+                for (let i = 0; i < self.selection.length; i++) {
                     promises.push(vlinderService.getVlinderData(
-                        self.selectedStations[i].value,
+                        self.selection[i].value,
                         new Date(self.selectedStartDateString),
                         new Date(self.selectedEndDateString)).then(
                         d => {
