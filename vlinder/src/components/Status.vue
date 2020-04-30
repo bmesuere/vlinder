@@ -88,7 +88,6 @@
             async loadData() {
                 let self = this;
                 let datas = [];
-                console.log(self.selection);
                 let promises = [];
                 for (let i = 0; i < self.selection.length; i++) {
                     promises.push(vlinderService.getVlinderData(

@@ -168,6 +168,7 @@
 
             },
             update_data(data) {
+                console.log(data);
                 this.current_data = Array.from(data);
                 let flattened_data = data.flat(1);
 
@@ -260,7 +261,7 @@
                 if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     // Update position of tooltip elements according to mouse position
                     //if ($.)
-                    let mousePosition = [d3.event.offsetX, d3.event.offsetY];  //d3.mouse(this.svg.node());
+                    let mousePosition = d3.mouse(this.svg.node());
                     let currentXScale = this.xAxis.scale(); // Get zoomed scale
                     let mouseX = currentXScale.invert(mousePosition[0]); // waarde van x-as, hier dus datum
                     let bisectTime = d3.bisector(function (d) {
@@ -289,8 +290,6 @@
                         .attr("x1", toolTipX)
                         .attr("x2", toolTipX);
 
-                    // Update tooltip information box
-                    this.tooltip_box.attr("transform", "translate(" + (mousePosition[0]+ 5) + ", " + (mousePosition[1] - 100) + ")");
 
                     this.tooltip_box
                         .selectAll("g.entry text.y-value")
@@ -323,6 +322,13 @@
                         .attr("x", 0)
                         .attr("height", height)
                         .attr("width", width);
+
+                    // Update tooltip information box
+                    let translate_x = mousePosition[0] + 5;
+                    if (mousePosition[0] + 5 + width > this.width - this.padding.right){
+                        translate_x = mousePosition[0] - 5 - width;
+                    }
+                    this.tooltip_box.attr("transform", "translate(" + (translate_x) + ", " + (mousePosition[1] - 100) + ")");
 
                     this.tooltip_box.select("text.title")
                         .text(this.format(new Date(x_value)))
