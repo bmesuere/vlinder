@@ -254,7 +254,8 @@
             updateToolTips() {
                 if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     // Update position of tooltip elements according to mouse position
-                    let mousePosition = d3.mouse(this.svg.node());
+                    //if ($.)
+                    let mousePosition =  [d3.event.offsetX, d3.event.offsetY];  //d3.mouse(this.svg.node());
                     let currentXScale = this.xAxis.scale(); // Get zoomed scale
                     let mouseX = currentXScale.invert(mousePosition[0]); // waarde van x-as, hier dus datum
                     let bisectTime = d3.bisector(function (d) {
