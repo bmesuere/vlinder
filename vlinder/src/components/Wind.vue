@@ -21,6 +21,13 @@
                 this.createPlot(this.focusedVlinderData);
             }
         },
+        mounted (){
+            this.div = d3.select('#d3-viz-windrose');
+            this.raw_data = [];
+            let observer = new ResizeObserver(() => this.createPlot(this.raw_data));
+            observer.observe(this.div.node());
+            this.createPlot(this.raw_data);
+        },
         methods: {
             createPlot(raw_data) {
 
@@ -33,6 +40,7 @@
                     .style("border-radius", "10px")
                     .style("background", "#fff");
 
+                this.raw_data = raw_data;
                 // Convert data to format needed for the windrose
                 const data_csv_format = this.convertData(raw_data);
                 const data = d3.csvParse(data_csv_format, (d, _, columns) => {
