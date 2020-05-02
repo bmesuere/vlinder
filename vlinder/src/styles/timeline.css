@@ -47,3 +47,18 @@ div #timeline-div {
 #temp {
     pointer-events: none;
 }
+
+.circles {
+    stroke: #3c373d;
+	fill: #999999;
+	cursor: pointer;
+    vector-effect: non-scaling-stroke;
+}
+
+.circles[status*="Ok"]{
+    fill:  #77b58c;
+}
+
+.circles[status*="Server Failure"]{
+    fill: #FF8888;
+}
