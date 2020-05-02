@@ -28,10 +28,10 @@
     stroke-width: 4px;
 }
 
-.circles[status*="online"]{
+.circles[status*="Ok"]{
     fill:  #77b58c;
 }
 
-.circles[status*="abnormal"]{
+.circles[status*="Server Failure"]{
     fill: #FF8888;
 }

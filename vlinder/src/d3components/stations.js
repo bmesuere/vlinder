@@ -2,10 +2,8 @@ import Callable from "../utils/callable"
 import * as d3 from "d3"
 import "d3-selection-multi";
 import LList from "../utils/LList.js"
+import {coordinates, X, Y} from "../utils/coordinates"
 
-const coordinates = ({longitude,latitude}) => [longitude,latitude];
-const X = ([x,]) => x;
-const Y = ([,y]) => y;
 
 export default class Stations extends Callable {
     guests = new LList();
