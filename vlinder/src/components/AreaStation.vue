@@ -108,13 +108,6 @@
                 .attr('y', this.height/2-20)
                 .attr('x', this.width/2-50)
                 .style('display', 'none');
-            this.info_box.append("rect")
-                .attr("class", "legend-background")
-                .attr("fill", "#d3d3d3")
-                .attr("opacity", 0.9)
-                .attr("rx", '3')
-                .attr("ry", '3')
-                .attr('stroke', 'black');
             // add text
             this.info_box.append("text")
                 .text(" Weergave van de omgeving rond het weerstation. ")
@@ -145,11 +138,19 @@
                 .attr('y', this.height/2+17)
                 .attr('x', this.width/2-105);
             // resize background box
-            this.info_box.select("rect")
-                .attr("x", this.info_box.node().getBBox().x-5)
-                .attr("y", this.info_box.node().getBBox().y-3)
-                .attr("width", this.info_box.node().getBBox().width+10)
-                .attr("height", this.info_box.node().getBBox().height+7);
+
+            this.info_box.append("rect")
+                //.attr("class", "legend-background")
+                .attr("fill", "#d3d3d3")
+                .attr("opacity", 0.9)
+                .attr("rx", '3')
+                .attr("ry", '3')
+                .attr('stroke', 'black')
+                .attr("x", this.width/2-110)
+                .attr("y", this.height/2-25)
+                .attr("width", 250)
+                .attr("height", 47);
+            this.info_box.selectAll('text').raise();
 
 
             this.update_data()
