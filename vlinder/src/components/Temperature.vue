@@ -50,7 +50,6 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             }
         },
         mounted() {
-            this.checkbox = this.$refs.perceivedcheckbox;
             this.temperature = this.$refs.tempchart;
             this.temperature.colors[0]='#ff0000';
             this.temperature.colors[1]='#ffc6e0';

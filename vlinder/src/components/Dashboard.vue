@@ -129,7 +129,13 @@
                     min-h="2"
                     drag-ignore-from="svg rect">
                 <b-card style="height: 100%">
-                    <temperature style="width: 100%; height: 100%"/>
+                    <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
+                    <line-chart-visualization v-else
+                                              ref="temperatureChart"
+                                              y-axis-label="Temperatuur"
+                                              x-axis-unit=" C°"
+                                              :y-axis-getter="(d) => d.temp"
+                                              style="width: 100%; height: 100%"/>
                 </b-card>
             </grid-item>
         </grid-layout>
