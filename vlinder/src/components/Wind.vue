@@ -19,7 +19,10 @@
         },
         watch: {
             focusedVlinderData() {
-                this.createPlot(this.focusedVlinderData);
+                let data  = this.focusedVlinderData;
+                if (data && data.length === 1){
+                    this.createPlot(data[0]);
+                }
             }
         },
         mounted (){
@@ -42,7 +45,7 @@
 
                 this.raw_data = raw_data;
                 // Convert data to format needed for the windrose
-                const data_csv_format = this.convertData(raw_data);
+                const data_csv_format = this.convertData(this.raw_data);
                 const data = d3.csvParse(data_csv_format, (d, _, columns) => {
                     let total = 0;
                     for (let i = 1; i < columns.length; i++) total += d[columns[i]] = +d[columns[i]];
@@ -234,7 +237,7 @@
                 ];
                 const amountOfValues = raw_data.length;
                 raw_data.forEach(element => wind_values[this.convertDegreeIntoAngle(element.windDirection)][this.convertWindSpeedIntoIndex(element.windSpeed)] += 1.0 / amountOfValues * 100);
-                let csv_str = ""
+                let csv_str = "";
                 wind_values.forEach(row => csv_str = csv_str.concat(row.toString(), '\n'));
                 return csv_str;
             },

@@ -38,8 +38,12 @@
         mixins: [
             VisualizationMixin
         ],
+        watch: {
+            focusedVlinderData() {
+                    this.update_data(this.focusedVlinderData);
+            }
+        },
         mounted() {
-            //this.$nextTick(this.create_graph);
             this.div = d3.select("#" + this.id);
             let observer = new ResizeObserver(this.create_graph);
             observer.observe(this.div.node());
@@ -164,11 +168,11 @@
 
             },
             update_data(data) {
-                this.current_data = data;
+                this.current_data = Array.from(data);
                 let flattened_data = data.flat(1);
 
                 // update scales
-                let dates = data[0].map(x => new Date(x.time));
+                let dates = flattened_data.map(x => new Date(x.time));
                 let start = new Date(Math.min.apply(null, dates));
                 let end = new Date(Math.max.apply(null, dates));
 
@@ -256,7 +260,7 @@
                 if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     // Update position of tooltip elements according to mouse position
                     //if ($.)
-                    let mousePosition = [d3.event.offsetX, d3.event.offsetY];  //d3.mouse(this.svg.node());
+                    let mousePosition = d3.mouse(this.svg.node());
                     let currentXScale = this.xAxis.scale(); // Get zoomed scale
                     let mouseX = currentXScale.invert(mousePosition[0]); // waarde van x-as, hier dus datum
                     let bisectTime = d3.bisector(function (d) {
@@ -285,8 +289,6 @@
                         .attr("x1", toolTipX)
                         .attr("x2", toolTipX);
 
-                    // Update tooltip information box
-                    this.tooltip_box.attr("transform", "translate(" + (mousePosition[0]+ 5) + ", " + (mousePosition[1] - 100) + ")");
 
                     this.tooltip_box
                         .selectAll("g.entry text.y-value")
@@ -319,6 +321,13 @@
                         .attr("x", 0)
                         .attr("height", height)
                         .attr("width", width);
+
+                    // Update tooltip information box
+                    let translate_x = mousePosition[0] + 5;
+                    if (mousePosition[0] + 5 + width > this.width - this.padding.right){
+                        translate_x = mousePosition[0] - 5 - width;
+                    }
+                    this.tooltip_box.attr("transform", "translate(" + (translate_x) + ", " + (mousePosition[1] - 100) + ")");
 
                     this.tooltip_box.select("text.title")
                         .text(this.format(new Date(x_value)))
