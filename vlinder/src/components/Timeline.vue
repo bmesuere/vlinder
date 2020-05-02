@@ -121,7 +121,8 @@
 
                     constructXAxis(height) {
                         const xAxis = d3.axisBottom() // create status_bars new bottom axis
-                            .scale(this.xScale); // that uses the domain of the xScale
+                                .tickFormat(d3.timeFormat("%H:%M"))
+                                .scale(this.xScale); // that uses the domain of the xScale
                         
                         xAxis.ticks(this.ticks);
                         
@@ -212,7 +213,7 @@
                         g.append("text")
                             .attr("x", x)
                             .attr("y", y + 15)
-                            .text(new Date(d.time).toLocaleString())
+                            .text(d3.timeFormat("%d/%m/%Y, %H:%M")(new Date(d.time)))
                             .attr("font-size", "12px")
                             .attr("font-family", "sans-serif");
 

@@ -3,7 +3,7 @@
         <b-container style="height: 100%">
             <b-row align-h="center" align-v="center" style="padding: 1em">
                 <b-col>
-                    Vlinderstations to display:
+                    Weerstations:
                     <multiselect v-model="selection" label="text" track-by="text" :clear-on-select="false"
                                  :multiple="true" :options="options" :searchable="true" :close-on-select="false"
                                  :show-labels="false" placeholder="No stations selected"/>
@@ -11,17 +11,17 @@
                 <b-col>
                     <b-row>
                         <b-col>
-                            From:
+                            Van:
                             <datetime v-model="selectedStartDateString" type="datetime"/>
                         </b-col>
                         <b-col>
-                            Until:
+                            Tot:
                             <datetime v-model="selectedEndDateString" type="datetime"/>
                         </b-col>
                     </b-row>
                 </b-col>
                 <b-col cols="2">
-                    <b-button @click="loadData">Load Data</b-button>
+                    <b-button @click="loadData">Toon status</b-button>
                 </b-col>
             </b-row>
             <b-row align-h="center">

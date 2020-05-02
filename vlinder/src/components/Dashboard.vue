@@ -44,7 +44,7 @@
                             </b-row>
                         </b-col>
                         <b-col cols="3">
-                            <b-button @click="loadVlinderData">Laad</b-button>
+                            <b-button @click="loadVlinderData">Toon metingen</b-button>
                         </b-col>
                     </b-row>
                 </b-card>
