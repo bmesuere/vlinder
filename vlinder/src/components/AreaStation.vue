@@ -1,7 +1,7 @@
 <template>
     <b-row>
-        <b-col id="d3-viz-area" style="height: 100%; width: 80%"/>
-        <b-col id="d3-viz-area-legend" style="height: 100%; width: 20%"/>
+        <b-col cols="9" id="d3-viz-area" style="height: 100%; width: 80%"/>
+        <b-col cols="3" id="d3-viz-area-legend" style="height: 100%; width: 20%"/>
     </b-row>
 </template>
 
@@ -36,8 +36,8 @@
             create_area_chart() {
 
                 let divBox = this.div.node().getBoundingClientRect();
-                this.width = Math.max(divBox.width, 100);
-                this.height = Math.max(divBox.height, 100);
+                this.width = divBox.width;
+                this.height = divBox.height;
 
                 this.div.selectAll("*").remove();
 
@@ -49,7 +49,7 @@
 
                 // setup everything
                 this.xLabels = ["0m", "20m", "50m", "100m", "250m", "500m"];
-                this.padding = {top: 20, left: 45, right: 20, bottom: 30};
+                this.padding = {top: 20, left: 45, right: 20, bottom: 32};
 
                 this.xScale = d3.scaleLinear()
                     .domain([0, this.xLabels.length])
