@@ -120,6 +120,8 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
                 if (data && data.length === 1){
 
                     this.temperature.update_data(this.temperatureData(data[0]));
+                } else if (!data || data.length===0){
+                    this.typePerceivedTemperature = null;
                 }
             }
         }
