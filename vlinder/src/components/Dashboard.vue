@@ -51,6 +51,9 @@
                         <b-col cols="2">
                             <b-button @click="loadVlinderData">Laad</b-button>
                         </b-col>
+                        <b-col cols="3">
+                            <b-button @click="downloadCsv">Download</b-button>
+                        </b-col>
                     </b-row>
                 </b-card>
             </grid-item>
@@ -155,6 +158,7 @@
     import Map from "./Map";
     import {Datetime} from "vue-datetime";
     import VueGridLayout from 'vue-grid-layout';
+    import vlinderDataToCsv from "../utils/vlinderDataToCsv";
 
     export default {
         name: "Dashboard",
@@ -232,14 +236,24 @@
                 });
             },
             loadVlinderData() {
-                //if (this.selectedStations[0]) {
-                    this.$store.dispatch('loadVlinderData', {
-                            ids: this.selectedStations.map(x => x['id']),
-                            start: new Date(this.selectedStartDateString),
-                            end: new Date(this.selectedEndDateString)
-                        }
-                    );
-               // }
+                this.$store.dispatch('loadVlinderData', {
+                        ids: this.selectedStations.map(x => x['id']),
+                        start: new Date(this.selectedStartDateString),
+                        end: new Date(this.selectedEndDateString)
+                    }
+                );
+            },
+            downloadCsv() {
+                let csvString = vlinderDataToCsv(this.vlinderData);
+
+                //Download the file as CSV
+                let downloadLink = document.createElement("a");
+                let blob = new Blob(["\ufeff", csvString]);
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = "vlinderdata.csv";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
             }
         }
     }
