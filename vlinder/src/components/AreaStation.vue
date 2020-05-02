@@ -1,10 +1,19 @@
 <template>
-    <b-row>
-        <b-col cols="9" id="d3-viz-area" style="height: 100%; width: 80%"/>
-        <b-col cols="3" id="d3-viz-area-legend" style="height: 100%; width: 20%"/>
-    </b-row>
+    <b-container>
+        <b-row v-if="this.selectedStations.length > 1">
+            <b-tabs>
+                <b-tab  v-for="(station, index) in selectedStations" v-bind:key="station.name"
+                        v-bind:title="station.name"
+                        v-on:click="update_data(index)">
+                </b-tab>
+            </b-tabs>
+        </b-row>
+        <b-row style="height: 85%">
+            <b-col cols="9" id="d3-viz-area" style="height: 100%; width: 80%"/>
+            <b-col cols="3" id="d3-viz-area-legend" style="height: 100%; width: 20%"/>
+        </b-row>
+    </b-container>
 </template>
-
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
@@ -30,7 +39,12 @@
 
             this.create_area_chart();
         },
-
+        props: {
+            "colors": {
+                type: Array,
+                default: () => ['#02bbfc', 'rgba(168,255,68,0.93)', 'saddlebrown']
+            }
+        },
 
         methods: {
             create_area_chart() {
@@ -157,7 +171,7 @@
 
 
             },
-            update_data() {
+            update_data(index=0) {
                 this.svg.selectAll("rect.bar").remove();
 
                 if (this.selectedStations === undefined
@@ -166,7 +180,7 @@
                     || this.stations.length === 0) {
                     return;
                 }
-                const landUse = this.selectedStations[0]["landUse"];
+                const landUse = this.selectedStations[index]["landUse"];
 
                 let showLabel = function (element, value, type) {
                     d3.select(element).attr("stroke", "black");
@@ -189,7 +203,6 @@
                     .append("g")
                     .classed('rect', true);
 
-                const colors = ['lightskyblue', 'limegreen', 'saddlebrown'];
                 const types = ['water', 'groen', 'verhard'];
                 for(let k = 0; k < landUse[0]['usage'].length; k++){
                     bars.append("rect")
@@ -203,7 +216,7 @@
                     })
                     .attr("width", this.width / (this.xLabels.length + 1) * 0.8)
                     .attr("height", d => this.dataScale(d['usage'][k]['value']))
-                    .attr("fill", colors[k])
+                    .attr("fill", this.colors[k])
                     .on("mouseover", function (d) { showLabel(this, d['usage'][k]['value'], types[k]); })
                     .on("mouseout", function () { removeLabel(this); })
                 ;
@@ -249,7 +262,7 @@
                     .attr('x', w/2-30)
                     .attr("rx", '1')
                     .attr("ry", '1')
-                    .attr("fill", 'lightskyblue' );
+                    .attr("fill", this.colors[0] );
                 this.legend_box.append("rect")
                     .attr('height', 10)
                     .attr('width', 10)
@@ -257,7 +270,7 @@
                     .attr('x', w/2-30)
                     .attr("rx", '1')
                     .attr("ry", '1')
-                    .attr("fill", 'limegreen' );
+                    .attr("fill", this.colors[1] );
                 this.legend_box.append("rect")
                     .attr('height', 10)
                     .attr('width', 10)
@@ -265,7 +278,7 @@
                     .attr('x', w/2-30)
                     .attr("rx", '1')
                     .attr("ry", '1')
-                    .attr("fill", 'saddlebrown' );
+                    .attr("fill", this.colors[2] );
 
                 // add text
                 this.legend_box.append("text")
