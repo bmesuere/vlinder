@@ -64,9 +64,11 @@
                 });
             },
             latestVlinderData() {
-                this.stations_component.join(enter => {
-                    Popup(enter.select("circle"), this.map, this.latestVlinderData);
-                });
+                if (this.stations_component.join) {
+                    this.stations_component.join(enter => {
+                        Popup(enter.select("circle"), this.map, this.latestVlinderData);
+                    });
+                }
             }
         },
         methods: {
@@ -90,6 +92,10 @@
                 });
 
                 this.setSelectedStations([this.stations[0]]);
+
+                this.stations_component.join(enter => {
+                    Popup(enter.select("circle"), this.map, this.latestVlinderData);
+                });
             }
         }
     }
