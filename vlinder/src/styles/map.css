@@ -7,6 +7,10 @@
     background-color: #DDDDDD;
 }
 
+#popup {
+    pointer-events: none;
+}
+
 .circles {
     stroke: #3c373d;
 	fill: #77b58c;

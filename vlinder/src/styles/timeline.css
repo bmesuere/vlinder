@@ -1,0 +1,49 @@
+div #timeline-div {
+    overflow: auto;
+    direction: rtl;
+    scrollbar-color: #ccdbee #eeeeff; /* thumb and track color */
+    scrollbar-width: thin;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#timeline-svg {
+    height: 100%;
+    width: 100%;
+}
+
+.ok {
+    fill: limegreen;
+}
+
+.niet-ok {
+    fill: #f44242;
+}
+
+
+.missing {
+    fill: rgb(128, 128, 128);
+}
+
+.bar:hover {
+    cursor: pointer;
+}
+
+.bar.ok:hover {
+    fill: lightgreen;
+}
+
+.bar.niet-ok:hover {
+    fill: salmon;
+}
+
+.bar.missing:hover {
+    fill: lightgray
+}
+
+#temp {
+    pointer-events: none;
+}

@@ -26,8 +26,10 @@
                 .append("g")
                 .attr("id", "timeline-y-axis");
 
-            this.bars = {width: 2, height: 40, h_padding: 1, v_padding: 1};
-            this.padding = {left: 70, right: 50, top: 50, bottom: 0}
+            // the h_padding has to be less than the width because this is actually just
+            // implemented as a border around the bar, but this off part of the actual bar
+            this.bars = {width: 3, height: 50, h_padding: 1.5, v_padding: 1};
+            this.padding = {left: 70, right: 50, top: 80, bottom: 0}
 
             this.width = 288 * this.bars.width;
 
@@ -100,6 +102,8 @@
                         .attr("width", (this.bars.width + 1) - this.bars.h_padding)
                         .attr("height", this.bars.height - this.bars.v_padding)
                         .attr("class", d => "bar " + this.getClass(d))
+                        .attr("rx", "1px")
+                        .attr("ry", "1px")
                         .duration(this.transitionLength);
                     },
 
@@ -177,15 +181,14 @@
                     },
 
                     handleMouseOver(d, xpos, ypos, name) {
-                        let g = d3
-                            .select("#timeline-div #timeline-svg")
+                        let g = this.graph
                             .append("g")
                             .attr("id", "temp")
                             .attr("opacity", 0.5);
 
                         let h = 50;
                         let x = xpos - 60;
-                        let y = ypos - this.bars.height + 4;
+                        let y = ypos - this.bars.height/1.4 + 1;
                         g.append("rect")
                             .attr("x", x - 3)
                             .attr("y", y - 14)
@@ -239,7 +242,7 @@
                     },
 
                     handleMouseOut() {
-                        d3.select("#timeline-div #timeline-svg")
+                        this.graph
                             .selectAll("#temp")
                             .transition()
                             .attr("opacity", 0)
@@ -256,104 +259,6 @@
     };
 </script>
 
-<style>
-
-    .status_bars {
-        fill: green;
-    }
-
-    .test {
-        width: 300px;
-        height: 146px;
-    }
-
-    .lol {
-        border: 2px solid black;
-        background-color: white;
-    }
-
-    .ok {
-        fill: green;
-    }
-
-    #temp {
-        pointer-events: none;
-    }
-
-    #stations-selector {
-        width: 100px;
-    }
-
-    .missing {
-        fill: rgb(128, 128, 128);
-    }
-
-    .bar.ok:hover {
-        fill: lightgreen;
-    }
-
-    .bar.missing:hover {
-        fill: lightgray
-    }
-
-    .dot.ok {
-        fill: white;
-        stroke: green;
-        stroke-width: 4px;
-    }
-
-    .dot.ok:hover {
-        fill: lightgreen;
-    }
-
-    .niet-ok {
-        fill: red;
-    }
-
-    .dot.niet-ok {
-        fill: white;
-        stroke: red;
-        stroke-width: 4px;
-    }
-
-    .dot.niet-ok:hover {
-        fill: salmon;
-    }
-
-    .bar.niet-ok:hover {
-        fill: salmon;
-    }
-
-    .dot:hover {
-        cursor: pointer;
-    }
-
-    .bar:hover {
-        cursor: pointer;
-    }
-
-    div #timeline-div {
-        overflow: auto;
-        direction: rtl;
-        scrollbar-color: #ccdbee #eeeeff; /* thumb and track color */
-        scrollbar-width: thin;
-        height: 100%;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #timeline-svg {
-        height: 100%;
-        width: 100%;
-    }
-
-    div.status {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        margin: 1px;
-        background-color: green;
-    }
+<style scoped>
+    @import "../styles/timeline.css";
 </style>
