@@ -27,8 +27,8 @@
                     :h="layout[0].h"
                     :i="layout[0].i"
                     :is-draggable="false"
-                    min-w="4"
-                    min-h="1"
+                    :min-w="4"
+                    :min-h="1"
                     :key="layout[0].i" style="z-index: 8">
                 <b-card style="height: 100%">
                     <b-row style="height: 100%" align-h="center" align-v="center">
@@ -59,8 +59,8 @@
                     :h="layout[1].h"
                     :i="layout[1].i"
                     :key="layout[1].i"
-                    min-w="2"
-                    min-h="1"
+                    :min-w="2"
+                    :min-h="1"
                     drag-ignore-from="svg">
                 <b-card style="height: 100%">
                     <area-station style="height: 100%; width: 100%"/>
@@ -73,8 +73,8 @@
                     :h="layout[2].h"
                     :i="layout[2].i"
                     :key="layout[2].i"
-                    min-w="3"
-                    min-h="2"
+                    :min-w="3"
+                    :min-h="2"
                     drag-ignore-from="svg rect">
                 <b-card style="height: 100%">
                     <line-chart-visualization ref="pressureChart"
@@ -91,8 +91,8 @@
                     :h="layout[3].h"
                     :i="layout[3].i"
                     :key="layout[3].i"
-                    min-w="3"
-                    min-h="2"
+                    :min-w="3"
+                    :min-h="2"
                     drag-ignore-from="svg rect">
                 <b-card style="height: 100%">
                     <line-chart-visualization ref="rainChart"
@@ -111,8 +111,8 @@
                     :h="layout[4].h"
                     :i="layout[4].i"
                     :key="layout[4].i"
-                    min-w="3"
-                    min-h="2"
+                    :min-w="3"
+                    :min-h="2"
                     drag-ignore-from="svg">
                 <b-card id="windRoseCard" style="height: 100%;">
                     <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
@@ -125,8 +125,8 @@
                     :h="layout[5].h"
                     :i="layout[5].i"
                     :key="layout[5].i"
-                    min-w="3"
-                    min-h="2"
+                    :min-w="3"
+                    :min-h="2"
                     drag-ignore-from="svg rect">
                 <b-card style="height: 100%">
                     <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
