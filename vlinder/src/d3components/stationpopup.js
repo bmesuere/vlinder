@@ -1,53 +1,108 @@
 import * as d3 from "d3"
 import "d3-selection-multi";
+import {coordinates, X, Y} from "../utils/coordinates"
 
-function make_popup(root) {
-    const g = root.append("g").attr("id", "popup");
+class Popup {
 
-    const h = 50;
-    const x = 2.5;
-    const offset = 10;
-    const y = offset + 4;
+    constructor(map, original_scale, data) {
+        this.map = map;
+        this.original_scale = original_scale;
+        this.scale = original_scale;
+        this.visible = false;
 
-    g.append("rect").attrs({
-        x: x - 3, y: y - 14,
-        width: 140, height: h,
-        fill: "white", "stroke-width": 0.5, stroke: "black",
-    });
+        if (data) {
+            this.set_data(data);
+        }
 
-    g.append("text").attrs({
-        x: x + 20, y,
-        "font-size": "12px", "font-family": "sans-serif",
-    }).text(d => d.name);
+        this.height = 50;
+        this.width = 140;
+        this.offset = -46;
 
-    g.append("circle").attrs({
-        cx: x + 5, cy: y - 4, r: 5,
-        class: "circles",
-        status: d => d.status
-    });
+        return this;
 
-    g.append("text").attrs({
-        x, y: y + 15,
-        "font-size": "12px", "font-family": "sans-serif",
-    }).text(d => (d.time ? new Date(d.time) : new Date()).toLocaleString());
+    }
+
+    set_data(data) {
+        this.name = data.name;
+        this.status = data.status;
+        this.time = data.time;
+        this.coordinates = data.coordinates;
+
+        this.update_coordinates();
+    }
+
+    show() {
+        if (!this.visible || !this.name) return;
+        const g = this.map.append("g").attr("id", "popup");
+
+        g.attr("transform", `scale(${this.scale}, ${this.scale})`)
+        
+        g.append("rect").attrs({
+            x: this.x - 3, y: this.y - 14,
+            width: this.width, height: this.height,
+            fill: "white", "stroke-width": 0.5, stroke: "black"
+        });
+
+        g.append("text").attrs({
+            x: this.x + 20, y: this.y,
+            "font-size": "12px", "font-family": "sans-serif",
+        }).text(this.name);
+
+        g.append("circle").attrs({
+            cx: this.x + 5, cy: this.y - 4, r: 5,
+            class: "circles",
+            status: this.status,
+        });
+
+        g.append("text").attrs({
+            x: this.x, y: this.y + 15,
+            "font-size": "12px", "font-family": "sans-serif",
+        }).text((this.time ? new Date(this.time) : new Date()).toLocaleString());
 
 
-    g.append("text").attrs({
-        x, y: y + 30,
-        "font-size": "12px", "font-family": "sans-serif",
-    }).text("no data"); //fix
+        g.append("text").attrs({
+            x: this.x, y: this.y + 30,
+            "font-size": "12px", "font-family": "sans-serif",
+        }).text("no data"); //fix
 
+    }
+
+    clear() {
+        this.map.selectAll("#popup").remove();
+    }
+
+    display(visible) {
+        this.visible = visible;
+        if (visible) this.show();
+        else this.clear();
+    }
+
+    update(scale) {
+        this.scale = this.original_scale/scale;
+        this.update_coordinates(); // fix coordinates to scale
+        this.clear();
+        this.show();
+    }
+
+    update_coordinates() {
+        this.x = X(this.map.projection(coordinates(this.coordinates)))/this.scale;
+        this.y = Y(this.map.projection(coordinates(this.coordinates)))/this.scale + this.offset;
+    }
 }
 
-function remove_popup(root) {
-    root.selectAll("#popup").remove();
-}
+export default function popup(root, map) {
+    let popup = new Popup(map, 2);
+    
+    root.on("mouseover.popup", function (d) {
+        popup.set_data(d);
+        popup.display(true)
+    });
 
-export default function popup(selection) {
-    selection.on("mouseover.popup", function () {
-        make_popup(d3.select(this.parentNode));
+    root.on("mouseout.popup", _ => {
+        popup.display(false);
     });
-    selection.on("mouseout.popup", function () {
-        remove_popup(d3.select(this.parentNode));
-    });
+
+    map.zoom.on("zoom.popup", _ => {
+        popup.update(d3.event.transform.k);
+    })
 }

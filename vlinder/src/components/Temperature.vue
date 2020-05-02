@@ -50,11 +50,10 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             }
         },
         mounted() {
-            this.checkbox = this.$refs.perceivedcheckbox;
             this.temperature = this.$refs.tempchart;
             this.temperature.colors[0]='#ff0000';
             this.temperature.colors[1]='#ffc6e0';
-            this.updateLineChart();
+            //this.updateLineChart();
         },
         methods: {
             /**
@@ -117,7 +116,11 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
                 }
             },
             updateLineChart() {
-                this.temperature.update_data(this.temperatureData(this.focusedVlinderData));
+                let data = this.focusedVlinderData;
+                if (data && data.length === 1){
+
+                    this.temperature.update_data(this.temperatureData(data[0]));
+                }
             }
         }
     }

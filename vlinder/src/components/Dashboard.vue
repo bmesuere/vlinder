@@ -26,6 +26,9 @@
                     :w="layout[0].w"
                     :h="layout[0].h"
                     :i="layout[0].i"
+                    :is-draggable="false"
+                    :min-w="4"
+                    :min-h="1"
                     :key="layout[0].i" style="z-index: 8">
                 <b-card style="height: 100%">
                     <b-row style="height: 100%" align-h="center" align-v="center">
@@ -43,8 +46,8 @@
                                 </b-col>
                             </b-row>
                         </b-col>
-                        <b-col cols="3">
-                            <b-button @click="loadVlinderData">Toon metingen</b-button>
+                        <b-col cols="2">
+                            <b-button @click="loadVlinderData">Laad</b-button>
                         </b-col>
                     </b-row>
                 </b-card>
@@ -55,7 +58,10 @@
                     :w="layout[1].w"
                     :h="layout[1].h"
                     :i="layout[1].i"
-                    :key="layout[1].i">
+                    :key="layout[1].i"
+                    :min-w="2"
+                    :min-h="1"
+                    drag-ignore-from="svg">
                 <b-card style="height: 100%">
                     <area-station style="height: 100%; width: 100%"/>
                 </b-card>
@@ -67,6 +73,8 @@
                     :h="layout[2].h"
                     :i="layout[2].i"
                     :key="layout[2].i"
+                    :min-w="3"
+                    :min-h="2"
                     drag-ignore-from="svg rect">
                 <b-card style="height: 100%">
                     <line-chart-visualization ref="pressureChart"
@@ -83,6 +91,8 @@
                     :h="layout[3].h"
                     :i="layout[3].i"
                     :key="layout[3].i"
+                    :min-w="3"
+                    :min-h="2"
                     drag-ignore-from="svg rect">
                 <b-card style="height: 100%">
                     <line-chart-visualization ref="rainChart"
@@ -100,7 +110,10 @@
                     :w="layout[4].w"
                     :h="layout[4].h"
                     :i="layout[4].i"
-                    :key="layout[4].i">
+                    :key="layout[4].i"
+                    :min-w="3"
+                    :min-h="2"
+                    drag-ignore-from="svg">
                 <b-card id="windRoseCard" style="height: 100%;">
                     <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
                 </b-card>
@@ -112,9 +125,17 @@
                     :h="layout[5].h"
                     :i="layout[5].i"
                     :key="layout[5].i"
+                    :min-w="3"
+                    :min-h="2"
                     drag-ignore-from="svg rect">
                 <b-card style="height: 100%">
-                    <temperature style="width: 100%; height: 100%"/>
+                    <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
+                    <line-chart-visualization v-else
+                                              ref="temperatureChart"
+                                              y-axis-label="Temperatuur"
+                                              x-axis-unit=" C°"
+                                              :y-axis-getter="(d) => d.temp"
+                                              style="width: 100%; height: 100%"/>
                 </b-card>
             </grid-item>
         </grid-layout>
@@ -165,23 +186,19 @@
                 selectedStartDateString: '',
                 selectedEndDateString: '',
                 layout: [
-                    {"x": 0, "y": 0, "w": 6, "h": 1, "i": "0"},
-                    {"x": 6, "y": 0, "w": 4, "h": 1, "i": "1"},
-                    {"x": 6, "y": 1, "w": 4, "h": 2, "i": "2"},
-                    {"x": 6, "y": 1, "w": 4, "h": 2, "i": "3"},
-                    {"x": 1, "y": 4, "w": 4, "h": 2, "i": "4"},
-                    {"x": 0, "y": 1, "w": 6, "h": 3, "i": "5"},
+                    {"x": 0, "y": 0, "w": 4, "h": 1, "i": "0"},
+                    {"x": 0, "y": 4, "w": 4, "h": 1, "i": "1"},
+                    {"x": 4, "y": 0, "w": 4, "h": 2, "i": "2"},
+                    {"x": 8, "y": 1, "w": 4, "h": 2, "i": "3"},
+                    {"x": 0, "y": 1, "w": 4, "h": 3, "i": "4"},
+                    {"x": 4, "y": 4, "w": 8, "h": 3, "i": "5"},
                 ]
-
             }
         },
         computed: {
             stations() {
                 return this.$store.getters.stations;
             }
-        },
-        mounted() {
-            this.updateLineCharts();
         },
         watch: {
             stations() {
@@ -204,9 +221,6 @@
                     )
                 }
             },
-            focusedVlinderData() {
-                this.updateLineCharts();
-            }
         },
         methods: {
             stationsToOptions() {
@@ -215,19 +229,15 @@
                     self.options.push({value: station['id'], text: station['name']})
                 });
             },
-            updateLineCharts() {
-                this.$refs.rainChart.update_data([this.focusedVlinderData]);
-                this.$refs.pressureChart.update_data([this.focusedVlinderData]);
-            },
             loadVlinderData() {
-                if (this.selectedStations[0]) {
+                //if (this.selectedStations[0]) {
                     this.$store.dispatch('loadVlinderData', {
                             ids: this.selectedStations.map(x => x['id']),
                             start: new Date(this.selectedStartDateString),
                             end: new Date(this.selectedEndDateString)
                         }
                     );
-                }
+               // }
             }
         }
     }
