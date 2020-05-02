@@ -79,17 +79,22 @@
                     status_bars.exit()
                         .transition()
                         .duration(this.transitionLength)
-                        .attr("height", 0)
-                        .attr("y", this.padding.top)
+                        .attrs({
+                            height: 0,
+                            y: this.padding.top
+                        })
                         .remove();
 
                     status_bars.enter()
                         .append("rect")
-                        .attr("x", d => this.xScale(new Date(d.time)))
-                        .attr("y", d => this.yScale(selection.indexOf(d.id)))
-                        .attr("width", (this.bars.width + 1) - this.bars.h_padding)
-                        .attr("height", 0)
-                        .attr("class", d => "bar " + this.getClass(d))
+                        .attrs({
+                            x: d => this.xScale(new Date(d.time)),
+                            y: d => this.yScale(selection.indexOf(d.id)),
+                            width: (this.bars.width + 1) - this.bars.h_padding,
+                            height: 0,
+                            class: "bar",
+                            status: d=>d.status
+                        })
                         .merge(status_bars)
                         .on("mouseover", d => this.handleMouseOver(
                                             d,
@@ -100,13 +105,14 @@
                             )
                         .on("mouseout", this.handleMouseOut)
                         .transition()
-                        .attr("x", d => this.xScale(new Date(d.time)))
-                        .attr("y", d => this.yScale(selection.indexOf(d.id)))
-                        .attr("width", (this.bars.width + 1) - this.bars.h_padding)
-                        .attr("height", this.bars.height - this.bars.v_padding)
-                        .attr("class", d => "bar " + this.getClass(d))
-                        .attr("rx", "1px")
-                        .attr("ry", "1px")
+                        .attrs({
+                            x: d => this.xScale(new Date(d.time)),
+                            y: d => this.yScale(selection.indexOf(d.id)),
+                            width: (this.bars.width + 1) - this.bars.h_padding,
+                            height: this.bars.height - this.bars.v_padding,
+                            class: "bar",
+                            status: d=>d.status,
+                        })
                         .duration(this.transitionLength);
                     },
 
@@ -114,11 +120,10 @@
                         this.graph
                             .transition()
                             .duration(this.transitionLength)
-                            .attr(
-                                "viewBox",
-                                "0 0 " + (this.padding.left + this.padding.right + this.width) + " " + (height + this.padding.top + this.padding.bottom)
-                            )
-                            .attr("direction", "ltr")
+                            .attrs({
+                                viewBox: "0 0 " + (this.padding.left + this.padding.right + this.width) + " " + (height + this.padding.top + this.padding.bottom),
+                                direction: "ltr"
+                            })
                     },
 
                     constructAxes(selectedNames, height) {
