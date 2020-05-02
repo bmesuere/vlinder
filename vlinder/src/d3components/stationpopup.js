@@ -16,13 +16,13 @@ function extendData(d, latestVlinderData) {
 }
 
 export default function popup(root, map, dataExtension) {
-    let popup = Popup(map, 2);
+    let popup = Popup(map, 1.5);
 
     root.on("mouseover.popup", function (d) {
         extendData(d, dataExtension);
 
         popup.set_coordinates(map.projection(coordinates(d.coordinates))); // can't use this for timeline so either duplicate code or find solution
-        popup.set_status("offline"); // undefined for now
+        popup.set_status(d.status); // undefined for now
         popup.set_title(d.name);
         popup.add_line((d.time ? new Date(d.time) : new Date()).toLocaleString());
         popup.add_line("🌡 " + d.temp + "°C\t" + "🌧️ " + d.humidity + "%");
