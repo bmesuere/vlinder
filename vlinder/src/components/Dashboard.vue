@@ -5,7 +5,9 @@
             <div style="position: absolute; z-index: 9; margin-left: auto; padding: 4vh">
                 <multiselect v-model="multiSelectValues" label="text" track-by="text" :clear-on-select="false"
                              :multiple="true" :options="options" :searchable="true" :close-on-select="false"
-                             :show-labels="false" placeholder="Selecteer een station"/>
+                             :max=5 :show-labels="false" placeholder="Selecteer een station">
+                    <span slot="maxElements">Maximum aantal geselecteerd. Verwijder een station voor je een nieuw kan toevoegen.</span>
+                </multiselect>
             </div>
         </div>
 
