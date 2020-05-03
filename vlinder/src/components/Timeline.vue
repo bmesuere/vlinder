@@ -196,7 +196,7 @@
                         this.popup.set_coordinates([x, y])
                         this.popup.set_title(name);
                         this.popup.set_status(d.status);
-                        this.popup.add_line((d.time ? new Date(d.time) : new Date()).toLocaleString());
+                        this.popup.add_line(d3.timeFormat("%d/%m/%Y, %H:%M")(d.time ? new Date(d.time) : new Date()));
                         this.popup.add_line("🌡 " + d.temp + "°C\t" + "🌧️ " + d.humidity + "%");
                         this.popup.display(true);
 
