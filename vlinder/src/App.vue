@@ -5,6 +5,9 @@
 </template>
 
 <script>
+    import { Settings } from 'luxon';
+    Settings.defaultLocale = 'nl'
+
     export default {
         name: "App",
         created() {

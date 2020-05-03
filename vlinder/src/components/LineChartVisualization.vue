@@ -32,7 +32,7 @@
             },
             "colors": {
                 type: Array,
-                default: () => ['#5DBE55', '#926DA5', '#2B92BE']
+                default: () => ['#5DBE55', '#926DA5', '#2580a7', '#cae23a', '#be662b']
             },
         },
         mixins: [

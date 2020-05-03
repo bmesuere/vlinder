@@ -24,7 +24,7 @@ export default function popup(root, map, dataExtension) {
         popup.set_coordinates(map.projection(coordinates(d.coordinates))); // can't use this for timeline so either duplicate code or find solution
         popup.set_status(d.status); // undefined for now
         popup.set_title(d.name);
-        popup.add_line((d.time ? new Date(d.time) : new Date()).toLocaleString());
+        popup.add_line(d3.timeFormat("%d/%m/%Y, %H:%M")(new Date(d.time)(d.time ? new Date(d.time) : new Date())));
         popup.add_line("🌡 " + d.temp + "°C\t" + "🌧️ " + d.humidity + "%");
         
         popup.display(true);
