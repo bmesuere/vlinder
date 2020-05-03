@@ -30,11 +30,11 @@ export default function popup(root, map, dataExtension) {
         popup.display(true);
     });
 
-    root.on("mouseout.popup", _ => {
+    root.on("mouseout.popup", function() {
         popup.display(false);
     });
 
-    map.zoom.on("zoom.popup", _ => {
+    map.zoom.on("zoom.popup", function() {
         popup.update(d3.event.transform.k);
     })
 

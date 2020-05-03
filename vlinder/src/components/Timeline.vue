@@ -15,7 +15,6 @@
             selection: Array
         },
         async mounted() {
-            let div = d3.select("#timeline-div");
             this.graph = d3
                 .select("#timeline-div").append("svg").attr("id", "timeline-svg");
 
