@@ -30,10 +30,6 @@
                 type: Number,
                 default: 1.5
             },
-            "colors": {
-                type: Array,
-                default: () => ['#5DBE55', '#926DA5', '#2580a7', '#cae23a', '#be662b']
-            },
         },
         mixins: [
             VisualizationMixin

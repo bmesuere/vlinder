@@ -49,10 +49,24 @@
                             </b-row>
                         </b-col>
                         <b-col cols="2">
-                            <b-button @click="loadVlinderData">Laad</b-button>
+                            <b-row style="padding: 2px">
+                                <b-button @click="loadVlinderData">Laad</b-button>
+                            </b-row>
+                            <b-row style="padding: 2px">
+                                <b-button @click="downloadCsv">Download</b-button>
+                            </b-row>
                         </b-col>
-                        <b-col cols="3">
-                            <b-button @click="downloadCsv">Download</b-button>
+                        <b-col cols="3" v-if="this.selectedStations.length > 1 ">
+                            <b-row v-for="(station, index) in selectedStations"
+                                v-bind:key="station.name">
+                                <b-col cols="1" class="rect">
+                                    <svg width="10" height="10">
+                                          <rect width="10" height="10" style="stroke-width:1;stroke:black"
+                                            v-bind:style="{ 'fill': colors[index] }"/>
+                                    </svg>
+                                </b-col>
+                                <b-col>{{station.name}}</b-col>
+                            </b-row>
                         </b-col>
                     </b-row>
                 </b-card>
