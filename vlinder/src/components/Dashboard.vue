@@ -36,13 +36,13 @@
                     <b-row style="height: 100%" align-h="center" align-v="center">
                         <b-col>
                             <b-row style="padding: 1vh" align-v="center">
-                                <b-col cols="2">Van:</b-col>
+                                <b-col cols="3">Van:</b-col>
                                 <b-col>
                                     <datetime v-model="selectedStartDateString" type="datetime"/>
                                 </b-col>
                             </b-row>
                             <b-row style="padding: 1vh" align-v="center">
-                                <b-col cols="2">Tot:</b-col>
+                                <b-col cols="3">Tot:</b-col>
                                 <b-col>
                                     <datetime v-model="selectedEndDateString" type="datetime"/>
                                 </b-col>
@@ -192,12 +192,12 @@
                 selectedStartDateString: '',
                 selectedEndDateString: '',
                 layout: [
-                    {"x": 0, "y": 0, "w": 4, "h": 1, "i": "0"},
-                    {"x": 0, "y": 4, "w": 4, "h": 1.3, "i": "1"},
-                    {"x": 4, "y": 0, "w": 4, "h": 2, "i": "2"},
-                    {"x": 8, "y": 1, "w": 4, "h": 2, "i": "3"},
-                    {"x": 0, "y": 1, "w": 4, "h": 2.7, "i": "4"},
-                    {"x": 4, "y": 4, "w": 8, "h": 3, "i": "5"},
+                    {"x": 0, "y": 0, "w": 5.5, "h": 1, "i": "0"},
+                    {"x": 6, "y": 0, "w": 4.5, "h": 1.3, "i": "1"},
+                    {"x": 0, "y": 5, "w": 4.5, "h": 2, "i": "2"},
+                    {"x": 8, "y": 1.3, "w": 4.5, "h": 2, "i": "3"},
+                    {"x": 4.5, "y": 3.3, "w": 5.5, "h": 3, "i": "4"},
+                    {"x": 0, "y": 1, "w": 5.5, "h": 3, "i": "5"},
                 ]
             }
         },

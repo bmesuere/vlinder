@@ -218,8 +218,7 @@
                     .attr("height", d => this.dataScale(d['usage'][k]['value']))
                     .attr("fill", this.colors[k])
                     .on("mouseover", function (d) { showLabel(this, d['usage'][k]['value'], types[k]); })
-                    .on("mouseout", function () { removeLabel(this); })
-                ;
+                    .on("mouseout", function () { removeLabel(this); });
                 }
 
                 return this.svg.node();
@@ -309,7 +308,6 @@
                     .attr("y", this.legend_box.node().getBBox().y - 3)
                     .attr("width", this.legend_box.node().getBBox().width + 10)
                     .attr("height", this.legend_box.node().getBBox().height + 7);
-
             }
         }
     }
