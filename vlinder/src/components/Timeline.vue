@@ -5,6 +5,7 @@
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import * as d3 from "d3";
+    import Popup from "../d3components/popup"
 
     export default {
         name: "Timeline",
@@ -25,6 +26,8 @@
             this.yaxis = this.graph
                 .append("g")
                 .attr("id", "timeline-y-axis");
+
+            this.popup = Popup(this.graph, 1);
 
             // the h_padding has to be less than the width because this is actually just
             // implemented as a border around the bar, but this off part of the actual bar
@@ -76,17 +79,22 @@
                     status_bars.exit()
                         .transition()
                         .duration(this.transitionLength)
-                        .attr("height", 0)
-                        .attr("y", this.padding.top)
+                        .attrs({
+                            height: 0,
+                            y: this.padding.top
+                        })
                         .remove();
 
                     status_bars.enter()
                         .append("rect")
-                        .attr("x", d => this.xScale(new Date(d.time)))
-                        .attr("y", d => this.yScale(selection.indexOf(d.id)))
-                        .attr("width", (this.bars.width + 1) - this.bars.h_padding)
-                        .attr("height", 0)
-                        .attr("class", d => "bar " + this.getClass(d))
+                        .attrs({
+                            x: d => this.xScale(new Date(d.time)),
+                            y: d => this.yScale(selection.indexOf(d.id)),
+                            width: (this.bars.width + 1) - this.bars.h_padding,
+                            height: 0,
+                            class: "bar",
+                            status: d=>d.status
+                        })
                         .merge(status_bars)
                         .on("mouseover", d => this.handleMouseOver(
                                             d,
@@ -97,13 +105,14 @@
                             )
                         .on("mouseout", this.handleMouseOut)
                         .transition()
-                        .attr("x", d => this.xScale(new Date(d.time)))
-                        .attr("y", d => this.yScale(selection.indexOf(d.id)))
-                        .attr("width", (this.bars.width + 1) - this.bars.h_padding)
-                        .attr("height", this.bars.height - this.bars.v_padding)
-                        .attr("class", d => "bar " + this.getClass(d))
-                        .attr("rx", "1px")
-                        .attr("ry", "1px")
+                        .attrs({
+                            x: d => this.xScale(new Date(d.time)),
+                            y: d => this.yScale(selection.indexOf(d.id)),
+                            width: (this.bars.width + 1) - this.bars.h_padding,
+                            height: this.bars.height - this.bars.v_padding,
+                            class: "bar",
+                            status: d=>d.status,
+                        })
                         .duration(this.transitionLength);
                     },
 
@@ -111,11 +120,10 @@
                         this.graph
                             .transition()
                             .duration(this.transitionLength)
-                            .attr(
-                                "viewBox",
-                                "0 0 " + (this.padding.left + this.padding.right + this.width) + " " + (height + this.padding.top + this.padding.bottom)
-                            )
-                            .attr("direction", "ltr")
+                            .attrs({
+                                viewBox: "0 0 " + (this.padding.left + this.padding.right + this.width) + " " + (height + this.padding.top + this.padding.bottom),
+                                direction: "ltr"
+                            })
                     },
 
                     constructAxes(selectedNames, height) {
@@ -181,80 +189,21 @@
                     },
 
                     handleMouseOver(d, xpos, ypos, name) {
-                        let g = this.graph
-                            .append("g")
-                            .attr("id", "temp")
-                            .attr("opacity", 0.5);
-
-                        let h = 50;
                         let x = xpos - 60;
-                        let y = ypos - this.bars.height/1.4 + 1;
-                        g.append("rect")
-                            .attr("x", x - 3)
-                            .attr("y", y - 14)
-                            .attr("width", 140)
-                            .attr("height", h)
-                            .attr("fill", "white")
-                            .attr("stroke-width", 0.5)
-                            .attr("stroke", "black");
+                        let y = ypos;
 
-                        g.append("text")
-                            .attr("x", x + 20)
-                            .attr("y", y)
-                            .text(name)
-                            .attr("font-size", "12px")
-                            .attr("font-family", "sans-serif");
-
-                        g.append("circle")
-                            .attr("cx", x + 5)
-                            .attr("cy", y - 4)
-                            .attr("r", 5)
-                            .attr("fill", "orange")
-                            .attr("class", this.getClass(d));
-
-                        g.append("text")
-                            .attr("x", x)
-                            .attr("y", y + 15)
-                            .text(new Date(d.time).toLocaleString())
-                            .attr("font-size", "12px")
-                            .attr("font-family", "sans-serif");
-
-                        if (d.status === "missing") {
-                            g.append("text")
-                                .attr("x", x)
-                                .attr("y", y + 30)
-                                .text("no data")
-                                .attr("font-size", "12px")
-                                .attr("font-family", "sans-serif")
-                        } else {
-                            g.append("text")
-                                .attr("x", x)
-                                .attr("y", y + 30)
-                                .text("🌡 " + d.temp + "°C\t" + "🌧️ " + d.humidity + "%")
-                                .attr("font-size", "12px")
-                                .attr("font-family", "sans-serif")
-                        }
-
-                        g.transition()
-                            .attr("opacity", 1)
-                            .duration(30)
+                        this.popup.set_coordinates([x, y])
+                        this.popup.set_title(name);
+                        this.popup.set_status(d.status);
+                        this.popup.add_line((d.time ? new Date(d.time) : new Date()).toLocaleString());
+                        this.popup.add_line("🌡 " + d.temp + "°C\t" + "🌧️ " + d.humidity + "%");
+                        this.popup.display(true);
 
                     },
 
                     handleMouseOut() {
-                        this.graph
-                            .selectAll("#temp")
-                            .transition()
-                            .attr("opacity", 0)
-                            .duration(30)
-                            .remove()
+                        this.popup.display(false)
                     },
-
-                    getClass(d) {
-                        if (d.status === "Ok") return "ok";
-                        else if (d.status === "missing") return "missing";
-                        else return "niet-ok"
-                    }
         }
     };
 </script>

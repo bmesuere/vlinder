@@ -12,8 +12,8 @@
     import belgium from "../local/belgium.geo.json.js";
     import Regions from "../d3components/continents.js";
     import Stations from "../d3components/stations.js";
-    import Popup from '../d3components/stationpopup.js'
-    import '../utils/extentions.js'
+    import Popup from '../d3components/stationpopup.js';
+    import '../utils/extentions.js';
 
     export default {
         name: "Map",
@@ -62,6 +62,13 @@
                     enter.select("circle")
                     .attr("selected", d => self.selectedStations.includes(d))
                 });
+            },
+            latestVlinderData() {
+                if (this.stations_component.join) {
+                    this.stations_component.join(enter => {
+                        Popup(enter.select("circle"), this.map, this.latestVlinderData);
+                    });
+                }
             }
         },
         methods: {
@@ -87,7 +94,7 @@
                 this.setSelectedStations([this.stations[0]]);
 
                 this.stations_component.join(enter => {
-                    Popup(enter.select("circle"), this.map);
+                    Popup(enter.select("circle"), this.map, this.latestVlinderData);
                 });
             }
         }

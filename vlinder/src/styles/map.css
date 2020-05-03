@@ -13,7 +13,7 @@
 
 .circles {
     stroke: #3c373d;
-	fill: #77b58c;
+	fill: #999999;
 	cursor: pointer;
     vector-effect: non-scaling-stroke;
 }
@@ -28,10 +28,10 @@
     stroke-width: 4px;
 }
 
-.circles[status*="abnormal"]{
-    fill: #FF8888;
+.circles[status*="Ok"]{
+    fill:  #77b58c;
 }
 
-.circles[status*="offline"]{
-    fill: #999999;
+.circles[status*="Server Failure"]{
+    fill: #FF8888;
 }
