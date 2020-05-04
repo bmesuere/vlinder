@@ -223,7 +223,7 @@
                 let w = divBoxLegend.width;
                 let h = divBoxLegend.height;
                 const scaling_factor = h/300;
-
+                console.log(["28+", "24-28", "20-24", "16-20", "12-16", "8-12", "4-8", "0-4"].reverse())
                 this.legend.selectAll("*").remove();
                 
                 this.svg_legend = this.legend.append("svg")
@@ -232,7 +232,7 @@
             
                 this.g_legend = this.svg_legend.append("g")
                     .selectAll("g")
-                    .data(["28+", "24-28", "20-24", "16-20", "12-16", "8-12", "4-8", "0-4"])
+                    .data(["0-4", "4-8", "8-12", "12-16", "16-20", "20-24", "24-28", "28+"])
                     .enter().append("g")
                     .attr("transform", (d, i) => {  return "translate(" + 0 + "," + ((((i - (8-1) / 2) * (20))+h/3)*scaling_factor) +")"; });
 
