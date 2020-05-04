@@ -223,7 +223,6 @@
                 let w = divBoxLegend.width;
                 let h = divBoxLegend.height;
                 const scaling_factor = h/300;
-                console.log(["28+", "24-28", "20-24", "16-20", "12-16", "8-12", "4-8", "0-4"].reverse())
                 this.legend.selectAll("*").remove();
                 
                 this.svg_legend = this.legend.append("svg")
