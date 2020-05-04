@@ -73,9 +73,7 @@
                     .range([this.height - this.padding.bottom, this.padding.top]);
 
                 this.xAxis = d3.axisBottom()
-                    .scale(this.xScale)
-                    .ticks(24)
-                    .tickFormat(this.format);
+                    .scale(this.xScale);
 
                 this.yAxis = d3.axisLeft()
                     .scale(this.yScale)
