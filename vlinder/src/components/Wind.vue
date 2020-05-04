@@ -1,5 +1,10 @@
 <template>
     <div id="d3-viz-windrose" style="height: 100%; width: 100%">
+        <b-tabs content-class="mt-3">
+        <b-tab title="First" active>
+            <div id="windrose-svg" style="height: 100%; width: 100%"/>
+        </b-tab>
+    </b-tabs>
         <div id="windrose-svg" style="height: 100%; width: 100%"/>
     </div>
 </template>
