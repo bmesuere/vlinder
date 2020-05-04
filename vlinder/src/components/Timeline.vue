@@ -6,6 +6,7 @@
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import * as d3 from "d3";
     import Popup from "../d3components/popup"
+    import fillMissingData from "../utils/vlinderDataParse";
 
     export default {
         name: "Timeline",
@@ -49,19 +50,19 @@
             this.transitionLength = 500;
         },
         watch: {
-            datas() {
-                this.updateData();
+            focusedVlinderData() {
+                this.updateData(fillMissingData(this.focusedVlinderData));
             }
         },
         methods: {
-            updateData() {
+            updateData(data) {
                 let selectedIds = [];
                 let selectedNames = [];
                 for (let station of this.selection) {
                     selectedIds.push(station.value);
                     selectedNames.push(station.text);
                 }
-                this.construct_graph(this.datas, selectedIds, selectedNames);
+                this.construct_graph(data, selectedIds, selectedNames);
             },
 
             construct_graph(datas, selection, selectedNames) {

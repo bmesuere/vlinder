@@ -1,5 +1,8 @@
-export default function fillMissingData(ddata) {
-    let data = [];
+export default function fillMissingData(vlinderData) {
+    if (vlinderData.length <= 0) return [];
+    
+    var ddata = [].concat.apply([], vlinderData);
+    var data = [];
     data.push(ddata[0]);
     for (var i = 0; i < ddata.length - 1; i++) {
         let diff = new Date(ddata[i + 1].time).getTime() - new Date(ddata[i].time).getTime();

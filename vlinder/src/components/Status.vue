@@ -6,7 +6,7 @@
                     Weerstations:
                     <multiselect v-model="selection" label="text" track-by="text" :clear-on-select="false"
                                  :multiple="true" :options="options" :searchable="true" :close-on-select="false"
-                                 :show-labels="false" placeholder="No stations selected"/>
+                                 :max=5 :show-labels="false" placeholder="No stations selected"/>
                 </b-col>
                 <b-col>
                     <b-row>
@@ -34,8 +34,8 @@
 <script>
     import Multiselect from "vue-multiselect";
     import Timeline from "./Timeline";
+    import VisualizationMixin from "../mixins/VisualizationMixin";
     import {Datetime} from "vue-datetime";
-    import fillMissingData from "../utils/vlinderDataParse";
     import vlinderService from "../services/vlinderService";
 
     export default {
@@ -45,6 +45,9 @@
             Timeline,
             Datetime
         },
+        mixins: [
+            VisualizationMixin
+        ],
         created() {
             this.stationsToOptions();
 
@@ -73,8 +76,23 @@
                 this.stationsToOptions();
             },
             selection() {
-                this.loadData();
-            }
+                let ids = this.selection.map(x => x['value']);
+                if (!this.selectedStations.map(x => x['id']).equals(ids)) {
+                    this.setSelectedStations(
+                        this.stations.filter(x => ids.includes(x['id']))
+                    )
+                }
+                // don't load data since it would trigger twice with dashboard
+            },
+            selectedStations() {
+                let ids = this.selectedStations.map(x => x['id']);
+                if (!ids.equals(this.selection.map(x => x['value']))) {
+                    this.selection = this.selectedStations.map(x => {
+                        return {value: x['id'], text: x['name']}
+                    })
+                }
+                // don't load data since it would trigger twice with dashboard
+            },
         },
         methods: {
             stationsToOptions() {
@@ -82,26 +100,14 @@
                 this.stations.forEach(station => {
                     self.options.push({value: station['id'], text: station['name']})
                 });
-                this.selection = [this.options[0]]
             },
             async loadData() {
-                let self = this;
-                let datas = [];
-                let promises = [];
-                for (let i = 0; i < self.selection.length; i++) {
-                    promises.push(vlinderService.getVlinderData(
-                        self.selection[i].value,
-                        new Date(self.selectedStartDateString),
-                        new Date(self.selectedEndDateString)).then(
-                        d => {
-                            let dataset = fillMissingData(d.data);
-                            datas.push(...dataset)
-                        }
-                    ));
-                }
-
-                await Promise.all(promises);
-                this.data = datas;
+                this.$store.dispatch('loadVlinderData', {
+                        ids: this.selectedStations.map(x => x['id']),
+                        start: new Date(this.selectedStartDateString),
+                        end: new Date(this.selectedEndDateString)
+                    }
+                );
             }
         }
     }
