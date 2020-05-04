@@ -1,0 +1,56 @@
+div #timeline-div {
+    overflow: auto;
+    direction: rtl;
+    scrollbar-color: #ccdbee #eeeeff; /* thumb and track color */
+    scrollbar-width: thin;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#timeline-svg {
+    height: 100%;
+    width: 100%;
+}
+
+.bar {
+    fill: #999999
+}
+
+.bar[status*="Ok"] {
+    fill: #77b58c;
+}
+
+.bar[status*="Server Failure"] {
+    fill: #f44242;
+}
+
+.bar:hover {
+    cursor: pointer;
+    fill: lightgray
+}
+
+.bar[status*="Ok"]:hover {
+    fill: lightgreen;
+}
+
+.bar[status*="Server Failure"]:hover {
+    fill: salmon;
+}
+
+.circles {
+    stroke: #3c373d;
+	fill: #999999;
+	cursor: pointer;
+    vector-effect: non-scaling-stroke;
+}
+
+.circles[status*="Ok"]{
+    fill:  #77b58c;
+}
+
+.circles[status*="Server Failure"]{
+    fill: #FF8888;
+}

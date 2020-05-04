@@ -12,6 +12,7 @@
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import * as d3 from 'd3'
+    import ResizeObserver from 'resize-observer-polyfill';
 
     export default {
         name: "WindRose",
@@ -23,7 +24,10 @@
         },
         watch: {
             focusedVlinderData() {
-                this.createPlot(this.focusedVlinderData);
+                let data  = this.focusedVlinderData;
+                if (data && data.length === 1){
+                    this.createPlot(data[0]);
+                }
             }
         },
         mounted (){
@@ -35,7 +39,6 @@
         },
         methods: {
             createPlot(raw_data) {
-
                 const tooltip = d3.select("body")
                     .append("div")
                     .style("position", "absolute")
@@ -47,7 +50,7 @@
 
                 this.raw_data = raw_data;
                 // Convert data to format needed for the windrose
-                const data_csv_format = this.convertData(raw_data);
+                const data_csv_format = this.convertData(this.raw_data);
                 const data = d3.csvParse(data_csv_format, (d, _, columns) => {
                     let total = 0;
                     for (let i = 1; i < columns.length; i++) total += d[columns[i]] = +d[columns[i]];
@@ -62,7 +65,7 @@
                 const height = size;
                 const legendWidth = width/5;
                 const legendMargin = legendWidth/3;
-                const legendModifier = width/600 // trial and error
+                const legendModifier = width/600; // trial and error
                 const margin = {top: 40, right: 80, bottom: 40, left: 40};
                 const innerRadius = 20;
                 const chartWidth = width - margin.left - margin.right - legendWidth*legendModifier;
@@ -72,8 +75,8 @@
                 d3.select('#windrose-svg').selectAll("svg").remove();
                 const svg = d3.select("#windrose-svg")
                     .append("svg")
-                    .style("width", width)
-                    .style("height", height)
+                    .style("width", width + 'px')
+                    .style("height", height + 'px')
                     .style("font", "10px sans-serif");
 
                 const g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
@@ -220,26 +223,26 @@
             convertData(raw_data) {
                 const wind_values = [
                     ['angle', '0-4', '4-8', '8-12', '12-16', '16-20', '20-24', '24-28', '28+'],
-                    ['N', 0, 0, 0, 0, 0, 0, 0, 0], // 1
-                    ['NNE', 0, 0, 0, 0, 0, 0, 0, 0], // 2
-                    ['NE', 0, 0, 0, 0, 0, 0, 0, 0], // 3
-                    ['ENE', 0, 0, 0, 0, 0, 0, 0, 0], // 4
-                    ['E', 0, 0, 0, 0, 0, 0, 0, 0], // 5
-                    ['ESE', 0, 0, 0, 0, 0, 0, 0, 0], // 6
-                    ['SE', 0, 0, 0, 0, 0, 0, 0, 0], // 7
-                    ['SSE', 0, 0, 0, 0, 0, 0, 0, 0], // 8
-                    ['S', 0, 0, 0, 0, 0, 0, 0, 0], // 9
-                    ['SSW', 0, 0, 0, 0, 0, 0, 0, 0], // 10
-                    ['SW', 0, 0, 0, 0, 0, 0, 0, 0], // 11
-                    ['WSW', 0, 0, 0, 0, 0, 0, 0, 0], // 12
-                    ['W', 0, 0, 0, 0, 0, 0, 0, 0], // 13
+                    ['N', 0, 0, 0, 0, 0, 0, 0, 0],   // 1
+                    ['NNO', 0, 0, 0, 0, 0, 0, 0, 0], // 2
+                    ['NO', 0, 0, 0, 0, 0, 0, 0, 0],  // 3
+                    ['ONO', 0, 0, 0, 0, 0, 0, 0, 0], // 4
+                    ['O', 0, 0, 0, 0, 0, 0, 0, 0],   // 5
+                    ['OZO', 0, 0, 0, 0, 0, 0, 0, 0], // 6
+                    ['ZO', 0, 0, 0, 0, 0, 0, 0, 0],  // 7
+                    ['ZZO', 0, 0, 0, 0, 0, 0, 0, 0], // 8
+                    ['Z', 0, 0, 0, 0, 0, 0, 0, 0],   // 9
+                    ['ZZW', 0, 0, 0, 0, 0, 0, 0, 0], // 10
+                    ['ZW', 0, 0, 0, 0, 0, 0, 0, 0],  // 11
+                    ['WZW', 0, 0, 0, 0, 0, 0, 0, 0], // 12
+                    ['W', 0, 0, 0, 0, 0, 0, 0, 0],   // 13
                     ['WNW', 0, 0, 0, 0, 0, 0, 0, 0], // 14
-                    ['NW', 0, 0, 0, 0, 0, 0, 0, 0], // 15
+                    ['NW', 0, 0, 0, 0, 0, 0, 0, 0],  // 15
                     ['NNW', 0, 0, 0, 0, 0, 0, 0, 0], // 16
                 ];
                 const amountOfValues = raw_data.length;
                 raw_data.forEach(element => wind_values[this.convertDegreeIntoAngle(element.windDirection)][this.convertWindSpeedIntoIndex(element.windSpeed)] += 1.0 / amountOfValues * 100);
-                let csv_str = ""
+                let csv_str = "";
                 wind_values.forEach(row => csv_str = csv_str.concat(row.toString(), '\n'));
                 return csv_str;
             },

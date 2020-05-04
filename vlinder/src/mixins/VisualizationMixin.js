@@ -3,6 +3,9 @@ export default {
         stations() {
             return this.$store.getters.stations
         },
+        selectedStations() {
+            return this.$store.getters.selectedStations
+        },
         vlinderData() {
             return this.$store.getters.vlinderData
         },
@@ -19,6 +22,9 @@ export default {
         },
         setFocusedVlinderData(data) {
             this.$store.dispatch('updateFocusedVlinderdata', data)
+        },
+        setSelectedStations(data) {
+            this.$store.dispatch('updateSelectedStations', data)
         }
     }
 }

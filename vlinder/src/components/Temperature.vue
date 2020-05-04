@@ -5,8 +5,8 @@
                 <b-col style="height: 100%">
                 <line-chart-visualization
                     ref="tempchart"
-                    v-bind:selected-stations="selectedStations"
                     y-axis-label="Temperatuur"
+                    x-axis-unit=" °C"
                     :y-axis-getter="(d) => d.temp"
                     style="width: 100%; height: 100%"
                 />
@@ -38,9 +38,6 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
                 options: ['Humindex', 'WCTI']
             }
         },
-        props: {
-            "selectedStations": Array,
-        },
         mixins: [
             VisualizationMixin
         ],
@@ -53,11 +50,10 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             }
         },
         mounted() {
-            this.checkbox = this.$refs.perceivedcheckbox;
             this.temperature = this.$refs.tempchart;
             this.temperature.colors[0]='#ff0000';
             this.temperature.colors[1]='#ffc6e0';
-            this.updateLineChart();
+            //this.updateLineChart();
         },
         methods: {
             /**
@@ -69,7 +65,7 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
              */
             computePerceivedTemperatureWCTI(T, V) {
                 const V0_16 = Math.pow(V*3.6*1.5, 0.16);
-                return 13.12 + 0.6215 * T - 11.37 * V0_16 + 0.3965 * T * V0_16;
+                return Math.round(10*(13.12 + 0.6215 * T - 11.37 * V0_16 + 0.3965 * T * V0_16))/10;
             },
 
             /**
@@ -81,7 +77,7 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
              */
             computePerceivedTemperatureHumindex(T, H) {
                 const tDew = this.dewPointTemperature(T, H);
-                return T+ 5/9*(6.11 * Math.pow(Math.E, (5417.7530*(1/273.16 - 1/(273.15+tDew)))) -10 );
+                return Math.round(10*(T+ 5/9*(6.11 * Math.pow(Math.E, (5417.7530*(1/273.16 - 1/(273.15+tDew)))) -10)) )/10;
             },
 
             /**
@@ -120,7 +116,13 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
                 }
             },
             updateLineChart() {
-                this.temperature.update_data(this.temperatureData(this.focusedVlinderData));
+                let data = this.focusedVlinderData;
+                if (data && data.length === 1){
+
+                    this.temperature.update_data(this.temperatureData(data[0]));
+                } else if (!data || data.length===0){
+                    this.typePerceivedTemperature = null;
+                }
             }
         }
     }
