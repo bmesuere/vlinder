@@ -1,12 +1,19 @@
 <template>
-    <div id="d3-viz-windrose" style="height: 100%; width: 100%">
-        <b-tabs content-class="mt-3">
-        <b-tab title="First" active>
-            <div id="windrose-svg" style="height: 100%; width: 100%"/>
-        </b-tab>
-    </b-tabs>
-        <div id="windrose-svg" style="height: 100%; width: 100%"/>
-    </div>
+    <b-container>
+        <h3>Windroos</h3>
+        <b-row v-if="this.selectedStations.length > 1">
+            <b-tabs>
+                <b-tab  v-for="(station, index) in selectedStations" v-bind:key="station.name"
+                        v-bind:title="station.name"
+                        v-on:click="update_data(index)">
+                </b-tab>
+            </b-tabs>
+        </b-row>
+        <b-row style="height: 85%">
+            <b-col cols="9" id="d3-viz-windrose" style="height: 100%; width: 80%"/>
+            <b-col cols="3" id="d3-viz-windrose-legend" style="height: 100%; width: 20%"/>
+        </b-row>
+    </b-container>
 </template>
 
 <script>
@@ -24,22 +31,32 @@
         },
         watch: {
             focusedVlinderData() {
-                let data  = this.focusedVlinderData;
-                if (data && data.length === 1){
-                    this.createPlot(data[0]);
-                }
+                this.update_data()
             }
         },
         mounted (){
             this.div = d3.select('#d3-viz-windrose');
-            this.raw_data = [];
-            let observer = new ResizeObserver(() => this.createPlot(this.raw_data));
+            this.legend = d3.select('#d3-viz-windrose-legend');
+            let observer = new ResizeObserver(this.create_windrose);
             observer.observe(this.div.node());
-            this.createPlot(this.raw_data);
+            this.create_windrose();
         },
         methods: {
-            createPlot(raw_data) {
-                const tooltip = d3.select("body")
+            create_windrose(index=0) {
+                
+                let divBox = this.div.node().getBoundingClientRect();
+                this.size = Math.min(divBox['height'], divBox['width']);
+                this.width = this.size;
+                this.height = this.size;
+                this.margin = {top: 40, right: 80, bottom: 40, left: 40};
+                this.innerRadius = 20;
+                this.chartWidth = this.width - this.margin.left - this.margin.right;
+                this.chartHeight = this.height - this.margin.top - this.margin.bottom;
+                this.outerRadius = (Math.min(this.chartWidth, this.chartHeight) / 2);
+
+                this.div.selectAll("*").remove();
+
+                this.tooltip = d3.select("body")
                     .append("div")
                     .style("position", "absolute")
                     .style("z-index", "10")
@@ -47,10 +64,46 @@
                     .style("padding", "5px")
                     .style("border-radius", "10px")
                     .style("background", "#fff");
+                
+                this.svg = this.div.append("svg", 0)
+                    .style("width", this.width + 'px')
+                    .style("height", this.height + 'px');
 
-                this.raw_data = raw_data;
+                this.g = this.svg.append("g").attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
+
+                this.angle = d3.scaleLinear()
+                    .range([0, 2 * Math.PI]);
+                
+                this.radius = d3.scaleLinear()
+                    .range([this.innerRadius, this.outerRadius]);
+
+                this.x = d3.scaleBand()
+                    .range([0, 2 * Math.PI])
+                    .align(0);
+
+                this.y = d3.scaleLinear() //you can try scaleRadial but it scales differently
+                    .range([this.innerRadius, this.outerRadius]);
+
+                this.z = d3.scaleOrdinal()
+                    .range(["#4242f4", "#42c5f4", "#42f4ce", "#42f456", "#adf442", "#f4e242", "#f4a142", "#f44242"]);    
+                
+                this.add_legend()
+                
+                this.update_data()
+            },
+            update_data(index=0){
+                this.g.selectAll("g").remove();
+                if (this.selectedStations === undefined
+                    || this.selectedStations.length === 0
+                    || this.stations === undefined
+                    || this.stations.length === 0
+                    || this.focusedVlinderData === undefined
+                    || this.focusedVlinderData.length === 0) {
+                    return;
+                }
+                
                 // Convert data to format needed for the windrose
-                const data_csv_format = this.convertData(this.raw_data);
+                const data_csv_format = this.convertData(this.focusedVlinderData[index]);
                 const data = d3.csvParse(data_csv_format, (d, _, columns) => {
                     let total = 0;
                     for (let i = 1; i < columns.length; i++) total += d[columns[i]] = +d[columns[i]];
@@ -58,167 +111,143 @@
                     return d;
                 });
 
-                // Setup
-                let divBox = d3.select('#d3-viz-windrose').node().getBoundingClientRect();
-                const size = Math.min(divBox['height'], divBox['width']);
-                const width = size;
-                const height = size;
-                const legendWidth = width/5;
-                const legendMargin = legendWidth/3;
-                const legendModifier = width/600; // trial and error
-                const margin = {top: 40, right: 80, bottom: 40, left: 40};
-                const innerRadius = 20;
-                const chartWidth = width - margin.left - margin.right - legendWidth*legendModifier;
-                const chartHeight = height - margin.top - margin.bottom - legendWidth*legendModifier;
-                const outerRadius = (Math.min(chartWidth, chartHeight) / 2);
-
-                d3.select('#windrose-svg').selectAll("svg").remove();
-                const svg = d3.select("#windrose-svg")
-                    .append("svg")
-                    .style("width", width + 'px')
-                    .style("height", height + 'px')
-                    .style("font", "10px sans-serif");
-
-                const g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-                const angle = d3.scaleLinear()
-                    .range([0, 2 * Math.PI]);
-                
-                const radius = d3.scaleLinear()
-                    .range([innerRadius, outerRadius]);
-
-                const x = d3.scaleBand()
-                    .range([0, 2 * Math.PI])
-                    .align(0);
-
-                const y = d3.scaleLinear() //you can try scaleRadial but it scales differently
-                    .range([innerRadius, outerRadius]);
-
-                const z = d3.scaleOrdinal()
-                    .range(["#4242f4", "#42c5f4", "#42f4ce", "#42f456", "#adf442", "#f4e242", "#f4a142", "#f44242"]);
-
-                // Insert data
-                x.domain(data.map(function (d) {
+                this.x.domain(data.map( (d) => {
                     return d.angle;
                 }));
-                y.domain([0, d3.max(data, function (d) {
+
+                this.y.domain([0, d3.max(data, (d) => {
                     return d.total;
                 })]);
-                z.domain(data.columns.slice(1));
-                // Extend the domain slightly to match the range of [0, 2π].
-                angle.domain([0, d3.max(data, function (d, i) {
+
+                this.z.domain(data.columns.slice(1));
+                
+                this.angle.domain([0, d3.max(data, (d, i) => {
                     return i + 1;
                 })]);
-                radius.domain([0, d3.max(data, function (d) {
+
+                this.radius.domain([0, d3.max(data, (d) => {
                     return d.y0 + d.y;
                 })]);
-                const angleOffset = -360.0 / data.length / 2.0;
-                g.append("g")
+
+                this.angleOffset = -360.0 / data.length / 2.0;
+
+                this.g.append("g")
                     .selectAll("g")
                     .data(d3.stack().keys(data.columns.slice(1))(data))
                     .enter().append("g")
-                    .attr("fill", function (d) {
-                        return z(d.key);
+                    .attr("fill", (d) => {
+                        return this.z(d.key);
                     })
                     .selectAll("path")
-                    .data(function (d) {
+                    .data((d) => {
                         return d;
                     })
                     .enter().append("path")
                     .attr("d", d3.arc()
-                        .innerRadius(function (d) {
-                            return y(d[0]);
+                        .innerRadius( (d) => {
+                            return this.y(d[0]);
                         })
-                        .outerRadius(function (d) {
-                            return y(d[1]);
+                        .outerRadius((d) => {
+                            return this.y(d[1]);
                         })
-                        .startAngle(function (d) {
-                            return x(d.data.angle);
+                        .startAngle((d) => {
+                            return this.x(d.data.angle);
                         })
-                        .endAngle(function (d) {
-                            return x(d.data.angle) + x.bandwidth();
+                        .endAngle((d) => {
+                            return this.x(d.data.angle) + this.x.bandwidth();
                         })
                         .padAngle(0.01)
-                        .padRadius(innerRadius))
-                    .attr("transform", function() {return "rotate("+ angleOffset + ")"})
-                    .on("mouseover", function(d){ tooltip.text((Math.round(((d[1] - d[0]) + Number.EPSILON) * 100) / 100).toString() + "%"); return tooltip.style("visibility", "visible");})
-                        .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-                        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+                        .padRadius(this.innerRadius))
+                    .attr("transform", () => {return "rotate("+ this.angleOffset + ")"})
+                    .on("mouseover", (d) => { this.tooltip.text((Math.round(((d[1] - d[0]) + Number.EPSILON) * 100) / 100).toString() + "%"); return this.tooltip.style("visibility", "visible");})
+                        .on("mousemove", () => {return this.tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+                        .on("mouseout", () => {return this.tooltip.style("visibility", "hidden");});
 
-                const label = g.append("g")
+                const label = this.g.append("g")
                     .selectAll("g")
                     .data(data)
                     .enter().append("g")
                     .attr("text-anchor", "middle")
-                    .attr("transform", function (d) {
-                        return "rotate(" + ((x(d.angle) + x.bandwidth() / 2) * 180 / Math.PI - (90 - angleOffset)) + ")translate(" + (outerRadius + 30) + ",0)";
+                    .attr("transform", (d) => {
+                        return "rotate(" + ((this.x(d.angle) + this.x.bandwidth() / 2) * 180 / Math.PI - (90 - this.angleOffset)) + ")translate(" + (this.outerRadius + 30) + ",0)";
                     });
 
                 label.append("text")
-                    .attr("transform", function (d) {
-                        return (x(d.angle) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(90)translate(0,16)" : "rotate(-90)translate(0,-9)";
+                    .attr("transform", (d) => {
+                        return (this.x(d.angle) + this.x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(90)translate(0,16)" : "rotate(-90)translate(0,-9)";
                     })
-                    .text(function (d) {
+                    .text((d) => {
                         return d.angle;
                     })
                     .style("font-size", 14);
 
-                g.selectAll(".axis")
-                    .data(d3.range(angle.domain()[1]))
+                this.g.selectAll(".axis")
+                    .data(d3.range(this.angle.domain()[1]))
                     .enter().append("g")
                     .attr("class", "axis")
-                    .attr("transform", function (d) {
-                        return "rotate(" + angle(d) * 180 / Math.PI + ")";
+                    .attr("transform", (d) => {
+                        return "rotate(" + this.angle(d) * 180 / Math.PI + ")";
                     })
                     .call(d3.axisLeft()
-                        .scale(radius.copy().range([-innerRadius, -(outerRadius + 10)])));
-
-                const yAxis = g.append("g")
+                        .scale(this.radius.copy().range([-this.innerRadius, -(this.outerRadius + 10)])));
+                
+                this.yAxis = this.g.append("g")
                     .attr("text-anchor", "middle");
 
-                const yTick = yAxis
+                this.yTick = this.yAxis
                     .selectAll("g")
-                    .data(y.ticks(5).slice(1))
+                    .data(this.y.ticks(5).slice(1))
                     .enter().append("g");
 
-                yTick.append("circle")
+                this.yTick.append("circle")
                     .attr("fill", "none")
                     .attr("stroke", "gray")
                     .attr("stroke-dasharray", "4,4")
-                    .attr("r", y);
+                    .attr("r", this.y);
 
-                yTick.append("text")
-                    .attr("y", function (d) {
-                        return -y(d);
+                this.yTick.append("text")
+                    .attr("y", (d) => {
+                        return -this.y(d);
                     })
                     .attr("dy", "-0.35em")
-                    .attr("x", function () {
+                    .attr("x", () => {
                         return -10;
                     })
-                    .text(y.tickFormat(5, "s"))
+                    .text(this.y.tickFormat(5, "s"))
                     .style("font-size", 14);
 
+                return this.svg.node();
+            },
+            add_legend(){
+                let divBoxLegend = this.legend.node().getBoundingClientRect();
+                let w = divBoxLegend.width;
+                let h = divBoxLegend.height;
+                const scaling_factor = h/300;
 
-                const legend = g.append("g")
+                this.legend.selectAll("*").remove();
+                
+                this.svg_legend = this.legend.append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+            
+                this.g_legend = this.svg_legend.append("g")
                     .selectAll("g")
-                    .data(data.columns.slice(1).reverse())
+                    .data(["28+", "24-28", "20-24", "16-20", "12-16", "8-12", "4-8", "0-4"])
                     .enter().append("g")
-                    .attr("transform", function(d, i) { return "translate(" + (outerRadius+legendMargin) + "," + ((i - (data.columns.length - 1) / 2) * (20*legendModifier)) + ")"; });
+                    .attr("transform", (d, i) => {  return "translate(" + 0 + "," + ((((i - (8-1) / 2) * (20))+h/3)*scaling_factor) +")"; });
 
-                legend.append("rect")
-                    .attr("width", 18*legendModifier)
-                    .attr("height", 18*legendModifier)
+                this.g_legend.append("rect")
+                    .attr("width", 18*scaling_factor)
+                    .attr("height", 18*scaling_factor)
                     .attr("dy", "100em")
-                    .attr("fill", z);
+                    .attr("fill", this.z); 
 
-                legend.append("text")
-                    .attr("x", 24*legendModifier)
-                    .attr("y", 9*legendModifier)
+                this.g_legend.append("text")
+                    .attr("x", 24*scaling_factor)
+                    .attr("y", 9*scaling_factor)
                     .attr("dy", "0.35em")
-                    .text(function(d) { return d.toString() + " m/s"; })
-                    .style("font-size",10*legendModifier);                
-
-                return svg.node();
+                    .text((d) => { return d + " m/s"; })
+                    .style("font-size",10*scaling_factor); 
             },
             convertData(raw_data) {
                 const wind_values = [
