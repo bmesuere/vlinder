@@ -63,6 +63,13 @@
 
                 // setup everything
                 this.padding = {top: 20, left: 40, right: 20, bottom: 50};
+
+                this.svg.append("text")
+                    .text(this.xAxisUnit)
+                    .attr("x", 0)
+                    .attr("y", 15)
+                    .style("font-size", "9px");
+
                 this.xScale = d3.scaleTime()
                     .range([this.padding.left + this.lineStrokeWidth / 2, this.width - this.padding.right]);
 
