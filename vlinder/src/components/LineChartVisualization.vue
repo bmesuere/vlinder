@@ -15,6 +15,8 @@
                 id: "id" + uuidv4(),
                 width: 0,
                 height: 0,
+                startDate: String,
+                endDate: String,
                 format: d3.timeFormat("%H:%M"),
                 textSizeLegend: 12,
                 titleSizeLegend: 16,
@@ -175,10 +177,10 @@
 
                 // update scales
                 let dates = flattened_data.map(x => new Date(x.time));
-                let start = new Date(Math.min.apply(null, dates));
-                let end = new Date(Math.max.apply(null, dates));
+                this.startDate = new Date(Math.min.apply(null, dates));
+                this.endDate = new Date(Math.max.apply(null, dates));
 
-                this.xScale.domain([start, end]);
+                this.xScale.domain([this.startDate, this.endDate]);
                 let [min, max] = d3.extent(flattened_data, this.yAxisGetter);
                 this.yScale.domain([min, min === max ? min + 1 : max]);
 
@@ -348,7 +350,8 @@
                     this.tooltip_box.attr("transform", "translate(" + (translate_x) + ", " + (mousePosition[1] - 100) + ")");
 
                     this.tooltip_box.select("text.title")
-                        .text(this.format(new Date(x_value)))
+                        .text(d3.timeFormat((this.endDate - this.startDate) < 93600000?
+                        "%H:%M" : "%d/%m/%y %H:%M")(new Date(x_value)))
                         .style("font-size", this.titleSizeLegend+"px")
                         .attr("dx", this.paddingLegend)
                         .attr("dy", 0)
