@@ -1,6 +1,15 @@
 <template>
     <b-container>
-        <h3>Windroos</h3>
+        <b-row>
+            <b-col><h3>Windroos</h3></b-col>
+            <b-col><b-button v-b-modal.modal-1 variant="info" class="float-right">
+                    <b-icon icon="info-circle"></b-icon>
+                   </b-button>
+                   <b-modal id="modal-1" hide-footer="true" title="Windroos">
+                    <p class="my-4">Voor elke windrichting toont de windroos hoeveel procent van de geselecteerde tijd de wind vanuit die richting waait, en hoe hard ze waait.</p>
+                   </b-modal>
+            </b-col>
+        </b-row>
         <b-row v-if="this.selectedStations.length > 1">
             <b-tabs>
                 <b-tab  v-for="(station, index) in selectedStations" v-bind:key="station.name"
