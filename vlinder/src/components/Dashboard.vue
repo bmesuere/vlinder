@@ -99,6 +99,7 @@
                     <line-chart-visualization ref="pressureChart"
                                               y-axis-label="Luchtdruk"
                                               x-axis-unit=" hPa"
+                                              msg-empty="De luchtdruk was constant over deze periode."
                                               :y-axis-getter="(d) => d.pressure"
                                               style="width: 100%; height: 100%"/>
                 </b-card>
@@ -117,6 +118,7 @@
                     <line-chart-visualization ref="rainChart"
                                               y-axis-label="Neerslagsom"
                                               x-axis-unit=" l/m²"
+                                              msg-empty="Er was geen neerslag in deze periode."
                                               :y-axis-getter="(d) => d.rainVolume"
                                               :enable-area=true
                                               style="width: 100%; height: 100%"
@@ -153,6 +155,7 @@
                                               ref="temperatureChart"
                                               y-axis-label="Temperatuur"
                                               x-axis-unit=" C°"
+                                              msg-empty="De temperatuur was constant over deze periode."
                                               :y-axis-getter="(d) => d.temp"
                                               style="width: 100%; height: 100%"/>
                 </b-card>

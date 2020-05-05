@@ -25,6 +25,7 @@
 
             "yAxisLabel": String,
             "xAxisUnit": String,
+            "msgEmpty": String,
             "yAxisGetter": Function,
             "lineStrokeWidth": {
                 type: Number,
@@ -237,6 +238,22 @@
 
                 legend_entries.merge(new_entries)
                     .attr("transform", (d, i) => "translate(0, " + (i+1)*20 + ")");
+
+
+                if(data && data.length> 0 && min===max){
+                    this.svg
+                        .append("text")
+                        .attr("class", "empty")
+                        .attr("y", this.height/2)
+                        .text(this.msgEmpty)
+                        .style("fill", "#95999c")
+                        .style("font-size", "11px")
+                        .attr("width", this.width)
+                        .attr("x", this.width/2)
+                        .style("text-anchor", "middle");
+                } else {
+                    this.svg.selectAll("text.empty").remove();
+                }
             },
             showToolTips() {
                 if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
