@@ -279,26 +279,31 @@
             updateToolTips() {
                 if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     // Update position of tooltip elements according to mouse position
-                    let mousePosition = d3.mouse(this.svg.node());
+                    let BB = this.svg.node().getBoundingClientRect();
+                    let posX = d3.event.clientX - BB.x;
+                    let posY = d3.event.clientY - BB.y + 20;
+                    console.log(posX + ' ' + posY);
                     let currentXScale = this.xAxis.scale(); // Get zoomed scale
-                    let mouseX = currentXScale.invert(mousePosition[0]); // waarde van x-as, hier dus datum
+                    let valueX = currentXScale.invert(posX);
                     let bisectTime = d3.bisector(function (d) {
                         return new Date(d.time);
                     }).left;
-                    let i = bisectTime(this.current_data[0], mouseX, 1); //hier zou punt muis moeten komen
+                    let i = bisectTime(this.current_data[0], valueX, 1);
                     let d0 = this.current_data[0][i - 1],
                         d1 = this.current_data[0][i];
-                    let selectedIndex = (d1 !== undefined) && mouseX - d0.time > d1.time - mouseX ? i : i - 1;
+                    let selectedIndex = (d1 !== undefined) &&
+                                new Date(valueX) - new Date(d0.time) > new Date(d1.time) - new Date(valueX) ?
+                                i : i - 1;
 
-                    let x_value = new Date(this.current_data[0][selectedIndex].time);
-                    let toolTipX = currentXScale(x_value);
-                    let y_values = this.current_data.map(d => this.yAxisGetter(d[selectedIndex]));
+                    valueX = new Date(this.current_data[0][selectedIndex].time);
+                    let toolTipX = currentXScale(valueX);
+                    let valuesY = this.current_data.map(d => this.yAxisGetter(d[selectedIndex]));
 
                     // Update tooltip dots
                     let self = this;
                     this.tooltip_dots
                         .attr("transform", function (d, i) {
-                            let toolTipY = self.yScale(y_values[i]);
+                            let toolTipY = self.yScale(valuesY[i]);
                             return "translate(" + toolTipX + ", " + toolTipY + ")";
                         });
 
@@ -310,14 +315,14 @@
 
                     this.tooltip_box
                         .selectAll("g.entry text.y-value")
-                        .data(y_values)
+                        .data(valuesY)
                         .attr("fill", "black")
                         .attr("dx", 2*this.paddingLegend)
                         .style("font-size", this.textSizeLegend + "px")
                         .text(d => d+this.xAxisUnit);
                     this.tooltip_box
                         .selectAll("g.entry circle.color-dot")
-                        .data(y_values)
+                        .data(valuesY)
                         .attr("r", 2)
                         .attr("transform", "translate(" + (1+this.paddingLegend) + ", "+ (1-this.paddingLegend) + ")")
                         .attr("fill", (d, i) => this.colors[i])
@@ -341,15 +346,15 @@
                         .attr("width", width);
 
                     // Update tooltip information box
-                    let translate_x = mousePosition[0] + 5;
-                    if (mousePosition[0] + 5 + width > this.width - this.padding.right){
-                        translate_x = mousePosition[0] - 5 - width;
+                    let translate_x = posX + 5;
+                    if (posX + 5 + width > this.width - this.padding.right){
+                        translate_x = posX - 5 - width;
                     }
-                    this.tooltip_box.attr("transform", "translate(" + (translate_x) + ", " + (mousePosition[1] - 100) + ")");
+                    this.tooltip_box.attr("transform", "translate(" + translate_x + ", " + (posY + 15) + ")");// Y-waarde
 
                     this.tooltip_box.select("text.title")
                         .text(d3.timeFormat((this.endDate - this.startDate) < 93600000?
-                        "%H:%M" : "%d/%m/%y %H:%M")(new Date(x_value)))
+                        "%H:%M" : "%d/%m/%y %H:%M")(new Date(valueX)))
                         .style("font-size", this.titleSizeLegend+"px")
                         .attr("dx", this.paddingLegend)
                         .attr("dy", 0)
