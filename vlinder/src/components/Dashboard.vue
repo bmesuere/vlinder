@@ -57,15 +57,15 @@
                             </b-row>
                         </b-col>
                         <b-col cols="3" v-if="this.selectedStations.length > 1 ">
-                            <b-row v-for="(station, index) in selectedStations"
-                                v-bind:key="station.name">
+                            <b-row v-for="(datadeel, index) in focusedVlinderData"
+                                v-bind:key="stationNames[datadeel[0].id]">
                                 <b-col cols="1" class="rect">
                                     <svg width="10" height="10">
                                           <rect width="10" height="10" style="stroke-width:1;stroke:black"
                                             v-bind:style="{ 'fill': colors[index] }"/>
                                     </svg>
                                 </b-col>
-                                <b-col>{{station.name}}</b-col>
+                                <b-col>{{stationNames[datadeel[0].id]}}</b-col>
                             </b-row>
                         </b-col>
                     </b-row>
@@ -208,6 +208,7 @@
                 options: [],
                 selectedStartDateString: '',
                 selectedEndDateString: '',
+                stationNames: {},
                 layout: [
                     {"x": 0, "y": 0, "w": 5.5, "h": 1, "i": "0"},
                     {"x": 6, "y": 0, "w": 4.5, "h": 1.3, "i": "1"},
@@ -220,6 +221,7 @@
         },
         computed: {
             stations() {
+                this.$store.getters.stations.forEach(st => this.stationNames[st.id] = st.name);
                 return this.$store.getters.stations;
             }
         },
