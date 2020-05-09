@@ -20,6 +20,8 @@
                 format: d3.timeFormat("%H:%M"),
                 textSizeLegend: 12,
                 titleSizeLegend: 16,
+                posX: -1,
+                posY: -1,
                 paddingLegend: 5
             }
         },
@@ -164,7 +166,7 @@
                     .call(this.zoom)
                     .on("mouseover", this.showToolTips)
                     .on("mouseout", this.hideToolTips)
-                    .on("mousemove", this.updateToolTips);
+                    .on("mousemove", this.updateHighlightedPosition);
 
                 if(this.current_data !== undefined){
                     this.update_data(this.current_data);
@@ -279,12 +281,8 @@
             updateToolTips() {
                 if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     // Update position of tooltip elements according to mouse position
-                    let BB = this.svg.node().getBoundingClientRect();
-                    let posX = d3.event.clientX - BB.x;
-                    let posY = d3.event.clientY - BB.y + 20;
-                    console.log(posX + ' ' + posY);
                     let currentXScale = this.xAxis.scale(); // Get zoomed scale
-                    let valueX = currentXScale.invert(posX);
+                    let valueX = currentXScale.invert(this.posX);
                     let bisectTime = d3.bisector(function (d) {
                         return new Date(d.time);
                     }).left;
@@ -346,11 +344,11 @@
                         .attr("width", width);
 
                     // Update tooltip information box
-                    let translate_x = posX + 5;
-                    if (posX + 5 + width > this.width - this.padding.right){
-                        translate_x = posX - 5 - width;
+                    let translate_x = this.posX + 5;
+                    if (this.posX + 5 + width > this.width - this.padding.right){
+                        translate_x = this.posX - 5 - width;
                     }
-                    this.tooltip_box.attr("transform", "translate(" + translate_x + ", " + (posY + 15) + ")");// Y-waarde
+                    this.tooltip_box.attr("transform", "translate(" + translate_x + ", " + (this.posY + 15) + ")");
 
                     this.tooltip_box.select("text.title")
                         .text(d3.timeFormat((this.endDate - this.startDate) < 93600000?
@@ -361,6 +359,12 @@
                     ;
 
                 }
+            },
+            updateHighlightedPosition(){
+                let BB = this.svg.node().getBoundingClientRect();
+                this.posX = d3.event.clientX - BB.x;
+                this.posY = d3.event.clientY - BB.y + 20;
+                this.updateToolTips();
             },
             updateChart() {
                 if (this.current_data && this.current_data.length <= 0 || this.current_data[0].length <= 0){
@@ -390,8 +394,6 @@
                 //    this.path.attr("d", this.line);
                 this.updateToolTips();
             }
-
-
         }
     }
 </script>
