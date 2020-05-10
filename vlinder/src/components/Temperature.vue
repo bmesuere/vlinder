@@ -1,6 +1,16 @@
 <template>
     <div id="d3-viz-temperature" style="display: inline-block">
         <b-container style="width: 100%; height: 100%">
+            <b-row>
+                <b-col><h3>Temperatuur</h3></b-col>
+                <b-col><b-button v-b-modal.modal-temperature variant="info" class="float-right">
+                        <b-icon icon="info-circle"></b-icon>
+                    </b-button>
+                    <b-modal id="modal-temperature" hide-footer="true" title="Temperatuur">
+                        <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
+                    </b-modal>
+                </b-col>
+            </b-row>
             <b-row align-h="center" align-v="start" style="height: 85%">
                 <b-col style="height: 100%">
                 <line-chart-visualization

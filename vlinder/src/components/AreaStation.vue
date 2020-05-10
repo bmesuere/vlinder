@@ -1,5 +1,15 @@
 <template>
     <b-container>
+        <b-row>
+            <b-col><h3>Landgebruik</h3></b-col>
+            <b-col><b-button v-b-modal.modal-areastation variant="info" class="float-right">
+                    <b-icon icon="info-circle"></b-icon>
+                   </b-button>
+                   <b-modal id="modal-areastation" hide-footer="true" title="Landgebruik">
+                    <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
+                   </b-modal>
+            </b-col>
+        </b-row>
         <b-row v-if="this.selectedStations.length > 1">
             <b-tabs>
                 <b-tab  v-for="(station, index) in selectedStations" v-bind:key="station.name"
