@@ -1,5 +1,19 @@
 <template>
-    <div :id="id" style="height: 100%; width: 100%"></div>
+    <b-container>
+        <b-row>
+            <b-col><h3>{{yAxisLabel}}</h3></b-col>
+            <b-col><b-button v-b-modal="yAxisLabel" variant="info" class="float-right">
+                    <b-icon icon="info-circle"></b-icon>
+                   </b-button>
+                   <b-modal :id=yAxisLabel hide-footer :title="yAxisLabel">
+                    <p class="my-4">Voor elke windrichting toont de windroos hoeveel procent van de geselecteerde tijd de wind vanuit die richting waait, en hoe hard ze waait.</p>
+                   </b-modal>
+            </b-col>
+        </b-row>
+        <b-row style="height: 85%">
+            <div :id="id" style="height: 100%; width: 100%"></div>
+        </b-row>
+    </b-container>
 </template>
 
 <script>
