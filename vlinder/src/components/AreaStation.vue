@@ -5,7 +5,7 @@
             <b-col><b-button v-b-modal.modal-areastation variant="info" class="float-right">
                     <b-icon icon="info-circle"></b-icon>
                    </b-button>
-                   <b-modal id="modal-areastation" hide-footer="true" title="Landgebruik">
+                   <b-modal id="modal-areastation" hide-footer title="Landgebruik">
                     <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
                    </b-modal>
             </b-col>
@@ -18,7 +18,11 @@
                 </b-tab>
             </b-tabs>
         </b-row>
-        <b-row style="height: 85%">
+        <b-row v-if="this.selectedStations.length > 1" style="height: 60%">
+            <b-col cols="9" id="d3-viz-area" style="height: 100%; width: 80%"/>
+            <b-col cols="3" id="d3-viz-area-legend" style="height: 100%; width: 20%"/>
+        </b-row>
+        <b-row v-else style="height: 85%">
             <b-col cols="9" id="d3-viz-area" style="height: 100%; width: 80%"/>
             <b-col cols="3" id="d3-viz-area-legend" style="height: 100%; width: 20%"/>
         </b-row>
