@@ -1,0 +1,38 @@
+$font-family-sans-serif: CircularStd;
+
+$theme-colors: (
+    "calendar": #6685F7,
+    "primary": #6685F7,
+    "success": #6685F7,
+    "info": #6685F7, 
+    "custom-color": #1111
+);
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+input {
+    border-style: none;
+    text-align: center;
+    width: auto;
+    background-color: none;
+}
+
+#timeInput {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendarBox{
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 1px solid  #6685F7;
+}
+
+.card {
+    border: none;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.10);
+}

@@ -1,6 +1,5 @@
 <template>
     <b-card style="height: 100%">
-        <template v-slot:header>
             <b-row>
                 <b-col>
                     <h3>Landgebruik</h3>
@@ -14,8 +13,7 @@
                     </b-modal>
                 </b-col>
             </b-row>
-        </template>
-        <b-row style="height: 100%">
+        <b-row style="height: 90%">
             <b-col cols="2" v-if="this.selectedStations.length > 1" style="height: 100%">
                <b-tabs pills vertical>
                     <b-tab v-for="(station, index) in selectedStations" v-bind:key="station.name"

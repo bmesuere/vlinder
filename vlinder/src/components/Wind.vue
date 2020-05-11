@@ -1,7 +1,6 @@
 <template>
     <b-card id="windRoseCard" style="height: 100%;">
-        <template v-slot:header>
-            <b-row>
+        <b-row>
                 <b-col><h3>Windroos</h3></b-col>
                 <b-col>
                     <b-button v-b-modal.modal-windrose variant="info" class="float-right">
@@ -12,7 +11,6 @@
                     </b-modal>
                 </b-col>
             </b-row>
-        </template>
         <b-row style="height: 100%">
             <b-col cols="2" v-if="this.selectedStations.length > 1" style="height: 100%">
                <b-tabs pills vertical>
@@ -308,5 +306,7 @@
 </script>
 
 <style scoped>
-
+body {
+font-family: CircularStd;
+}
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div style="margin-left: 2.5%; margin-right: 2.5%">
+    <div>
         
         <div style="padding-boo: 4vh; display: flex; width: 100%">
             <Map style="width: 50%; height: 50%; float:left"/>
@@ -11,47 +11,30 @@
                 </multiselect>
             </div>
         </div>
-        <b-card style="height: auto; margin-top: 2vh;">
-                    <b-row style="height: 100%" align-h="center" align-v="center">
-                                <b-col>
-                                    <b-row>
-                                        <b-col>
-                                            <p>Van:</p>
-                                        </b-col>
-                                        <b-col>
-                                            <datetime v-model="selectedStartDateString" type="datetime"/>
-                                        </b-col>
-                                    </b-row>
-                                </b-col>
-                                <b-col>
-                                    <b-row>
-                                        <b-col>
-                                            <p>Tot:</p>
-                                        </b-col>
-                                        <b-col>
-                                            <datetime v-model="selectedEndDateString" type="datetime"/>
-                                        </b-col>
-                                    </b-row>
-                                </b-col>
-                        <b-col>
-                            <b-button variant="success" @click="loadVlinderData">Selecteer</b-button>
-                        </b-col>
-                        <b-col>
-                            <b-button variant="info" @click="downloadCsv">Download</b-button>
-                        </b-col>
-                        <b-col v-if="this.selectedStations.length > 1 ">
-                            <b-row v-for="(datadeel, index) in focusedVlinderData"
-                                v-bind:key="stationNames[datadeel[0].id]">
-                                <b-col cols="1" class="rect">
-                                    <svg width="10" height="10">
-                                          <rect width="10" height="10" style="stroke-width:1;stroke:black"
-                                            v-bind:style="{ 'fill': colors[index] }"/>
-                                    </svg>
-                                </b-col>
-                                <b-col>{{stationNames[datadeel[0].id]}}</b-col>
-                            </b-row>
-                        </b-col>
-                    </b-row>
+
+        <b-card style="height: auto; border-style: none; box-shadow: 0px 0px 0px 0px rgba(0,0,0,0);">
+                    <row id="timeInput" style="height: 100%;" align-h="center" align-v="center" >
+                        <div style="display: flex;">
+                            <div>
+                            <p style="margin-bottom: 0px">Van:</p>
+                                <div style="z-index: 100;" class="calendarBox">
+                                    <b-icon style="z-index:100" icon="calendar-fill" variant="calendar"></b-icon>
+                                    <datetime style="background-color #000000; " v-model="selectedStartDateString" type="datetime"/>
+                                </div>
+                            </div>
+                            <div style="margin-left: 20px">
+                                <p style="margin-bottom: 0px">Tot:</p>
+                                <div class="calendarBox">
+                                    <b-icon style="z-index:100" icon="calendar-fill" variant="calendar"></b-icon>
+                                    <datetime style="background-color #000000;" v-model="selectedEndDateString" type="datetime"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex;">   
+                            <b-button variant="info" @click="loadVlinderData">Selecteer</b-button>
+                            <b-button style="margin-left: 20px" variant="outline-info" @click="downloadCsv">Download</b-button>
+                        </div> 
+                    </row>
                 </b-card>
 
         <grid-layout :layout.sync="layout"
@@ -76,7 +59,6 @@
                     :min-h="2"
                     drag-ignore-from="svg rect">
                     <b-card style="height: 100%">
-                        <template v-slot:header>
                             <b-row>
                                 <b-col><h3>Temperatuur</h3></b-col>
                                 <b-col>
@@ -88,8 +70,7 @@
                                     </b-modal>
                                 </b-col>
                             </b-row>
-                        </template>
-                        <b-row style="height: 100%">
+                        <b-row style="height: 90%">
                             <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
                             <line-chart-visualization v-else
                                           ref="temperatureChart"
@@ -112,7 +93,7 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg">
-                <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
+                <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%; padding-bottom: 10px;"/>
             </grid-item>
             <grid-item
                     :x="layout[2].x"
@@ -125,7 +106,6 @@
                     :min-h="2"
                     drag-ignore-from="svg rect">
                     <b-card style="height: 100%">
-                        <template v-slot:header>
                             <b-row>
                                 <b-col><h3>Neerslagsom</h3></b-col>
                                 <b-col>
@@ -137,15 +117,14 @@
                                     </b-modal>
                                 </b-col>
                             </b-row>
-                        </template>
-                        <b-row style="height: 100%">
+                        <b-row style="height: 90%">
                             <line-chart-visualization ref="rainChart"
                                                         y-axis-label="Neerslagsom"
                                                         x-axis-unit=" l/m²"
                                                         msg-empty="Er was geen neerslag in deze periode."
                                                         :y-axis-getter="(d) => d.rainVolume"
                                                         :enable-area=true
-                                                        style="width: 100%; height: 100%"
+                                                        style="width: 100%; height: 100%; padding: 10px;"
                                 />
                         </b-row>
                     </b-card>
@@ -174,7 +153,6 @@
                     :min-h="2"
                     drag-ignore-from="svg rect">
                     <b-card style="height: 100%">
-                        <template v-slot:header>
                             <b-row>
                                 <b-col><h3>Luchtdruk</h3></b-col>
                                 <b-col>
@@ -186,14 +164,14 @@
                                     </b-modal>
                                 </b-col>
                             </b-row>
-                        </template>
-                        <b-row style="height: 100%">
-                            <line-chart-visualization ref="pressureChart"
+                        <b-row style="height: 90%">
+                            <line-chart-visualization 
+                                              ref="pressureChart"
                                               y-axis-label="Luchtdruk"
                                               msg-empty="De luchtdruk was constant over deze periode."
                                               x-axis-unit=" hPa"
                                               :y-axis-getter="(d) => d.pressure"
-                                              style="width: 100%; height: 100%"/>
+                                              style="width: 100%; height: 100%; padding: 10px;"/>
                         </b-row>
                     </b-card>
             </grid-item>
