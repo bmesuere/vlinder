@@ -49,9 +49,28 @@
                      :vertical-compact="true"
                      :prevent-collision="false"
                      :use-css-transforms="true"
-
+                     :breakpoints="breakpoints"
+                     :cols="cols"
                      :responsive="true"
                      style="width: 100%">
+            <grid-item
+                    :x="layout[0].x"
+                    :y="layout[0].y"
+                    :w="layout[0].w"
+                    :h="layout[0].h"
+                    :i="layout[0].i"
+                    :key="layout[0].i"
+                    :min-w="3"
+                    :min-h="2"
+                    drag-ignore-from="svg rect">
+                <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
+                <line-chart-visualization v-else
+                                          ref="temperatureChart"
+                                          y-axis-label="Temperatuur"
+                                          x-axis-unit=" C°"
+                                          :y-axis-getter="(d) => d.temp"
+                                          style="width: 100%; height: 100%"/>
+            </grid-item>
             <grid-item
                     :x="layout[1].x"
                     :y="layout[1].y"
@@ -59,10 +78,10 @@
                     :h="layout[1].h"
                     :i="layout[1].i"
                     :key="layout[1].i"
-                    :min-w="2"
-                    :min-h="1"
+                    :min-w="3"
+                    :min-h="2"
                     drag-ignore-from="svg">
-                    <area-station style="height: 100%; width: 100%"/>
+                <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
             </grid-item>
             <grid-item
                     :x="layout[2].x"
@@ -74,11 +93,13 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                    <line-chart-visualization ref="pressureChart"
-                                              y-axis-label="Luchtdruk"
-                                              x-axis-unit=" hPa"
-                                              :y-axis-getter="(d) => d.pressure"
-                                              style="width: 100%; height: 100%"/>
+                <line-chart-visualization ref="rainChart"
+                                          y-axis-label="Neerslagsom"
+                                          x-axis-unit=" l/m²"
+                                          :y-axis-getter="(d) => d.rainVolume"
+                                          :enable-area=true
+                                          style="width: 100%; height: 100%"
+                />
             </grid-item>
             <grid-item
                     :x="layout[3].x"
@@ -87,16 +108,10 @@
                     :h="layout[3].h"
                     :i="layout[3].i"
                     :key="layout[3].i"
-                    :min-w="3"
-                    :min-h="2"
-                    drag-ignore-from="svg rect">
-                    <line-chart-visualization ref="rainChart"
-                                              y-axis-label="Neerslagsom"
-                                              x-axis-unit=" l/m²"
-                                              :y-axis-getter="(d) => d.rainVolume"
-                                              :enable-area=true
-                                              style="width: 100%; height: 100%"
-                    />
+                    :min-w="2"
+                    :min-h="1"
+                    drag-ignore-from="svg">
+                    <area-station style="height: 100%; width: 100%"/>
             </grid-item>
             <grid-item
                     :x="layout[4].x"
@@ -107,25 +122,11 @@
                     :key="layout[4].i"
                     :min-w="3"
                     :min-h="2"
-                    drag-ignore-from="svg">
-                    <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
-            </grid-item>
-            <grid-item
-                    :x="layout[5].x"
-                    :y="layout[5].y"
-                    :w="layout[5].w"
-                    :h="layout[5].h"
-                    :i="layout[5].i"
-                    :key="layout[5].i"
-                    :min-w="3"
-                    :min-h="2"
                     drag-ignore-from="svg rect">
-                    <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
-                    <line-chart-visualization v-else
-                                              ref="temperatureChart"
-                                              y-axis-label="Temperatuur"
-                                              x-axis-unit=" C°"
-                                              :y-axis-getter="(d) => d.temp"
+                    <line-chart-visualization ref="pressureChart"
+                                              y-axis-label="Luchtdruk"
+                                              x-axis-unit=" hPa"
+                                              :y-axis-getter="(d) => d.pressure"
                                               style="width: 100%; height: 100%"/>
             </grid-item>
         </grid-layout>
@@ -177,13 +178,20 @@
                 selectedStartDateString: '',
                 selectedEndDateString: '',
                 layout: [
-                    {"x": 0, "y": 0, "w": 5.5, "h": 1, "i": "0"},
-                    {"x": 6, "y": 0, "w": 4.5, "h": 1.3, "i": "1"},
-                    {"x": 0, "y": 5, "w": 4.5, "h": 2, "i": "2"},
-                    {"x": 8, "y": 1.3, "w": 4.5, "h": 2, "i": "3"},
-                    {"x": 4.5, "y": 3.3, "w": 5.5, "h": 3, "i": "4"},
-                    {"x": 0, "y": 1, "w": 5.5, "h": 3, "i": "5"},
-                ]
+                    {"x": 0, "y": 0, "w": 6, "h": 3, "i": "0"},
+                    {"x": 6, "y": 0, "w": 6, "h": 3, "i": "1"},
+                    {"x": 0, "y": 3, "w": 6, "h": 2, "i": "2"},
+                    {"x": 6, "y": 3, "w": 6, "h": 2, "i": "3"},
+                    {"x": 0, "y": 6, "w": 6, "h": 3, "i": "4"},
+                    //{"x": 0, "y": 1, "w": 5.5, "h": 3, "i": "5"},
+                ],
+                breakpoints: {
+                    lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0
+                },
+                cols: {
+                    lg: 12, md: 12, sm: 12, xs: 6, xxs: 6
+                }
+
             }
         },
         computed: {
