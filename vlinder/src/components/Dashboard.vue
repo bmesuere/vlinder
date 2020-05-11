@@ -1,8 +1,9 @@
 <template>
-    <div style="margin-left: 10%; margin-right: 10%; margin-top: 10px;">
-        <div style="position: relative; display: flex; width: 100%">
-            <Map style="margin: auto; width: 100%; height: 100%;"/>
-            <div style="position: absolute; z-index: 9; margin-left: auto; padding: 4vh">
+    <div style="margin-left: 2.5%; margin-right: 2.5%">
+        
+        <div style="padding-boo: 4vh; display: flex; width: 100%">
+            <Map style="width: 50%; height: 50%; float:left"/>
+            <div style="float:right">
                 <multiselect v-model="multiSelectValues" label="text" track-by="text" :clear-on-select="false"
                              :multiple="true" :options="options" :searchable="true" :close-on-select="false"
                              :max=5 :show-labels="false" placeholder="Selecteer een station">
@@ -10,6 +11,36 @@
                 </multiselect>
             </div>
         </div>
+        <b-card style="height: 5%; margin-top: 2vh;">
+                    <b-row style="height: 100%" align-h="center" align-v="center">
+                                <b-col>
+                                    <b-row>
+                                        <b-col>
+                                            <p>Van:</p>
+                                        </b-col>
+                                        <b-col>
+                                            <datetime v-model="selectedStartDateString" type="datetime"/>
+                                        </b-col>
+                                    </b-row>
+                                </b-col>
+                                <b-col>
+                                    <b-row>
+                                        <b-col>
+                                            <p>Tot:</p>
+                                        </b-col>
+                                        <b-col>
+                                            <datetime v-model="selectedEndDateString" type="datetime"/>
+                                        </b-col>
+                                    </b-row>
+                                </b-col>
+                        <b-col>
+                            <b-button variant="success" @click="loadVlinderData">Selecteer</b-button>
+                        </b-col>
+                        <b-col>
+                            <b-button variant="info" @click="downloadCsv">Download</b-button>
+                        </b-col>
+                    </b-row>
+                </b-card>
 
         <grid-layout :layout.sync="layout"
                      :col-num="12"
@@ -21,42 +52,6 @@
 
                      :responsive="true"
                      style="width: 100%">
-
-            <grid-item
-                    :x="layout[0].x"
-                    :y="layout[0].y"
-                    :w="layout[0].w"
-                    :h="layout[0].h"
-                    :i="layout[0].i"
-                    :is-draggable="false"
-                    :min-w="4"
-                    :min-h="1"
-                    :key="layout[0].i" style="z-index: 8">
-                <b-card style="height: 100%">
-                    <b-row style="height: 100%" align-h="center" align-v="center">
-                        <b-col>
-                            <b-row style="padding: 1vh" align-v="center">
-                                <b-col cols="3">Van:</b-col>
-                                <b-col>
-                                    <datetime v-model="selectedStartDateString" type="datetime"/>
-                                </b-col>
-                            </b-row>
-                            <b-row style="padding: 1vh" align-v="center">
-                                <b-col cols="3">Tot:</b-col>
-                                <b-col>
-                                    <datetime v-model="selectedEndDateString" type="datetime"/>
-                                </b-col>
-                            </b-row>
-                        </b-col>
-                        <b-col cols="2">
-                            <b-button @click="loadVlinderData">Laad</b-button>
-                        </b-col>
-                        <b-col cols="3">
-                            <b-button @click="downloadCsv">Download</b-button>
-                        </b-col>
-                    </b-row>
-                </b-card>
-            </grid-item>
             <grid-item
                     :x="layout[1].x"
                     :y="layout[1].y"
@@ -67,9 +62,7 @@
                     :min-w="2"
                     :min-h="1"
                     drag-ignore-from="svg">
-                <b-card style="height: 100%">
                     <area-station style="height: 100%; width: 100%"/>
-                </b-card>
             </grid-item>
             <grid-item
                     :x="layout[2].x"
@@ -81,13 +74,11 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                <b-card style="height: 100%">
                     <line-chart-visualization ref="pressureChart"
                                               y-axis-label="Luchtdruk"
                                               x-axis-unit=" hPa"
                                               :y-axis-getter="(d) => d.pressure"
                                               style="width: 100%; height: 100%"/>
-                </b-card>
             </grid-item>
             <grid-item
                     :x="layout[3].x"
@@ -99,7 +90,6 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                <b-card style="height: 100%">
                     <line-chart-visualization ref="rainChart"
                                               y-axis-label="Neerslagsom"
                                               x-axis-unit=" l/m²"
@@ -107,7 +97,6 @@
                                               :enable-area=true
                                               style="width: 100%; height: 100%"
                     />
-                </b-card>
             </grid-item>
             <grid-item
                     :x="layout[4].x"
@@ -119,9 +108,7 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg">
-                <b-card id="windRoseCard" style="height: 100%;">
                     <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%"/>
-                </b-card>
             </grid-item>
             <grid-item
                     :x="layout[5].x"
@@ -133,7 +120,6 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                <b-card style="height: 100%">
                     <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
                     <line-chart-visualization v-else
                                               ref="temperatureChart"
@@ -141,7 +127,6 @@
                                               x-axis-unit=" C°"
                                               :y-axis-getter="(d) => d.temp"
                                               style="width: 100%; height: 100%"/>
-                </b-card>
             </grid-item>
         </grid-layout>
 
