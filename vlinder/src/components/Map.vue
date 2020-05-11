@@ -49,8 +49,11 @@
         data() {
             return {
                 map: {},
-                stations_component: {}
+                stations_component: {},
             }
+        },
+        props: {
+            hovered: String,
         },
         watch: {
             stations() {
@@ -69,6 +72,13 @@
                         Popup(enter.select("circle"), this.map, this.latestVlinderData);
                     });
                 }
+            },
+            hovered() {
+                let self = this;
+                this.stations_component.join(enter => {
+                    enter.select("circle")
+                    .attr("hovered", d => d.id == self.hovered)
+                });
             }
         },
         methods: {

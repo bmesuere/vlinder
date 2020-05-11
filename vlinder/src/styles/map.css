@@ -23,6 +23,11 @@
     stroke-width: 4px;
 }
 
+.circles[hovered*=true] {
+    stroke: #004477;
+    stroke-width: 4px;
+}
+
 .circles[selected*=true]{
 	stroke: #0066cc;
     stroke-width: 4px;

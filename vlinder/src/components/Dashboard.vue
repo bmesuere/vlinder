@@ -2,12 +2,24 @@
     <div style="margin-left: 2.5%; margin-right: 2.5%">
         
         <div style="padding-boo: 4vh; display: flex; width: 100%">
-            <Map style="width: 50%; height: 50%; float:left"/>
+            <Map :hovered="hovered" style="width: 50%; height: 50%; float:left"/>
             <div style="float:right">
                 <multiselect v-model="multiSelectValues" label="text" track-by="text" :clear-on-select="false"
                              :multiple="true" :options="options" :searchable="true" :close-on-select="false"
                              :max=5 :show-labels="false" placeholder="Selecteer een station">
-                    <span slot="maxElements">Maximum aantal geselecteerd. Verwijder een station voor je een nieuw kan toevoegen.</span>
+                 <template slot="option" slot-scope="props">
+                    <div @mouseenter="hovered = props.option.value" 
+                         @mouseleave="hovered = null" 
+                         style="padding:4px 4px 4px 4px"
+                         class="option__desc">
+                        <span style="font-size: 20px">{{ props.option.text }}</span>
+                        <br>
+                        <span style="font-size: 10px">{{ props.option.value }}</span>
+                    </div>
+                 </template>
+                    <span slot="maxElements">
+                        Maximum aantal geselecteerd. Verwijder een station voor je een nieuw kan toevoegen.
+                    </span>
                 </multiselect>
             </div>
         </div>
@@ -206,7 +218,8 @@
                 },
                 cols: {
                     lg: 12, md: 12, sm: 12, xs: 6, xxs: 6
-                }
+                },
+                hovered: null
 
             }
         },
@@ -264,7 +277,7 @@
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
-            }
+            },
         }
     }
 </script>
