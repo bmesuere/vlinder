@@ -1,24 +1,5 @@
 <template>
-    <b-card style="height: 100%">
-        <template v-slot:header>
-            <b-row>
-                <b-col><h3>{{yAxisLabel}}</h3></b-col>
-                <b-col>
-                    <b-button v-b-modal="yAxisLabel" variant="info" class="float-right">
-                        <b-icon icon="info-circle"></b-icon>
-                    </b-button>
-                    <b-modal :id=yAxisLabel hide-footer :title="yAxisLabel">
-                        <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.
-
-</p>
-                    </b-modal>
-                </b-col>
-            </b-row>
-        </template>
-        <b-row style="height: 100%">
-            <div :id="id" style="height: 100%; width: 100%"></div>
-        </b-row>
-    </b-card>
+    <div :id="id" style="height: 100%; width: 100%"></div>
 </template>
 
 <script>

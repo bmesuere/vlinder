@@ -75,14 +75,32 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
-                <line-chart-visualization v-else
+                    <b-card style="height: 100%">
+                        <template v-slot:header>
+                            <b-row>
+                                <b-col><h3>Temperatuur</h3></b-col>
+                                <b-col>
+                                    <b-button v-b-modal.temperature variant="info" class="float-right">
+                                        <b-icon icon="info-circle"></b-icon>
+                                    </b-button>
+                                    <b-modal id=temperature hide-footer title="Temperatuur">
+                                        <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
+                                    </b-modal>
+                                </b-col>
+                            </b-row>
+                        </template>
+                        <b-row style="height: 100%">
+                            <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
+                            <line-chart-visualization v-else
                                           ref="temperatureChart"
                                           y-axis-label="Temperatuur"
                                           x-axis-unit=" C°"
                                           msg-empty="De temperatuur was constant over deze periode."
                                           :y-axis-getter="(d) => d.temp"
-                                          style="width: 100%; height: 100%"/>
+                                          style="width: 100%; height: 100%"
+                                />
+                        </b-row>
+                    </b-card>
             </grid-item>
             <grid-item
                     :x="layout[1].x"
@@ -106,14 +124,32 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                <line-chart-visualization ref="rainChart"
-                                          y-axis-label="Neerslagsom"
-                                          x-axis-unit=" l/m²"
-                                          msg-empty="Er was geen neerslag in deze periode."
-                                          :y-axis-getter="(d) => d.rainVolume"
-                                          :enable-area=true
-                                          style="width: 100%; height: 100%"
-                />
+                    <b-card style="height: 100%">
+                        <template v-slot:header>
+                            <b-row>
+                                <b-col><h3>Neerslagsom</h3></b-col>
+                                <b-col>
+                                    <b-button v-b-modal.rain variant="info" class="float-right">
+                                        <b-icon icon="info-circle"></b-icon>
+                                    </b-button>
+                                    <b-modal id=rain hide-footer title="Neerslagsom">
+                                        <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
+                                    </b-modal>
+                                </b-col>
+                            </b-row>
+                        </template>
+                        <b-row style="height: 100%">
+                            <line-chart-visualization ref="rainChart"
+                                                        y-axis-label="Neerslagsom"
+                                                        x-axis-unit=" l/m²"
+                                                        msg-empty="Er was geen neerslag in deze periode."
+                                                        :y-axis-getter="(d) => d.rainVolume"
+                                                        :enable-area=true
+                                                        style="width: 100%; height: 100%"
+                                />
+                        </b-row>
+                    </b-card>
+                
             </grid-item>
             <grid-item
                     :x="layout[3].x"
@@ -137,12 +173,29 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                    <line-chart-visualization ref="pressureChart"
+                    <b-card style="height: 100%">
+                        <template v-slot:header>
+                            <b-row>
+                                <b-col><h3>Luchtdruk</h3></b-col>
+                                <b-col>
+                                    <b-button v-b-modal.pressure variant="info" class="float-right">
+                                        <b-icon icon="info-circle"></b-icon>
+                                    </b-button>
+                                    <b-modal id=pressure hide-footer title="Luchtdruk">
+                                        <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
+                                    </b-modal>
+                                </b-col>
+                            </b-row>
+                        </template>
+                        <b-row style="height: 100%">
+                            <line-chart-visualization ref="pressureChart"
                                               y-axis-label="Luchtdruk"
                                               msg-empty="De luchtdruk was constant over deze periode."
                                               x-axis-unit=" hPa"
                                               :y-axis-getter="(d) => d.pressure"
                                               style="width: 100%; height: 100%"/>
+                        </b-row>
+                    </b-card>
             </grid-item>
         </grid-layout>
 
