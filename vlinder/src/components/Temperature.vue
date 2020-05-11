@@ -7,6 +7,7 @@
                     ref="tempchart"
                     y-axis-label="Temperatuur"
                     x-axis-unit=" °C"
+                    msg-empty="De temperatuur was constant over deze periode."
                     :y-axis-getter="(d) => d.temp"
                     style="width: 100%; height: 100%"
                 />
