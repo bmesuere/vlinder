@@ -187,7 +187,7 @@
 
             },
             update_data(index=0) {
-                this.svg.selectAll("rect.bar").remove();
+                this.svg.selectAll("rect.area").remove();
 
                 if (this.selectedStations === undefined
                     || this.selectedStations.length === 0
@@ -212,7 +212,7 @@
                 };
 
                 let bars = this.svg
-                    .selectAll("rect.bar")
+                    .selectAll("rect.area")
                     .data(landUse)
                     .enter()
                     .append("g")
@@ -221,7 +221,7 @@
                 const types = ['water', 'groen', 'verhard'];
                 for(let k = 0; k < landUse[0]['usage'].length; k++){
                     bars.append("rect")
-                    .attr('class', 'bar')
+                    .attr('class', 'area')
                     .attr("x", (d, i) => this.xScale(i + 0.6))
                     .attr("y", (d) => {
                         let y = this.padding.top;

@@ -11,7 +11,7 @@
                 </multiselect>
             </div>
         </div>
-        <b-card style="height: 5%; margin-top: 2vh;">
+        <b-card style="height: auto; margin-top: 2vh;">
                     <b-row style="height: 100%" align-h="center" align-v="center">
                                 <b-col>
                                     <b-row>
@@ -38,6 +38,18 @@
                         </b-col>
                         <b-col>
                             <b-button variant="info" @click="downloadCsv">Download</b-button>
+                        </b-col>
+                        <b-col v-if="this.selectedStations.length > 1 ">
+                            <b-row v-for="(datadeel, index) in focusedVlinderData"
+                                v-bind:key="stationNames[datadeel[0].id]">
+                                <b-col cols="1" class="rect">
+                                    <svg width="10" height="10">
+                                          <rect width="10" height="10" style="stroke-width:1;stroke:black"
+                                            v-bind:style="{ 'fill': colors[index] }"/>
+                                    </svg>
+                                </b-col>
+                                <b-col>{{stationNames[datadeel[0].id]}}</b-col>
+                            </b-row>
                         </b-col>
                     </b-row>
                 </b-card>
@@ -77,6 +89,7 @@
                     <line-chart-visualization ref="pressureChart"
                                               y-axis-label="Luchtdruk"
                                               x-axis-unit=" hPa"
+                                              msg-empty="De luchtdruk was constant over deze periode."
                                               :y-axis-getter="(d) => d.pressure"
                                               style="width: 100%; height: 100%"/>
             </grid-item>
@@ -93,6 +106,7 @@
                     <line-chart-visualization ref="rainChart"
                                               y-axis-label="Neerslagsom"
                                               x-axis-unit=" l/m²"
+                                              msg-empty="Er was geen neerslag in deze periode."
                                               :y-axis-getter="(d) => d.rainVolume"
                                               :enable-area=true
                                               style="width: 100%; height: 100%"
@@ -125,6 +139,7 @@
                                               ref="temperatureChart"
                                               y-axis-label="Temperatuur"
                                               x-axis-unit=" C°"
+                                              msg-empty="De temperatuur was constant over deze periode."
                                               :y-axis-getter="(d) => d.temp"
                                               style="width: 100%; height: 100%"/>
             </grid-item>
@@ -176,6 +191,7 @@
                 options: [],
                 selectedStartDateString: '',
                 selectedEndDateString: '',
+                stationNames: {},
                 layout: [
                     {"x": 0, "y": 0, "w": 5.5, "h": 1, "i": "0"},
                     {"x": 6, "y": 0, "w": 4.5, "h": 1.3, "i": "1"},
@@ -188,6 +204,7 @@
         },
         computed: {
             stations() {
+                this.$store.getters.stations.forEach(st => this.stationNames[st.id] = st.name);
                 return this.$store.getters.stations;
             }
         },

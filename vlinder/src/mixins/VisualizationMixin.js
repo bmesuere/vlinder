@@ -26,5 +26,10 @@ export default {
         setSelectedStations(data) {
             this.$store.dispatch('updateSelectedStations', data)
         }
+    }, props: {
+            "colors": {
+                type: Array,
+                default: () => ['#5DBE55', '#926DA5', '#2580a7', '#e2d13a', '#be662b']
+            },
     }
 }

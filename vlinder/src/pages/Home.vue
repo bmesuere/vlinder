@@ -20,6 +20,18 @@
         <Dashboard :class="shown === 'dashboard' ? '' : 'disabled'" style="flex: 1;"/>
         <Status :class="shown === 'status' ? '' : 'disabled'" style="flex: 1;"/>
         <footer style="text-align: center; width: 100%; color: grey; font-size: small; padding-top: 2vh">
+            <div class="gallery" style="align-content: center">
+                <div class="flex" style="max-width: 100%; padding-top: 50px">
+                    <img src="../../partners/vito.png" alt="" style="max-width: 12%; padding: 1%">
+                    <img src="../../partners/vla.jpg" alt="" style="max-width: 10%; padding: 1%">
+                    <img src="../../partners/ugent.png" alt="" style="max-width: 10%; padding: 1%">
+                    <img src="../../partners/vvs.jpg" alt="" style="max-width: 10%; padding: 1%">
+                    <img src="../../partners/kmi.jpeg" alt="" style="max-width: 10%; padding: 1%">
+                    <img src="../../partners/att.png" alt="" style="max-width: 12%; padding: 1%">
+                    <img src="../../partners/volkssterrenwacht.png" alt="" style="max-width: 10%; padding: 1%">
+                    <img src="../../partners/technopolis.png" alt="" style="max-width: 10%; padding: 1%">
+                </div>
+            </div>
             Project Datavisualisatie UGent
         </footer>
     </div>

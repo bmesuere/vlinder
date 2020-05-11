@@ -34,6 +34,8 @@
                 id: "id" + uuidv4(),
                 width: 0,
                 height: 0,
+                startDate: String,
+                endDate: String,
                 format: d3.timeFormat("%H:%M"),
                 textSizeLegend: 12,
                 titleSizeLegend: 16,
@@ -44,14 +46,11 @@
 
             "yAxisLabel": String,
             "xAxisUnit": String,
+            "msgEmpty": String,
             "yAxisGetter": Function,
             "lineStrokeWidth": {
                 type: Number,
                 default: 1.5
-            },
-            "colors": {
-                type: Array,
-                default: () => ['#5DBE55', '#926DA5', '#2580a7', '#cae23a', '#be662b']
             },
         },
         mixins: [
@@ -85,6 +84,13 @@
 
                 // setup everything
                 this.padding = {top: 20, left: 40, right: 20, bottom: 50};
+
+                this.svg.append("text")
+                    .text(this.xAxisUnit)
+                    .attr("x", 0)
+                    .attr("y", 15)
+                    .style("font-size", "9px");
+
                 this.xScale = d3.scaleTime()
                     .range([this.padding.left + this.lineStrokeWidth / 2, this.width - this.padding.right]);
 
@@ -190,10 +196,10 @@
 
                 // update scales
                 let dates = flattened_data.map(x => new Date(x.time));
-                let start = new Date(Math.min.apply(null, dates));
-                let end = new Date(Math.max.apply(null, dates));
+                this.startDate = new Date(Math.min.apply(null, dates));
+                this.endDate = new Date(Math.max.apply(null, dates));
 
-                this.xScale.domain([start, end]);
+                this.xScale.domain([this.startDate, this.endDate]);
                 let [min, max] = d3.extent(flattened_data, this.yAxisGetter);
                 this.yScale.domain([min, min === max ? min + 1 : max]);
 
@@ -258,6 +264,22 @@
 
                 legend_entries.merge(new_entries)
                     .attr("transform", (d, i) => "translate(0, " + (i+1)*20 + ")");
+
+
+                if(data && data.length> 0 && min===max){
+                    this.svg
+                        .append("text")
+                        .attr("class", "empty")
+                        .attr("y", this.height/2)
+                        .text(this.msgEmpty)
+                        .style("fill", "#95999c")
+                        .style("font-size", "11px")
+                        .attr("width", this.width)
+                        .attr("x", this.width/2)
+                        .style("text-anchor", "middle");
+                } else {
+                    this.svg.selectAll("text.empty").remove();
+                }
             },
             showToolTips() {
                 if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
@@ -347,7 +369,8 @@
                     this.tooltip_box.attr("transform", "translate(" + (translate_x) + ", " + (mousePosition[1] - 100) + ")");
 
                     this.tooltip_box.select("text.title")
-                        .text(this.format(new Date(x_value)))
+                        .text(d3.timeFormat((this.endDate - this.startDate) < 93600000?
+                        "%H:%M" : "%d/%m/%y %H:%M")(new Date(x_value)))
                         .style("font-size", this.titleSizeLegend+"px")
                         .attr("dx", this.paddingLegend)
                         .attr("dy", 0)
