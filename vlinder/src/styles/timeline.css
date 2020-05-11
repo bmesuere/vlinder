@@ -15,28 +15,28 @@ div #timeline-div {
     width: 100%;
 }
 
-.bar {
+#timeline-svg rect.bar {
     fill: #999999
 }
 
-.bar[status*="Ok"] {
+#timeline-svg rect.bar[status*="Ok"] {
     fill: #77b58c;
 }
 
-.bar[status*="Server Failure"] {
+#timeline-svg rect.bar[status*="Server Failure"] {
     fill: #f44242;
 }
 
-.bar:hover {
+#timeline-svg rect.bar:hover {
     cursor: pointer;
     fill: lightgray
 }
 
-.bar[status*="Ok"]:hover {
+#timeline-svg rect.bar[status*="Ok"]:hover {
     fill: lightgreen;
 }
 
-.bar[status*="Server Failure"]:hover {
+#timeline-svg rect.bar[status*="Server Failure"]:hover {
     fill: salmon;
 }
 
