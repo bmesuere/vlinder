@@ -1,4 +1,7 @@
 import csv
+import os
+
+from api.kaartjes.image_tools import vlinder_png_to_base64
 
 station_metadata = []
 with open('data.csv', 'r') as f:
@@ -9,6 +12,12 @@ with open('data.csv', 'r') as f:
                     "groen500"]:
             row[key] = float(row[key])
         station_metadata.append(row)
+    for row in station_metadata:
+        vlinder = row['VLINDER']
+        if os.path.isfile(f'kaartjes/{vlinder}_crop.png'):
+            row['image'] = vlinder_png_to_base64(f'kaartjes/{vlinder}_crop.png')
+        else:
+            row['image'] = 'none'
 
 d = {"lon": "longitude", "lat": "latitude"}
 
