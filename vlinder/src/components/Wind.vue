@@ -1,28 +1,31 @@
 <template>
-    <b-container>
-        <b-row>
-            <b-col><h3>Windroos</h3></b-col>
-            <b-col><b-button v-b-modal.modal-1 variant="info" class="float-right">
-                    <b-icon icon="info-circle"></b-icon>
-                   </b-button>
-                   <b-modal id="modal-1" hide-footer="true" title="Windroos">
-                    <p class="my-4">Voor elke windrichting toont de windroos hoeveel procent van de geselecteerde tijd de wind vanuit die richting waait, en hoe hard ze waait.</p>
-                   </b-modal>
-            </b-col>
-        </b-row>
-        <b-row v-if="this.selectedStations.length > 1">
-            <b-tabs>
-                <b-tab  v-for="(station, index) in selectedStations" v-bind:key="station.name"
-                        v-bind:title="station.name"
-                        v-on:click="update_data(index)">
-                </b-tab>
-            </b-tabs>
-        </b-row>
-        <b-row style="height: 85%">
-            <b-col cols="9" id="d3-viz-windrose" style="height: 100%; width: 80%"/>
-            <b-col cols="3" id="d3-viz-windrose-legend" style="height: 100%; width: 20%"/>
-        </b-row>
-    </b-container>
+    <b-card id="windRoseCard" style="height: 100%;">
+        <template v-slot:header>
+            <b-row>
+                <b-col><h3>Windroos</h3></b-col>
+                <b-col>
+                    <b-button v-b-modal.modal-windrose variant="info" class="float-right">
+                        <b-icon icon="info-circle"></b-icon>
+                    </b-button>
+                    <b-modal id="modal-windrose" hide-footer title="Windroos">
+                        <p class="my-4">Voor elke windrichting toont de windroos hoeveel procent van de geselecteerde tijd de wind vanuit die richting waait, en hoe hard ze waait.</p>
+                    </b-modal>
+                </b-col>
+            </b-row>
+        </template>
+        <b-row style="height: 100%">
+            <b-col cols="2" v-if="this.selectedStations.length > 1" style="height: 100%">
+               <b-tabs pills vertical>
+                    <b-tab v-for="(station, index) in selectedStations" v-bind:key="station.name"
+                            v-bind:title="station.name"
+                            v-on:click="update_data(index)">
+                    </b-tab>
+            </b-tabs> 
+            </b-col> 
+            <b-col v-bind:cols="this.selectedStations.length > 1 ? 7 : 9" id="d3-viz-windrose" style="height: 100%"/>
+            <b-col v-bind:cols="this.selectedStations.length > 1 ? 3 : 3" id="d3-viz-windrose-legend" style="height: 100%"/>
+        </b-row>  
+    </b-card>
 </template>
 
 <script>
