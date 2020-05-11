@@ -13,8 +13,17 @@
                 />
                 </b-col>
             </b-row>
-            <b-row align-v="center" align-h="center" style="padding-left:40px; padding-right: 25px">
-                    <multiselect v-model="typePerceivedTemperature" :options="options" placeholder="Gevoelstemperatuur"/>
+            <b-row>
+                <b-form-group style="padding-left: 7vh">
+                    <b-form-radio-group
+                        id="radio-group-1"
+                        v-model="typePerceivedTemperature"
+                        :options="options"
+                        value-field="item"
+                        text-field="name"
+                        name="Gevoelstemperatuur"
+                    ></b-form-radio-group>
+                </b-form-group>
             </b-row>
         </b-container>
     </div>
@@ -25,18 +34,20 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import LineChartVisualization from "./LineChartVisualization";
-    import Multiselect from 'vue-multiselect'
 
     export default {
         name: "Temperature",
         components: {
             LineChartVisualization,
-            Multiselect
         },
         data: function() {
             return {
-                typePerceivedTemperature: null,
-                options: ['Humindex', 'WCTI']
+                typePerceivedTemperature: 'Geen',
+                options: [
+                    { item: 'Geen', name: 'Geen',  },
+                    { item: 'Humindex', name: 'Humindex' },
+                    { item: 'WCTI', name: 'WCTI' },
+                ]
             }
         },
         mixins: [
@@ -93,7 +104,7 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             },
 
             temperatureData(data) {
-                if (this.typePerceivedTemperature) {
+                if (this.typePerceivedTemperature || this.typePerceivedTemperature === 'Geen') {
                    let self = this;
                    let perceivedTemp;
                    if(this.typePerceivedTemperature === 'Humindex') {
@@ -103,14 +114,14 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
                                "time": d['time']
                            };
                        });
-                   } else {
+                   } else if (this.typePerceivedTemperature === 'WCTI') {
                        perceivedTemp = data.map(function (d) {
                            return {
                                "temp": self.computePerceivedTemperatureWCTI(d['temp'], d['windSpeed']),
                                "time": d['time']
                            };
                        });
-                   }
+                   } 
                    return [data, perceivedTemp];
                 } else {
                     return [data];
