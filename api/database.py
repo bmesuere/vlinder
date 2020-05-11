@@ -72,6 +72,8 @@ def add_status(vlinder_data, start_time, look_back=3):
         d['status'] = 'Ok'
         if data_equal(prev, d):
             d['status'] = 'Server Failure'
+            for d1 in prev:
+                d1['status'] = 'Server Failure'
         elif prev_time < d['time'] - timedelta(minutes=9):
             d['status'] = 'Offline'
         prev_time = d['time']
@@ -85,21 +87,21 @@ def fix_cumulative_rain(d_list):
     delta = 0
     prev = d_list[0]
     for d in d_list[1:]:
-        if d['RainVolume'] < prev['RainVolume']:
-            delta += prev['RainVolume'] - d['RainVolume']
-        d['RainVolume'] += delta
+        if d['rainVolume'] < prev['rainVolume']:
+            delta += prev['rainVolume'] - d['rainVolume']
+        d['rainVolume'] += delta
         prev = d
     return d_list
 
 
 def data_equal(d_list, d):
     for d1 in d_list:
-        if (d1 is not None and d1['temp'] == d['temp'] and d1['humidity'] == d['humidity'] and
+        if not (d1 is not None and d1['temp'] == d['temp'] and d1['humidity'] == d['humidity'] and
                     d1['pressure'] == d['pressure'] and d1['windSpeed'] == d['windSpeed'] and
                     d1['windDirection'] == d['windDirection'] and d1['rainIntensity'] == d['rainIntensity'] and
-                    d1['RainVolume'] == d['RainVolume'] and d1['WindGust'] == d['WindGust']):
-            return True
-    return False
+                    d1['rainVolume'] == d['rainVolume'] and d1['windGust'] == d['windGust']):
+            return False
+    return True
 
 
 def vlinder_data_transform(row):
