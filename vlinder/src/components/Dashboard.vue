@@ -1,6 +1,6 @@
 <template>
-    <div style="margin-left: 2.5%; margin-right: 2.5%">
-        
+    <div style="margin-left: 2.5%; margin-right: 2.5%;">
+
         <div style="padding-boo: 4vh; display: flex; width: 100%">
             <Map style="width: 50%; height: 50%; float:left"/>
             <div style="float:right">
@@ -55,16 +55,15 @@
                 </b-card>
 
         <grid-layout :layout.sync="layout"
-                     :col-num="12"
                      :is-draggable="true"
                      :is-resizable="true"
                      :vertical-compact="true"
                      :prevent-collision="false"
                      :use-css-transforms="true"
                      :breakpoints="breakpoints"
-                     :cols="cols"
+                     style="overflow-x: hidden"
                      :responsive="true"
-                     style="width: 100%">
+                     >
             <grid-item
                     :x="layout[0].x"
                     :y="layout[0].y"

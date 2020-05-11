@@ -85,11 +85,11 @@
                 // setup everything
                 this.padding = {top: 20, left: 40, right: 20, bottom: 50};
 
-                this.svg.append("text")
-                    .text(this.xAxisUnit)
-                    .attr("x", 0)
-                    .attr("y", 15)
-                    .style("font-size", "9px");
+                //this.svg.append("text")
+                //    .text(this.xAxisUnit)
+                //    .attr("x", 0)
+                //    .attr("y", 15)
+                //    .style("font-size", "9px");
 
                 this.xScale = d3.scaleTime()
                     .range([this.padding.left + this.lineStrokeWidth / 2, this.width - this.padding.right]);
@@ -136,7 +136,7 @@
 
                 this.svg.select(".y.axis")
                     .append("text")
-                    .text(this.yAxisLabel)
+                    .text(this.yAxisLabel + " (" + this.xAxisUnit + ")")
                     .style("text-anchor", "end")
                     .attr("dx", -this.padding.top)
                     .attr("dy", "1em")
@@ -298,7 +298,6 @@
             updateToolTips() {
                 if (this.current_data && this.current_data.length > 0 && this.current_data[0].length > 0) {
                     // Update position of tooltip elements according to mouse position
-                    //if ($.)
                     let mousePosition = d3.mouse(this.svg.node());
                     let currentXScale = this.xAxis.scale(); // Get zoomed scale
                     let mouseX = currentXScale.invert(mousePosition[0]); // waarde van x-as, hier dus datum
@@ -309,7 +308,6 @@
                     let d0 = this.current_data[0][i - 1],
                         d1 = this.current_data[0][i];
                     let selectedIndex = (d1 !== undefined) && mouseX - d0.time > d1.time - mouseX ? i : i - 1;
-                  //let selectedIndex = mouseX - new Date(d0.time) > new Date(d1.time) - mouseX ? i : i - 1;
 
                     let x_value = new Date(this.current_data[0][selectedIndex].time);
                     let toolTipX = currentXScale(x_value);
