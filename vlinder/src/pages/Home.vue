@@ -23,14 +23,15 @@
         <footer style="text-align: center; width: 100%; color: grey; font-size: small; margin-top: 5vh; background-color: #fff; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.10);">
             <div class="gallery" style="align-content: center">
                 <div class="flex" style="max-width: 100%; padding-top: 40px; padding-bottom: 10px">
-                    <img src="../../partners/vito.png" alt="" style="max-width: 10%; padding: 1%">
-                    <img src="../../partners/vla.jpg" alt="" style="max-width: 5%; padding: 1%">
-                    <img src="../../partners/ugent.png" alt="" style="max-width: 7%; padding: 1%">
-                    <img src="../../partners/vvs.jpg" alt="" style="max-width: 8%; padding: 1%">
-                    <img src="../../partners/kmi.jpeg" alt="" style="max-width: 7%; padding: 1%">
-                    <img src="../../partners/att.png" alt="" style="max-width: 10%; padding: 1%">
+                    <img src="../../partners/ugent.png" alt="" style="max-width:  7%; padding: 1%">
+                    <img src="../../partners/vito.png"  alt="" style="max-width: 10%; padding: 1%">
+                    <img src="../../partners/vla.jpg"   alt="" style="max-width:  5%; padding: 1%">
+                    <img src="../../partners/vvw.png"   alt="" style="max-width: 10%; padding: 1%">
+                    <img src="../../partners/vvs.jpg"   alt="" style="max-width:  8%; padding: 1%">
+                    <img src="../../partners/kmi.jpeg"  alt="" style="max-width:  7%; padding: 1%">
+                    <img src="../../partners/att.png"   alt="" style="max-width: 10%; padding: 1%">
                     <img src="../../partners/volkssterrenwacht.png" alt="" style="max-width: 6%; padding: 1%">
-                    <img src="../../partners/technopolis.png" alt="" style="max-width: 7%; padding: 1%">
+                    <img src="../../partners/technopolis.png"  alt="" style="max-width: 7%; padding: 1%">
                 </div>
             </div>
             ©
