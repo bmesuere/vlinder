@@ -63,7 +63,7 @@
                                     <b-button v-b-modal.temperature variant="info" class="float-right">
                                         <b-icon icon="info-circle"></b-icon>
                                     </b-button>
-                                    <b-modal id=temperature hide-footer title="Temperatuur">
+                                    <b-modal id=temperature hide-backdrop content-class="shadow" centered hide-footer title="Temperatuur">
                                         <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
                                     </b-modal>
                                 </b-col>
@@ -110,7 +110,7 @@
                                     <b-button v-b-modal.rain variant="info" class="float-right">
                                         <b-icon icon="info-circle"></b-icon>
                                     </b-button>
-                                    <b-modal id=rain hide-footer title="Neerslagsom">
+                                    <b-modal hide-backdrop content-class="shadow" centered  id=rain hide-footer title="Neerslagsom">
                                         <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
                                     </b-modal>
                                 </b-col>
@@ -157,7 +157,7 @@
                                     <b-button v-b-modal.pressure variant="info" class="float-right">
                                         <b-icon icon="info-circle"></b-icon>
                                     </b-button>
-                                    <b-modal id=pressure hide-footer title="Luchtdruk">
+                                    <b-modal hide-backdrop content-class="shadow" centered id=pressure hide-footer title="Luchtdruk">
                                         <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
                                     </b-modal>
                                 </b-col>
