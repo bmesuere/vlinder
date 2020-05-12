@@ -87,8 +87,8 @@ def fix_cumulative_rain(d_list):
     delta = 0
     prev = d_list[0]['rainVolume']
     for d in d_list[1:]:
-        if d['rainVolume'] < prev['rainVolume']:
-            delta += prev['rainVolume'] - d['rainVolume']
+        if d['rainVolume'] < prev:
+            delta += prev - d['rainVolume']
         prev = d['rainVolume']
         d['rainVolume'] += delta
     return d_list
