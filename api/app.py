@@ -51,10 +51,13 @@ def station(ID, VLINDER, lat, lon,
             water50, verhard50, groen50,
             water100, verhard100, groen100,
             water250, verhard250, groen250,
-            water500, verhard500, groen500):
+            water500, verhard500, groen500,
+            stad, benaming):
     return {
         "id": ID,
         "name": VLINDER,
+        "city": stad,
+        "given_name": benaming,
         "coordinates": {
             "longitude": lon,
             "latitude": lat,
