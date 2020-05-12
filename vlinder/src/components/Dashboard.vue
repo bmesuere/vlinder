@@ -1,52 +1,72 @@
 <template>
     <div>
-        <div style="padding-boo: 4vh; display: flex; width: 100%">
-            <Map :hovered="hovered" style="width: 50%; height: 50%; float:left"/>
-            <div style="float:right">
-                <multiselect v-model="multiSelectValues" label="text" track-by="text" :clear-on-select="false"
-                             :multiple="true" :options="options" :searchable="true" :close-on-select="false"
-                             :max=5 :show-labels="false" placeholder="Selecteer een station">
-                 <template slot="option" slot-scope="props">
-                    <div @mouseenter="hovered = props.option.value" 
-                         @mouseleave="hovered = null" 
-                         style="padding:4px 4px 4px 4px"
-                         class="option__desc">
-                        <span style="font-size: 20px">{{ props.option.text }}</span>
-                        <br>
-                        <span style="font-size: 10px">{{ props.option.value }}</span>
-                    </div>
-                 </template>
-                    <span slot="maxElements">
+        <b-row style="padding: 4vh; display: flex; width: 100%">
+            <b-col style="padding: 0">
+                <Map :hovered="hovered" style="float:left"/>
+            </b-col>
+            <b-col style="float: right; width: 100%">
+                <b-row>
+                    <b-col>
+                        <multiselect style="width: 100%"
+                                     v-model="multiSelectValues" label="text" track-by="text" :clear-on-select="false"
+                                     :multiple="true" :options="options" :searchable="true" :close-on-select="false"
+                                     :max=5 :show-labels="false" placeholder="Selecteer een station">
+                            <template slot="option" slot-scope="props">
+                                <div @mouseenter="hovered = props.option.value"
+                                     @mouseleave="hovered = null"
+                                     style="padding:4px 4px 4px 4px"
+                                     class="option__desc">
+                                    <span style="font-size: 20px">{{ props.option.text }}</span>
+                                    <br>
+                                    <span style="font-size: 10px">{{ props.option.value }}</span>
+                                </div>
+                            </template>
+                            <span slot="maxElements">
                         Maximum aantal geselecteerd. Verwijder een station voor je een nieuw kan toevoegen.
                     </span>
-                </multiselect>
-            </div>
-        </div>
+                        </multiselect>
+                    </b-col>
+                </b-row>
+                <b-row style="margin: 1vh; background-color: #ffffff; height: 70%">
+                    <b-col style="height: 100%; padding: 1vh">
+                        <b-tabs pills vertical>
+                            <b-tab v-for="station in selectedStations" v-bind:key="station.name"
+                                   v-bind:title="station.name">
+                                <b-img :src="`${publicPath}kaartjes/${station.name}_crop.png`" fluid-grow>
+                                </b-img>
+                            </b-tab>
+                        </b-tabs>
+                    </b-col>
+                </b-row>
+            </b-col>
+        </b-row>
 
-        <b-card style="height: auto; border-style: none; box-shadow: 0px 0px 0px 0px rgba(0,0,0,0);">
-                    <row id="timeInput" style="height: 100%;" align-h="center" align-v="center" >
-                        <div style="display: flex;">
-                            <div>
-                            <p style="margin-bottom: 0px">Van:</p>
-                                <div style="z-index: 100;" class="calendarBox">
-                                    <b-icon style="z-index:100" icon="calendar-fill" variant="calendar"></b-icon>
-                                    <datetime style="background-color #000000; " v-model="selectedStartDateString" type="datetime"/>
-                                </div>
-                            </div>
-                            <div style="margin-left: 20px">
-                                <p style="margin-bottom: 0px">Tot:</p>
-                                <div class="calendarBox">
-                                    <b-icon style="z-index:100" icon="calendar-fill" variant="calendar"></b-icon>
-                                    <datetime style="background-color #000000;" v-model="selectedEndDateString" type="datetime"/>
-                                </div>
-                            </div>
+        <b-card style="height: auto; border-style: none; box-shadow: 0 0 0 0 rgba(0,0,0,0);">
+            <b-row id="timeInput" style="height: 100%;" align-h="center" align-v="center">
+                <b-col style="display: flex;">
+                    <div>
+                        <p style="margin-bottom: 0">Van:</p>
+                        <div style="z-index: 100;" class="calendarBox">
+                            <b-icon style="z-index:100" icon="calendar-fill" variant="calendar"/>
+                            <datetime style="background-color: #000000; " v-model="selectedStartDateString"
+                                      type="datetime"/>
                         </div>
-                        <div style="display: flex;">   
-                            <b-button variant="info" @click="loadVlinderData">Selecteer</b-button>
-                            <b-button style="margin-left: 20px" variant="outline-info" @click="downloadCsv">Download</b-button>
-                        </div> 
-                    </row>
-                </b-card>
+                    </div>
+                    <div style="margin-left: 20px">
+                        <p style="margin-bottom: 0">Tot:</p>
+                        <div class="calendarBox">
+                            <b-icon style="z-index:100" icon="calendar-fill" variant="calendar"/>
+                            <datetime style="background-color: #000000;" v-model="selectedEndDateString"
+                                      type="datetime"/>
+                        </div>
+                    </div>
+                </b-col>
+                <b-col style="display: flex;">
+                    <b-button variant="info" @click="loadVlinderData">Selecteer</b-button>
+                    <b-button style="margin-left: 20px" variant="outline-info" @click="downloadCsv">Download</b-button>
+                </b-col>
+            </b-row>
+        </b-card>
 
         <grid-layout :layout.sync="layout"
                      :is-draggable="true"
@@ -57,7 +77,7 @@
                      :breakpoints="breakpoints"
                      style="overflow-x: hidden"
                      :responsive="true"
-                     >
+        >
             <grid-item
                     :x="layout[0].x"
                     :y="layout[0].y"
@@ -68,30 +88,33 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                    <b-card style="height: 100%">
-                            <b-row>
-                                <b-col><h3>Temperatuur</h3></b-col>
-                                <b-col>
-                                    <b-button v-b-modal.temperature variant="info" class="float-right">
-                                        <b-icon icon="info-circle"></b-icon>
-                                    </b-button>
-                                    <b-modal id=temperature hide-backdrop content-class="shadow" centered hide-footer title="Temperatuur">
-                                        <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
-                                    </b-modal>
-                                </b-col>
-                            </b-row>
-                        <b-row style="height: 90%">
-                            <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
-                            <line-chart-visualization v-else
-                                          ref="temperatureChart"
-                                          y-axis-label="Temperatuur"
-                                          x-axis-unit=" C°"
-                                          msg-empty="De temperatuur was constant over deze periode."
-                                          :y-axis-getter="(d) => d.temp"
-                                          style="width: 100%; height: 100%"
-                                />
-                        </b-row>
-                    </b-card>
+                <b-card style="height: 100%">
+                    <b-row>
+                        <b-col><h3>Temperatuur</h3></b-col>
+                        <b-col>
+                            <b-button v-b-modal.temperature variant="info" class="float-right">
+                                <b-icon icon="info-circle"/>
+                            </b-button>
+                            <b-modal id=temperature hide-backdrop content-class="shadow" centered hide-footer
+                                     title="Temperatuur">
+                                <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
+                                    luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
+                                    posuere.</p>
+                            </b-modal>
+                        </b-col>
+                    </b-row>
+                    <b-row style="height: 90%">
+                        <temperature v-if="this.selectedStations.length < 2" style="width: 100%; height: 100%"/>
+                        <line-chart-visualization v-else
+                                                  ref="temperatureChart"
+                                                  y-axis-label="Temperatuur"
+                                                  x-axis-unit=" C°"
+                                                  msg-empty="De temperatuur was constant over deze periode."
+                                                  :y-axis-getter="(d) => d.temp"
+                                                  style="width: 100%; height: 100%"
+                        />
+                    </b-row>
+                </b-card>
             </grid-item>
             <grid-item
                     :x="layout[1].x"
@@ -115,30 +138,33 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                    <b-card style="height: 100%">
-                            <b-row>
-                                <b-col><h3>Neerslagsom</h3></b-col>
-                                <b-col>
-                                    <b-button v-b-modal.rain variant="info" class="float-right">
-                                        <b-icon icon="info-circle"></b-icon>
-                                    </b-button>
-                                    <b-modal hide-backdrop content-class="shadow" centered  id=rain hide-footer title="Neerslagsom">
-                                        <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
-                                    </b-modal>
-                                </b-col>
-                            </b-row>
-                        <b-row style="height: 90%">
-                            <line-chart-visualization ref="rainChart"
-                                                        y-axis-label="Neerslagsom"
-                                                        x-axis-unit=" l/m²"
-                                                        msg-empty="Er was geen neerslag in deze periode."
-                                                        :y-axis-getter="(d) => d.rainVolume"
-                                                        :enable-area=true
-                                                        style="width: 100%; height: 100%; padding: 10px;"
-                                />
-                        </b-row>
-                    </b-card>
-                
+                <b-card style="height: 100%">
+                    <b-row>
+                        <b-col><h3>Neerslagsom</h3></b-col>
+                        <b-col>
+                            <b-button v-b-modal.rain variant="info" class="float-right">
+                                <b-icon icon="info-circle"/>
+                            </b-button>
+                            <b-modal hide-backdrop content-class="shadow" centered id=rain hide-footer
+                                     title="Neerslagsom">
+                                <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
+                                    luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
+                                    posuere.</p>
+                            </b-modal>
+                        </b-col>
+                    </b-row>
+                    <b-row style="height: 90%">
+                        <line-chart-visualization ref="rainChart"
+                                                  y-axis-label="Neerslagsom"
+                                                  x-axis-unit=" l/m²"
+                                                  msg-empty="Er was geen neerslag in deze periode."
+                                                  :y-axis-getter="(d) => d.rainVolume"
+                                                  :enable-area=true
+                                                  style="width: 100%; height: 100%; padding: 10px;"
+                        />
+                    </b-row>
+                </b-card>
+
             </grid-item>
             <grid-item
                     :x="layout[3].x"
@@ -150,7 +176,7 @@
                     :min-w="2"
                     :min-h="1"
                     drag-ignore-from="svg">
-                    <area-station style="height: 100%; width: 100%"/>
+                <area-station style="height: 100%; width: 100%"/>
             </grid-item>
             <grid-item
                     :x="layout[4].x"
@@ -162,31 +188,33 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg rect">
-                    <b-card style="height: 100%">
-                            <b-row>
-                                <b-col><h3>Luchtdruk</h3></b-col>
-                                <b-col>
-                                    <b-button v-b-modal.pressure variant="info" class="float-right">
-                                        <b-icon icon="info-circle"></b-icon>
-                                    </b-button>
-                                    <b-modal hide-backdrop content-class="shadow" centered id=pressure hide-footer title="Luchtdruk">
-                                        <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
-                                    </b-modal>
-                                </b-col>
-                            </b-row>
-                        <b-row style="height: 90%">
-                            <line-chart-visualization 
-                                              ref="pressureChart"
-                                              y-axis-label="Luchtdruk"
-                                              msg-empty="De luchtdruk was constant over deze periode."
-                                              x-axis-unit=" hPa"
-                                              :y-axis-getter="(d) => d.pressure"
-                                              style="width: 100%; height: 100%; padding: 10px;"/>
-                        </b-row>
-                    </b-card>
+                <b-card style="height: 100%">
+                    <b-row>
+                        <b-col><h3>Luchtdruk</h3></b-col>
+                        <b-col>
+                            <b-button v-b-modal.pressure variant="info" class="float-right">
+                                <b-icon icon="info-circle"/>
+                            </b-button>
+                            <b-modal hide-backdrop content-class="shadow" centered id=pressure hide-footer
+                                     title="Luchtdruk">
+                                <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
+                                    luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
+                                    posuere.</p>
+                            </b-modal>
+                        </b-col>
+                    </b-row>
+                    <b-row style="height: 90%">
+                        <line-chart-visualization
+                                ref="pressureChart"
+                                y-axis-label="Luchtdruk"
+                                msg-empty="De luchtdruk was constant over deze periode."
+                                x-axis-unit=" hPa"
+                                :y-axis-getter="(d) => d.pressure"
+                                style="width: 100%; height: 100%; padding: 10px;"/>
+                    </b-row>
+                </b-card>
             </grid-item>
         </grid-layout>
-
     </div>
 </template>
 
@@ -248,8 +276,8 @@
                 cols: {
                     lg: 12, md: 12, sm: 12, xs: 6, xxs: 6
                 },
-                hovered: null
-
+                hovered: null,
+                publicPath: process.env.BASE_URL
             }
         },
         computed: {

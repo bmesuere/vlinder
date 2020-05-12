@@ -14,6 +14,6 @@ def vlinder_png_to_base64(path):
 
 if __name__ == '__main__':
     import os
-    for image in os.listdir('.'):
+    for image in os.listdir(''):
         if image.endswith('.png'):
             crop_image(image, 590, 255, 5, 40, f'vlinder{image[7:9]}_crop.png')

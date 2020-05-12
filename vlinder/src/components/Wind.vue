@@ -1,28 +1,30 @@
 <template>
     <b-card id="windRoseCard" style="height: 100%;">
         <b-row>
-                <b-col><h3>Windroos</h3></b-col>
-                <b-col>
-                    <b-button v-b-modal.modal-windrose variant="info" class="float-right">
-                        <b-icon icon="info-circle"></b-icon>
-                    </b-button>
-                    <b-modal hide-backdrop content-class="shadow" centered  id="modal-windrose" hide-footer title="Windroos">
-                        <p class="my-4">Voor elke windrichting toont de windroos hoeveel procent van de geselecteerde tijd de wind vanuit die richting waait, en hoe hard ze waait.</p>
-                    </b-modal>
-                </b-col>
-            </b-row>
+            <b-col><h3>Windroos</h3></b-col>
+            <b-col>
+                <b-button v-b-modal.modal-windrose variant="info" class="float-right">
+                    <b-icon icon="info-circle"/>
+                </b-button>
+                <b-modal hide-backdrop content-class="shadow" centered id="modal-windrose" hide-footer title="Windroos">
+                    <p class="my-4">Voor elke windrichting toont de windroos hoeveel procent van de geselecteerde tijd
+                        de wind vanuit die richting waait, en hoe hard ze waait.</p>
+                </b-modal>
+            </b-col>
+        </b-row>
         <b-row style="height: 100%">
             <b-col cols="2" v-if="this.selectedStations.length > 1" style="height: 100%">
-               <b-tabs pills vertical>
+                <b-tabs pills vertical>
                     <b-tab v-for="(station, index) in selectedStations" v-bind:key="station.name"
-                            v-bind:title="station.name"
-                            v-on:click="update_data(index)">
+                           v-bind:title="station.name"
+                           v-on:click="update_data(index)">
                     </b-tab>
-            </b-tabs> 
-            </b-col> 
+                </b-tabs>
+            </b-col>
             <b-col v-bind:cols="this.selectedStations.length > 1 ? 7 : 9" id="d3-viz-windrose" style="height: 100%"/>
-            <b-col v-bind:cols="this.selectedStations.length > 1 ? 3 : 3" id="d3-viz-windrose-legend" style="height: 100%"/>
-        </b-row>  
+            <b-col v-bind:cols="this.selectedStations.length > 1 ? 3 : 3" id="d3-viz-windrose-legend"
+                   style="height: 100%"/>
+        </b-row>
     </b-card>
 </template>
 
@@ -44,7 +46,7 @@
                 this.update_data()
             }
         },
-        mounted (){
+        mounted() {
             this.div = d3.select('#d3-viz-windrose');
             this.legend = d3.select('#d3-viz-windrose-legend');
             let observer = new ResizeObserver(this.create_windrose);
@@ -52,8 +54,7 @@
             this.create_windrose();
         },
         methods: {
-            create_windrose(index=0) {
-                
+            create_windrose(index = 0) {
                 let divBox = this.div.node().getBoundingClientRect();
                 this.size = Math.min(divBox['height'], divBox['width']);
                 this.width = this.size;
@@ -74,7 +75,7 @@
                     .style("padding", "5px")
                     .style("border-radius", "10px")
                     .style("background", "#fff");
-                
+
                 this.svg = this.div.append("svg", 0)
                     .style("width", this.width + 'px')
                     .style("height", this.height + 'px');
@@ -83,7 +84,7 @@
 
                 this.angle = d3.scaleLinear()
                     .range([0, 2 * Math.PI]);
-                
+
                 this.radius = d3.scaleLinear()
                     .range([this.innerRadius, this.outerRadius]);
 
@@ -95,13 +96,13 @@
                     .range([this.innerRadius, this.outerRadius]);
 
                 this.z = d3.scaleOrdinal()
-                    .range(["#4242f4", "#42c5f4", "#42f4ce", "#42f456", "#adf442", "#f4e242", "#f4a142", "#f44242"]);    
-                
-                this.add_legend()
-                
+                    .range(["#4242f4", "#42c5f4", "#42f4ce", "#42f456", "#adf442", "#f4e242", "#f4a142", "#f44242"]);
+
+                this.add_legend();
+
                 this.update_data()
             },
-            update_data(index=0){
+            update_data(index = 0) {
                 this.g.selectAll("g").remove();
                 if (this.selectedStations === undefined
                     || this.selectedStations.length === 0
@@ -111,7 +112,7 @@
                     || this.focusedVlinderData.length === 0) {
                     return;
                 }
-                
+
                 // Convert data to format needed for the windrose
                 const data_csv_format = this.convertData(this.focusedVlinderData[index]);
                 const data = d3.csvParse(data_csv_format, (d, _, columns) => {
@@ -121,7 +122,7 @@
                     return d;
                 });
 
-                this.x.domain(data.map( (d) => {
+                this.x.domain(data.map((d) => {
                     return d.angle;
                 }));
 
@@ -130,7 +131,7 @@
                 })]);
 
                 this.z.domain(data.columns.slice(1));
-                
+
                 this.angle.domain([0, d3.max(data, (d, i) => {
                     return i + 1;
                 })]);
@@ -154,7 +155,7 @@
                     })
                     .enter().append("path")
                     .attr("d", d3.arc()
-                        .innerRadius( (d) => {
+                        .innerRadius((d) => {
                             return this.y(d[0]);
                         })
                         .outerRadius((d) => {
@@ -168,10 +169,19 @@
                         })
                         .padAngle(0.01)
                         .padRadius(this.innerRadius))
-                    .attr("transform", () => {return "rotate("+ this.angleOffset + ")"})
-                    .on("mouseover", (d) => { this.tooltip.text((Math.round(((d[1] - d[0]) + Number.EPSILON) * 100) / 100).toString() + "%"); return this.tooltip.style("visibility", "visible");})
-                        .on("mousemove", () => {return this.tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-                        .on("mouseout", () => {return this.tooltip.style("visibility", "hidden");});
+                    .attr("transform", () => {
+                        return "rotate(" + this.angleOffset + ")"
+                    })
+                    .on("mouseover", (d) => {
+                        this.tooltip.text((Math.round(((d[1] - d[0]) + Number.EPSILON) * 100) / 100).toString() + "%");
+                        return this.tooltip.style("visibility", "visible");
+                    })
+                    .on("mousemove", () => {
+                        return this.tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
+                    })
+                    .on("mouseout", () => {
+                        return this.tooltip.style("visibility", "hidden");
+                    });
 
                 const label = this.g.append("g")
                     .selectAll("g")
@@ -200,7 +210,7 @@
                     })
                     .call(d3.axisLeft()
                         .scale(this.radius.copy().range([-this.innerRadius, -(this.outerRadius + 10)])));
-                
+
                 this.yAxis = this.g.append("g")
                     .attr("text-anchor", "middle");
 
@@ -228,35 +238,39 @@
 
                 return this.svg.node();
             },
-            add_legend(){
+            add_legend() {
                 let divBoxLegend = this.legend.node().getBoundingClientRect();
                 let w = divBoxLegend.width;
                 let h = divBoxLegend.height;
-                const scaling_factor = h/300;
+                const scaling_factor = h / 300;
                 this.legend.selectAll("*").remove();
-                
+
                 this.svg_legend = this.legend.append("svg")
                     .attr("width", w)
                     .attr("height", h);
-            
+
                 this.g_legend = this.svg_legend.append("g")
                     .selectAll("g")
                     .data(["0-4", "4-8", "8-12", "12-16", "16-20", "20-24", "24-28", "28+"])
                     .enter().append("g")
-                    .attr("transform", (d, i) => {  return "translate(" + 0 + "," + ((((i - (8-1) / 2) * (20))+h/3)*scaling_factor) +")"; });
+                    .attr("transform", (d, i) => {
+                        return "translate(" + 0 + "," + ((((i - (8 - 1) / 2) * (20)) + h / 3) * scaling_factor) + ")";
+                    });
 
                 this.g_legend.append("rect")
-                    .attr("width", 18*scaling_factor)
-                    .attr("height", 18*scaling_factor)
+                    .attr("width", 18 * scaling_factor)
+                    .attr("height", 18 * scaling_factor)
                     .attr("dy", "100em")
-                    .attr("fill", this.z); 
+                    .attr("fill", this.z);
 
                 this.g_legend.append("text")
-                    .attr("x", 24*scaling_factor)
-                    .attr("y", 9*scaling_factor)
+                    .attr("x", 24 * scaling_factor)
+                    .attr("y", 9 * scaling_factor)
                     .attr("dy", "0.35em")
-                    .text((d) => { return d + " m/s"; })
-                    .style("font-size",10*scaling_factor); 
+                    .text((d) => {
+                        return d + " m/s";
+                    })
+                    .style("font-size", 10 * scaling_factor);
             },
             convertData(raw_data) {
                 const wind_values = [
@@ -306,7 +320,7 @@
 </script>
 
 <style scoped>
-body {
-font-family: CircularStd;
-}
+    body {
+        font-family: CircularStd, serif;
+    }
 </style>
