@@ -9,9 +9,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExclamationTriangle, faAd, faTachometerAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+import '../scss/custom.scss';
+import "circular-std";
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'vue-datetime/dist/vue-datetime.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css'
 
