@@ -2,7 +2,7 @@
     <div>
         <b-row style="padding: 4vh; display: flex; width: 100%">
             <b-col style="padding: 0">
-                <Map :hovered="hovered" style="float:left"/>
+                <Map :hovered="hovered" style="float:left;width:100%"/>
             </b-col>
             <b-col style="float: right; width: 100%">
                 <b-row>

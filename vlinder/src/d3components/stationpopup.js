@@ -16,7 +16,7 @@ function extendData(d, latestVlinderData) {
 }
 
 export default function popup(root, map, dataExtension) {
-    let popup = Popup(map, 1.5);
+    let popup = Popup(map, 2);
 
     root.on("mouseover.popup", function (d) {
         extendData(d, dataExtension);
