@@ -51,7 +51,7 @@ def station(ID, VLINDER, lat, lon,
             water50, verhard50, groen50,
             water100, verhard100, groen100,
             water250, verhard250, groen250,
-            water500, verhard500, groen500):
+            water500, verhard500, groen500, image):
     return {
         "id": ID,
         "name": VLINDER,
@@ -81,6 +81,7 @@ def station(ID, VLINDER, lat, lon,
                                         {"type": "paved", "value": verhard500}]
              },
         ],
+        "image": str(image),
         "measurements": f"{base_url}measurements/{ID}"
     }
 
