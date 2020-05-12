@@ -32,7 +32,7 @@
             // the h_padding has to be less than the width because this is actually just
             // implemented as a border around the bar, but this off part of the actual bar
             this.bars = {width: 3, height: 50, h_padding: 1.5, v_padding: 1};
-            this.padding = {left: 70, right: 50, top: 80, bottom: 0}
+            this.padding = {left: 150, right: 50, top: 80, bottom: 70}
 
             this.width = 288 * this.bars.width;
 

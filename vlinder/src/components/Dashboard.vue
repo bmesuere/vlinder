@@ -18,7 +18,7 @@
                                      class="option__desc">
                                     <span style="font-size: 20px">{{ props.option.text }}</span>
                                     <br>
-                                    <span style="font-size: 10px">{{ props.option.value }}</span>
+                                    <span style="font-size: 14px">{{ props.option.location }}</span>
                                 </div>
                             </template>
                             <span slot="maxElements">
@@ -294,7 +294,7 @@
                 let ids = this.selectedStations.map(x => x['id']);
                 if (!ids.equals(this.multiSelectValues.map(x => x['value']))) {
                     this.multiSelectValues = this.selectedStations.map(x => {
-                        return {value: x['id'], text: x['name']}
+                        return {value: x['id'], text: x['given_name'], location: x['city']}
                     })
                 }
                 this.loadVlinderData();
@@ -312,7 +312,7 @@
             stationsToOptions() {
                 let self = this;
                 this.stations.forEach(station => {
-                    self.options.push({value: station['id'], text: station['name']})
+                    self.options.push({value: station['id'], text: station['given_name'], location: station['city']})
                 });
             },
             loadVlinderData() {
