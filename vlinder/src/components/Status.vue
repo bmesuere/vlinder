@@ -4,7 +4,7 @@
             <b-row align-h="center" align-v="center" style="padding: 1em">
                 <b-col>
                     Weerstations:
-                    <multiselect v-model="selection" label="text" track-by="text" :clear-on-select="false"
+                    <multiselect v-model="selection" label="label" track-by="text" :clear-on-select="false"
                                  :multiple="true" :options="options" :searchable="true" :close-on-select="false"
                                  :max=5 :show-labels="false" placeholder="Selecteer een station">
                               <template slot="option" slot-scope="props">
@@ -97,7 +97,7 @@
                 let ids = this.selectedStations.map(x => x['id']);
                 if (!ids.equals(this.selection.map(x => x['value']))) {
                     this.selection = this.selectedStations.map(x => {
-                        return {value: x['id'], text: x['given_name'], location: x['city']}
+                        return {value: x['id'], text: x['given_name'], location: x['city'], label: "[" + x['name'] + "] " + x['given_name']}
                     })
                 }
                 // don't load data since it would trigger twice with dashboard
@@ -107,7 +107,7 @@
             stationsToOptions() {
                 let self = this;
                 this.stations.forEach(station => {
-                    self.options.push({value: station['id'], text: station['given_name'], location: station['city']})
+                    self.options.push({value: station['id'], text: station['given_name'], location: station['city'], label: "[" + station['name'] + "] " + station['given_name']})
                 });
             },
             async loadData() {

@@ -54,7 +54,7 @@ class Popup {
 
         // title
         g.append("text").attrs({
-            x: this.x + 20, y: this.y,
+            x: this.x + 15, y: this.y,
             "font-size": "12px", "font-family": "sans-serif",
         }).text(this.title);
 
