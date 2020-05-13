@@ -8,7 +8,7 @@
                     <b-button v-b-modal.modal-areastation variant="info" class="float-right">
                         <b-icon icon="info-circle"></b-icon>
                     </b-button>
-                    <b-modal hide-backdrop content-class="shadow" centered  id="modal-areastation" hide-footer title="Landgebruik">
+                    <b-modal id="modal-areastation" hide-footer title="Landgebruik">
                         <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci posuere.</p>
                     </b-modal>
                 </b-col>

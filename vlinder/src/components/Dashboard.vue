@@ -85,7 +85,7 @@
                             <b-button v-b-modal.temperature variant="info" class="float-right">
                                 <b-icon icon="info-circle"/>
                             </b-button>
-                            <b-modal id=temperature hide-backdrop content-class="shadow" centered hide-footer
+                            <b-modal id=temperature hide-footer
                                      title="Temperatuur">
                                 <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
                                     luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
@@ -135,7 +135,7 @@
                             <b-button v-b-modal.rain variant="info" class="float-right">
                                 <b-icon icon="info-circle"/>
                             </b-button>
-                            <b-modal hide-backdrop content-class="shadow" centered id=rain hide-footer
+                            <b-modal id=rain hide-footer
                                      title="Neerslagsom">
                                 <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
                                     luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
@@ -185,7 +185,7 @@
                             <b-button v-b-modal.pressure variant="info" class="float-right">
                                 <b-icon icon="info-circle"/>
                             </b-button>
-                            <b-modal hide-backdrop content-class="shadow" centered id=pressure hide-footer
+                            <b-modal id=pressure hide-footer
                                      title="Luchtdruk">
                                 <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
                                     luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
@@ -222,7 +222,7 @@
                             <b-button v-b-modal.location variant="info" class="float-right">
                                 <b-icon icon="info-circle"/>
                             </b-button>
-                            <b-modal hide-backdrop content-class="shadow" centered id=location hide-footer
+                            <b-modal id=location hide-footer
                                      title="Locatie op kaart">
                                 <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
                                     luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
@@ -416,6 +416,10 @@
     .dashboard_multiselect .multiselect__content-wrapper :-webkit-scrollbar {
         display: none;
         -ms-overflow-style: none;
+    }
+
+    .modal-backdrop {
+        opacity: 0.6;
     }
 
 </style>
