@@ -18,19 +18,31 @@
                     </multiselect>
                 </b-col>
                 <b-col>
-                    <b-row>
-                        <b-col>
-                            Van:
-                            <datetime v-model="selectedStartDateString" type="datetime"/>
+                <b-card style="border-style: none; box-shadow: 0 0 0 0 rgba(0,0,0,0);">
+                    <b-row id="timeInput" style="height: 100%;" align-h="center" align-v="center">
+                        <b-col style="margin-left: 50px">
+                            <b-row>
+                                <p style="margin-bottom: 0">Van:</p>
+                                <div class="calendarBox">
+                                    <b-icon icon="calendar-fill" variant="calendar"/>
+                                    <datetime style="background-color: #000000; " v-model="selectedStartDateString"
+                                                type="datetime"/>
+                                </div>
+                            </b-row>
+                            <b-row>
+                                <p style="margin-bottom: 0">Tot:</p>
+                                <div class="calendarBox">
+                                    <b-icon icon="calendar-fill" variant="calendar"/>
+                                    <datetime style="background-color: #000000;" v-model="selectedEndDateString"
+                                                type="datetime"/>
+                                </div>
+                            </b-row>
                         </b-col>
-                        <b-col>
-                            Tot:
-                            <datetime v-model="selectedEndDateString" type="datetime"/>
+                        <b-col style="margin-left: 50px">
+                            <b-button variant="info" @click="loadData">Selecteer</b-button>
                         </b-col>
                     </b-row>
-                </b-col>
-                <b-col cols="2">
-                    <b-button @click="loadData">Toon status</b-button>
+                </b-card>
                 </b-col>
             </b-row>
             <b-row align-h="center">

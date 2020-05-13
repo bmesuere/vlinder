@@ -74,7 +74,6 @@ class Popup {
                 m = this.lines[i].length;
             }
         }
-        console.log(m)
         return this.basewidth + m * 6;
     }
 

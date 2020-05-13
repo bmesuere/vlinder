@@ -218,6 +218,17 @@
                 <b-card style="width:100%;height:100%">
                     <b-row>
                         <b-col><h3>Locatie op kaart</h3></b-col>
+                        <b-col>
+                            <b-button v-b-modal.location variant="info" class="float-right">
+                                <b-icon icon="info-circle"/>
+                            </b-button>
+                            <b-modal hide-backdrop content-class="shadow" centered id=location hide-footer
+                                     title="Locatie op kaart">
+                                <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
+                                    luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
+                                    posuere.</p>
+                            </b-modal>
+                        </b-col>
                     </b-row>
                     <b-tabs pills vertical style="width:100%;height:100%">
                         <b-tab v-for="station in selectedStations" v-bind:key="station.name"
