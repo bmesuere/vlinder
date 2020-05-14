@@ -152,8 +152,7 @@
                     .attr("fill", "#b3b3b3")
                     .attr("opacity", 0.6)
                     .attr("rx", '3')
-                    .attr("ry", '3')
-                    .attr('stroke', 'black');
+                    .attr("ry", '3');
 
                 this.tooltip_box.append("text").attr("class", "title");
 

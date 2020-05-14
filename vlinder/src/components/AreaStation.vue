@@ -131,14 +131,13 @@
 
                 this.yAxisGroup.call(this.yAxis);
 
-                this.tooltip = this.svg
+                this.tooltip = d3.select("body")
                     .append("div")
                     .style("position", "absolute")
-                    .style("z-index", "10")
                     .style("visibility", "hidden")
-                    .style("padding", "5px")
-                    .style("border-radius", "10px")
-                    .style("background", "#fff");
+                    .style("padding", "3px")
+                    .style("border-radius", "2px")
+                    .style("background", "rgb(196,196,196)");
 
                 this.update_data()
 
@@ -154,20 +153,6 @@
                     return;
                 }
                 const landUse = this.selectedStations[index]["landUse"];
-
-                let showLabel = function (element, value, type) {
-                    d3.select(element).attr("stroke", "black");
-                    d3.select('#d3-viz-area')
-                        .select('svg')
-                        .append("svg:title")
-                        .text((100 * value).toFixed(2) + '% ' + type)
-                };
-
-                let removeLabel = function (element) {
-                    d3.select(element).attr("stroke", "none");
-                    d3.select('#d3-viz-area')
-                        .select('svg').selectAll("title").remove();
-                };
 
                 let bars = this.svg
                     .selectAll("rect.area")
@@ -190,8 +175,16 @@
                     .attr("width", this.width / (this.xLabels.length + 1) * 0.8)
                     .attr("height", d => this.dataScale(d['usage'][k]['value']))
                     .attr("fill", this.colors[k])
-                    .on("mouseover", function (d) { showLabel(this, d['usage'][k]['value'], self.types[k]); })
-                    .on("mouseout", function () { removeLabel(this); });
+                    .on("mouseover", function(d) {
+                        d3.select(this).attr("stroke", "black");
+                        self.tooltip.text((100 * d['usage'][k]['value']).toFixed(2) + '% ' + self.types[k]);
+                        return self.tooltip.style("visibility", "visible");
+                    })
+                    .on("mousemove", () => {return this.tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");})
+                    .on("mouseout", function (){
+                        d3.select(this).attr("stroke", "none");
+                        return self.tooltip.style("visibility", "hidden");
+                    });
                 }
 
                 return this.svg.node();
@@ -236,5 +229,7 @@
 </script>
 
 <style scoped>
-
+    body {
+        font-family: CircularStd, serif;
+    }
 </style>
