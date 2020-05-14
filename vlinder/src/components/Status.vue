@@ -57,7 +57,6 @@
     import Timeline from "./Timeline";
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import {Datetime} from "vue-datetime";
-    import vlinderService from "../services/vlinderService";
 
     export default {
         name: "Status",

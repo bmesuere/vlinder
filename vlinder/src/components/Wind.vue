@@ -54,7 +54,7 @@
             this.create_windrose();
         },
         methods: {
-            create_windrose(index = 0) {
+            create_windrose() {
                 let divBox = this.div.node().getBoundingClientRect();
                 this.size = Math.min(divBox['height'], divBox['width']);
                 this.width = this.size;
