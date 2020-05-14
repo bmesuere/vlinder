@@ -104,7 +104,7 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             },
 
             temperatureData(data) {
-                if (this.typePerceivedTemperature || this.typePerceivedTemperature === 'Geen') {
+                if (this.typePerceivedTemperature) {
                    let self = this;
                    let perceivedTemp;
                    if(this.typePerceivedTemperature === 'Humindex') {
@@ -121,6 +121,8 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
                                "time": d['time']
                            };
                        });
+                   } else {
+                       return [data];
                    } 
                    return [data, perceivedTemp];
                 } else {
