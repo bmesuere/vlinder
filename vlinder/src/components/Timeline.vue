@@ -31,12 +31,12 @@
 
             // the h_padding has to be less than the width because this is actually just
             // implemented as a border around the bar, but this off part of the actual bar
-            this.bars = {width: 3, height: 50, h_padding: 1.5, v_padding: 1};
-            this.padding = {left: 70, right: 50, top: 80, bottom: 0}
+            this.bars = {width: 3, height: 40, h_padding: 1.5, v_padding: 1};
+            this.padding = {left: 150, right: 50, top: 80, bottom: 70}
 
             this.width = 288 * this.bars.width;
 
-            this.ticks = 10;
+            this.ticks = 20;
 
 
             this.xScale = d3
@@ -133,7 +133,6 @@
 
             constructXAxis(height) {
                 const xAxis = d3.axisBottom() // create status_bars new bottom axis
-                    .tickFormat(d3.timeFormat("%H:%M"))
                     .scale(this.xScale); // that uses the domain of the xScale
 
                 xAxis.ticks(this.ticks);
@@ -142,7 +141,9 @@
                     .transition()
                     .duration(this.transitionLength)
                     .attr("transform", `translate(0, ${this.padding.top + height - this.bars.height})`)
-                    .call(xAxis);
+                    .call(xAxis)
+                    .selectAll("text")
+                    .attr("transform", "translate(-15,15)rotate(-45)");
             },
 
             constructYAxis(selectedNames, height) {

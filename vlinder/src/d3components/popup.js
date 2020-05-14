@@ -10,7 +10,7 @@ class Popup {
 
         this.lines = []
         this.height = 20;
-        this.width = 140;
+        this.basewidth = 40;
         this.offset = -46;
         this.title = "";
         return this;
@@ -38,11 +38,10 @@ class Popup {
         const g = this.map.append("g").attr("id", "popup");
 
         g.attr("transform", `scale(${this.scale}, ${this.scale})`)
-        
         // body
         g.append("rect").attrs({
             x: this.x - 3, y: this.y - 14,
-            width: this.width, height: this.height + this.lines.length * 15,
+            width: this.getWidth(), height: this.height + this.lines.length * 15,
             fill: "white", "stroke-width": 0.5, stroke: "black"
         });
 
@@ -55,7 +54,7 @@ class Popup {
 
         // title
         g.append("text").attrs({
-            x: this.x + 20, y: this.y,
+            x: this.x + 15, y: this.y,
             "font-size": "12px", "font-family": "sans-serif",
         }).text(this.title);
 
@@ -66,6 +65,16 @@ class Popup {
                 "font-size": "12px", "font-family": "sans-serif",
             }).text(this.lines[i]);
         }
+    }
+
+    getWidth() {
+        let m = this.title.length;
+        for (var i = 0; i < this.lines.length; i++) {
+            if (this.lines[i].length > m) {
+                m = this.lines[i].length;
+            }
+        }
+        return this.basewidth + m * 6;
     }
 
     clear() {

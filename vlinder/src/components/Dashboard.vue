@@ -5,10 +5,11 @@
                 <Map :hovered="hovered" style="float:left;width:100%"/>
             </b-col>
             <b-col style="float: right; width: 100%">
-                <b-row>
-                    <b-col>
-                        <multiselect style="width: 100%"
-                                     v-model="multiSelectValues" label="text" track-by="text" :clear-on-select="false"
+                <b-row style="height: 100%">
+                    <b-col style="height: 100%" >
+                        <multiselect class="dashboard_multiselect"
+                                     style="width: 100%"
+                                     v-model="multiSelectValues" label="label" track-by="text" :clear-on-select="false"
                                      :multiple="true" :options="options" :searchable="true" :close-on-select="false"
                                      :max=5 :show-labels="false" placeholder="Selecteer een station">
                             <template slot="option" slot-scope="props">
@@ -18,24 +19,13 @@
                                      class="option__desc">
                                     <span style="font-size: 20px">{{ props.option.text }}</span>
                                     <br>
-                                    <span style="font-size: 10px">{{ props.option.value }}</span>
+                                    <span style="font-size: 14px">{{ props.option.location }}</span>
                                 </div>
                             </template>
                             <span slot="maxElements">
                         Maximum aantal geselecteerd. Verwijder een station voor je een nieuw kan toevoegen.
                     </span>
                         </multiselect>
-                    </b-col>
-                </b-row>
-                <b-row style="margin: 1vh; background-color: #ffffff; height: 70%">
-                    <b-col style="height: 100%; padding: 1vh">
-                        <b-tabs pills vertical>
-                            <b-tab v-for="station in selectedStations" v-bind:key="station.name"
-                                   v-bind:title="station.name">
-                                <b-img :src="`${publicPath}kaartjes/${station.name}_crop.png`" fluid-grow>
-                                </b-img>
-                            </b-tab>
-                        </b-tabs>
                     </b-col>
                 </b-row>
             </b-col>
@@ -75,7 +65,7 @@
                      :prevent-collision="false"
                      :use-css-transforms="true"
                      :breakpoints="breakpoints"
-                     style="overflow-x: hidden"
+                     style="overflow: hidden"
                      :responsive="true"
         >
             <grid-item
@@ -95,7 +85,7 @@
                             <b-button v-b-modal.temperature variant="info" class="float-right">
                                 <b-icon icon="info-circle"/>
                             </b-button>
-                            <b-modal id=temperature hide-backdrop content-class="shadow" centered hide-footer
+                            <b-modal id=temperature hide-footer
                                      title="Temperatuur">
                                 <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
                                     luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
@@ -145,7 +135,7 @@
                             <b-button v-b-modal.rain variant="info" class="float-right">
                                 <b-icon icon="info-circle"/>
                             </b-button>
-                            <b-modal hide-backdrop content-class="shadow" centered id=rain hide-footer
+                            <b-modal id=rain hide-footer
                                      title="Neerslagsom">
                                 <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
                                     luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
@@ -195,7 +185,7 @@
                             <b-button v-b-modal.pressure variant="info" class="float-right">
                                 <b-icon icon="info-circle"/>
                             </b-button>
-                            <b-modal hide-backdrop content-class="shadow" centered id=pressure hide-footer
+                            <b-modal id=pressure hide-footer
                                      title="Luchtdruk">
                                 <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
                                     luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
@@ -212,6 +202,40 @@
                                 :y-axis-getter="(d) => d.pressure"
                                 style="width: 100%; height: 100%; padding: 10px;"/>
                     </b-row>
+                </b-card>
+            </grid-item>
+
+            <grid-item
+                    :x="layout[5].x"
+                    :y="layout[5].y"
+                    :w="layout[5].w"
+                    :h="layout[5].w/2.5"
+                    :i="layout[5].i"
+                    :key="layout[5].i"
+                    :min-w="3"
+                    :min-h="2"
+                    drag-ignore-from="svg rect">
+                <b-card style="width:100%;height:100%">
+                    <b-row>
+                        <b-col><h3>Locatie op kaart</h3></b-col>
+                        <b-col>
+                            <b-button v-b-modal.location variant="info" class="float-right">
+                                <b-icon icon="info-circle"/>
+                            </b-button>
+                            <b-modal id=location hide-footer
+                                     title="Locatie op kaart">
+                                <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
+                                    luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
+                                    posuere.</p>
+                            </b-modal>
+                        </b-col>
+                    </b-row>
+                    <b-tabs pills vertical style="width:100%;height:100%">
+                        <b-tab v-for="station in selectedStations" v-bind:key="station.name"
+                                v-bind:title="station.name" class="square">
+                            <b-img :src="`${publicPath}kaartjes/${station.name}_crop.png`" fluid-grow />
+                        </b-tab>
+                    </b-tabs>
                 </b-card>
             </grid-item>
         </grid-layout>
@@ -268,6 +292,7 @@
                     {"x": 0, "y": 3, "w": 6, "h": 2, "i": "2"},
                     {"x": 6, "y": 3, "w": 6, "h": 2, "i": "3"},
                     {"x": 0, "y": 6, "w": 6, "h": 3, "i": "4"},
+                    {"x": 6, "y": 6, "w": 6, "h": 6, "i": "5"},
                     //{"x": 0, "y": 1, "w": 5.5, "h": 3, "i": "5"},
                 ],
                 breakpoints: {
@@ -294,7 +319,7 @@
                 let ids = this.selectedStations.map(x => x['id']);
                 if (!ids.equals(this.multiSelectValues.map(x => x['value']))) {
                     this.multiSelectValues = this.selectedStations.map(x => {
-                        return {value: x['id'], text: x['name']}
+                        return {value: x['id'], text: x['given_name'], location: x['city'], label: "[" + x['name'] + "] " + x['given_name']}
                     })
                 }
                 this.loadVlinderData();
@@ -312,7 +337,7 @@
             stationsToOptions() {
                 let self = this;
                 this.stations.forEach(station => {
-                    self.options.push({value: station['id'], text: station['name']})
+                    self.options.push({value: station['id'], text: station['given_name'], location: station['city'], label: "[" + station['name'] + "] " + station['given_name']})
                 });
             },
             loadVlinderData() {
@@ -343,4 +368,58 @@
     #windRoseCard .card-body {
         padding: 0.5rem;
     }
+</style>
+
+<style>
+    .dashboard_multiselect.multiselect {
+        height: 20%;
+    }
+
+    .dashboard_multiselect .multiselect__select {
+        display: none;
+    }
+
+    .multiselect__tag {
+        background-color: #6685f7;
+        pointer-events: all;
+    }
+
+    .multiselect__option--highlight {
+        background-color: white;
+        color: #354968;
+    }
+
+    .multiselect__option:hover {
+        background-color: #6685f7;
+        color: white;
+    }
+
+    .multiselect__option.multiselect__option--selected {
+        background-color: #f3f3f3;
+        color: #35495e;
+        
+    }
+
+    .multiselect__option--selected:hover {
+        background-color: #ff6a76;
+    }
+
+    .dashboard_multiselect .multiselect__content-wrapper,
+    .dashboard_multiselect .multiselect__content-wrapper.multiselect-leave-active.multiselect-leave-to,
+    .dashboard_multiselect .multiselect__content-wrapper.multiselect-leave
+    {
+        display: block !important; 
+        visibility: visible !important;
+        max-height: 400% !important;
+    }
+
+    .dashboard_multiselect .multiselect__content-wrapper :-webkit-scrollbar {
+        display: none;
+        -ms-overflow-style: none;
+    }
+
+    .modal-backdrop {
+        opacity: 0.6;
+    }
+
 </style>

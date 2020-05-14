@@ -8,8 +8,8 @@
                     <b-button v-b-modal.modal-areastation variant="info" class="float-right">
                         <b-icon icon="info-circle"></b-icon>
                     </b-button>
-                    <b-modal hide-backdrop content-class="shadow" centered  id="modal-areastation" hide-footer title="Omgeving">
-                        <p class="my-4">Weergave van hoe de omgeving rond het weerstation eruitziet. Op de x-as staat de straal waarin gekeken wordt.
+                    <b-modal id="modal-areastation" hide-footer title="Landgebruik">
+                       <p class="my-4">Weergave van hoe de omgeving rond het weerstation eruitziet. Op de x-as staat de straal waarin gekeken wordt.
                             De hoogte van de rechthoek toont hoeveel procent van de ruimte binnen die afstand groen is (park, bos, gras ... ), verhard is (gebouw, parking, weg ... ) of water is. </p>
                     </b-modal>
                 </b-col>

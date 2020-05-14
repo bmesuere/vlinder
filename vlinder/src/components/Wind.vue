@@ -6,7 +6,7 @@
                 <b-button v-b-modal.modal-windrose variant="info" class="float-right">
                     <b-icon icon="info-circle"/>
                 </b-button>
-                <b-modal hide-backdrop content-class="shadow" centered id="modal-windrose" hide-footer title="Windroos">
+                <b-modal id="modal-windrose" hide-footer title="Windroos">
                     <p class="my-4">Voor elke windrichting toont de windroos hoeveel procent van de geselecteerde tijd
                         de wind vanuit die richting waait, en hoe hard ze waait.</p>
                 </b-modal>
