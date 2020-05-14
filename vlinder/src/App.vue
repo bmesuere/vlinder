@@ -6,7 +6,7 @@
 
 <script>
     import { Settings } from 'luxon';
-    Settings.defaultLocale = 'nl'
+    Settings.defaultLocale = 'nl';
 
     export default {
         name: "App",

@@ -6,7 +6,7 @@
             </b-col>
             <b-col style="float: right; width: 100%">
                 <b-row style="height: 100%">
-                    <b-col style="height: 100%" >
+                    <b-col style="height: 100%">
                         <multiselect class="dashboard_multiselect"
                                      style="width: 100%"
                                      v-model="multiSelectValues" label="label" track-by="text" :clear-on-select="false"
@@ -65,9 +65,9 @@
                      :prevent-collision="false"
                      :use-css-transforms="true"
                      :breakpoints="breakpoints"
+                     :autoSize="true"
                      style="overflow: hidden"
-                     :responsive="true"
-        >
+                     :responsive="true">
             <grid-item
                     :x="layout[0].x"
                     :y="layout[0].y"
@@ -77,7 +77,7 @@
                     :key="layout[0].i"
                     :min-w="3"
                     :min-h="2"
-                    drag-ignore-from="svg rect">
+                    drag-ignore-from="svg">
                 <b-card style="height: 100%">
                     <b-row>
                         <b-col><h3>Temperatuur</h3></b-col>
@@ -232,8 +232,8 @@
                     </b-row>
                     <b-tabs pills vertical style="width:100%;height:100%">
                         <b-tab v-for="station in selectedStations" v-bind:key="station.name"
-                                v-bind:title="station.name" class="square">
-                            <b-img :src="`${publicPath}kaartjes/${station.name}_crop.png`" fluid-grow />
+                               v-bind:title="station.name" class="square">
+                            <b-img :src="`${publicPath}kaartjes/${station.name}_crop.png`" fluid-grow/>
                         </b-tab>
                     </b-tabs>
                 </b-card>
@@ -292,7 +292,7 @@
                     {"x": 0, "y": 3, "w": 6, "h": 2, "i": "2"},
                     {"x": 6, "y": 3, "w": 6, "h": 2, "i": "3"},
                     {"x": 0, "y": 6, "w": 6, "h": 3, "i": "4"},
-                    {"x": 6, "y": 6, "w": 6, "h": 6, "i": "5"},
+                    {"x": 6, "y": 6, "w": 6, "h": 3, "i": "5"},
                     //{"x": 0, "y": 1, "w": 5.5, "h": 3, "i": "5"},
                 ],
                 breakpoints: {
@@ -319,7 +319,12 @@
                 let ids = this.selectedStations.map(x => x['id']);
                 if (!ids.equals(this.multiSelectValues.map(x => x['value']))) {
                     this.multiSelectValues = this.selectedStations.map(x => {
-                        return {value: x['id'], text: x['given_name'], location: x['city'], label: "[" + x['name'] + "] " + x['given_name']}
+                        return {
+                            value: x['id'],
+                            text: x['given_name'],
+                            location: x['city'],
+                            label: "[" + x['name'] + "] " + x['given_name']
+                        }
                     })
                 }
                 this.loadVlinderData();
@@ -337,7 +342,12 @@
             stationsToOptions() {
                 let self = this;
                 this.stations.forEach(station => {
-                    self.options.push({value: station['id'], text: station['given_name'], location: station['city'], label: "[" + station['name'] + "] " + station['given_name']})
+                    self.options.push({
+                        value: station['id'],
+                        text: station['given_name'],
+                        location: station['city'],
+                        label: "[" + station['name'] + "] " + station['given_name']
+                    })
                 });
             },
             loadVlinderData() {
@@ -397,7 +407,7 @@
     .multiselect__option.multiselect__option--selected {
         background-color: #f3f3f3;
         color: #35495e;
-        
+
     }
 
     .multiselect__option--selected:hover {
@@ -406,9 +416,8 @@
 
     .dashboard_multiselect .multiselect__content-wrapper,
     .dashboard_multiselect .multiselect__content-wrapper.multiselect-leave-active.multiselect-leave-to,
-    .dashboard_multiselect .multiselect__content-wrapper.multiselect-leave
-    {
-        display: block !important; 
+    .dashboard_multiselect .multiselect__content-wrapper.multiselect-leave {
+        display: block !important;
         visibility: visible !important;
         max-height: 400% !important;
     }
