@@ -7,6 +7,50 @@
     background-color: #DDDDDD;
 }
 
+#legend-div {
+    position: absolute;
+    bottom: 0;
+    width: 25%;
+    height: 25%;
+    background-color: #FFFFFF;
+    pointer-events: none;
+}
+
+#radio {
+    position: absolute;
+    bottom: 22%;
+    width: 16%;
+    height: 23%;
+    background-color: #FFFFFF;
+    font-size: 0.6vw;
+    pointer-events: none;
+    color: #35495e;
+    padding: 1% 0 0 1%;
+}
+
+.radio-label {
+    padding-left: 0.3vw;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+input[type=radio] {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    width: 0.7vw;
+    height: 0.7vw;
+    border-radius: 10px;
+    outline: none;
+    box-shadow: inset 0 0 0 2px #FFF;
+    border: 1px solid #6685f7;
+    cursor: pointer;
+    pointer-events: all;
+  }
+  input[type=radio]:checked {
+    background-color: #6685f7;
+  }
+
 #popup {
     pointer-events: none;
 }
@@ -20,17 +64,17 @@
 
 .circles:hover {
 	stroke: #004477;
-    stroke-width: 4px;
+    stroke-width: 2px;
 }
 
 .circles[hovered*=true] {
     stroke: #004477;
-    stroke-width: 4px;
+    stroke-width: 2px;
 }
 
 .circles[selected*=true]{
 	stroke: #0066cc;
-    stroke-width: 4px;
+    stroke-width: 3px;
 }
 
 .circles[status*="Ok"]{
