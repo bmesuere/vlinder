@@ -406,8 +406,8 @@
 </style>
 
 <style>
-    .dashboard_multiselect.multiselect {
-        height: 20%;
+    .dashboard_multiselect .multiselect__tags {
+        font-size: 1vw;
     }
 
     .dashboard_multiselect .multiselect__select {
@@ -444,7 +444,7 @@
     .dashboard_multiselect .multiselect__content-wrapper.multiselect-leave {
         display: block !important;
         visibility: visible !important;
-        max-height: 350% !important;
+        max-height: 15vw !important;
     }
 
     .dashboard_multiselect .multiselect__content-wrapper :-webkit-scrollbar {
