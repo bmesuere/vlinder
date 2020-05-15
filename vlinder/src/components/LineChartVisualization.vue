@@ -6,7 +6,7 @@
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import ResizeObserver from 'resize-observer-polyfill';
     import * as d3 from 'd3'
-    import {uuidv4} from "../utils";
+    import {uuidv4, customFormat} from "../utils";
 
     export default {
         name: "LineChartVisualization",
@@ -17,7 +17,6 @@
                 height: 0,
                 startDate: String,
                 endDate: String,
-                format: d3.timeFormat("%H:%M"),
                 textSizeLegend: 12,
                 titleSizeLegend: 16,
                 posX: -1,
@@ -45,6 +44,26 @@
             }
         },
         mounted() {
+
+
+            //var formatMillisecond = format(".%L"),
+            //    formatSecond = format(":%S"),
+            //    formatMinute = format("%I:%M"),
+            //    formatHour = format("%I %p"),
+            //    formatDay = format("%a %d"),
+            //    formatWeek = format("%b %d"),
+            //    formatMonth = format("%B"),
+            //    formatYear = format("%Y");
+
+            //function multiFormat(date) {
+            //    return (d3.timeSecond(date) < date ? formatMillisecond
+            //        : d3.timeMinute(date) < date ? formatSecond
+            //            : d3.timeHour(date) < date ? formatMinute
+            //                : d3.timeDay(date) < date ? formatHour
+            //                    : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
+            //                        : d3.timeYear(date) < date ? formatMonth
+            //                            : formatYear)(date);
+            //}
             this.div = d3.select("#" + this.id);
             let observer = new ResizeObserver(this.create_graph);
             observer.observe(this.div.node());
@@ -81,6 +100,7 @@
                     .range([this.height - this.padding.bottom, this.padding.top]);
 
                 this.xAxis = d3.axisBottom()
+                    .tickFormat(customFormat)
                     .scale(this.xScale);
 
                 this.yAxis = d3.axisLeft()

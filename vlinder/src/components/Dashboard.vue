@@ -209,7 +209,7 @@
                     :x="layout[5].x"
                     :y="layout[5].y"
                     :w="layout[5].w"
-                    :h="layout[5].w/2.5"
+                    :h="layout[5].h"
                     :i="layout[5].i"
                     :key="layout[5].i"
                     :min-w="3"

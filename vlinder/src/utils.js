@@ -1,3 +1,4 @@
+import * as d3  from 'd3'
 export function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -18,4 +19,23 @@ export function generate_fake_data(amount, start_time, pressure = undefined, rai
 
         return {"time": date, "pressure": pressure, "rainVolume": rainVolume}
     })
+}
+
+var formatMillisecond = d3.timeFormat(".%L"),
+    formatSecond = d3.timeFormat(":%S"),
+    formatMinute = d3.timeFormat("%H:%M"),
+    formatHour = d3.timeFormat("%H"),
+    formatDay = d3.timeFormat("%a %d"),
+    formatWeek = d3.timeFormat("%b %d"),
+    formatMonth = d3.timeFormat("%B"),
+    formatYear = d3.timeFormat("%Y");
+
+export function customFormat(date) {
+    return (d3.timeSecond(date) < date ? formatMillisecond
+        : d3.timeMinute(date) < date ? formatSecond
+            : d3.timeHour(date) < date ? formatMinute
+                : d3.timeDay(date) < date ? formatHour
+                    : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
+                        : d3.timeYear(date) < date ? formatMonth
+                            : formatYear)(date);
 }
