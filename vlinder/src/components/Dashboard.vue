@@ -10,8 +10,9 @@
                         <multiselect class="dashboard_multiselect"
                                      style="width: 100%"
                                      v-model="multiSelectValues" label="label" track-by="text" :clear-on-select="false"
-                                     :multiple="true" :options="options" :searchable="true" :close-on-select="false"
-                                     :max=5 :show-labels="false" placeholder="Selecteer een station">
+                                     :multiple="true" :options="options" :searchable="true" :internal-search="false" :close-on-select="false"
+                                     :max=5 :show-labels="false" placeholder="Selecteer een station"
+                                     @search-change="test">
                             <template slot="option" slot-scope="props">
                                 <div @mouseenter="hovered = props.option.value"
                                      @mouseleave="hovered = null"
@@ -287,6 +288,8 @@
             return {
                 multiSelectValues: [],
                 options: [],
+                isLoading: false,
+                allOptions: [],
                 selectedStartDateString: '',
                 selectedEndDateString: '',
                 stationNames: {},
@@ -316,6 +319,9 @@
             }
         },
         watch: {
+            allOptions () {
+                this.options = this.allOptions.slice();
+            },
             stations() {
                 this.stationsToOptions();
             },
@@ -346,7 +352,7 @@
             stationsToOptions() {
                 let self = this;
                 this.stations.forEach(station => {
-                    self.options.push({
+                    self.allOptions.push({
                         value: station['id'],
                         text: station['given_name'],
                         location: station['city'],
@@ -374,6 +380,21 @@
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
             },
+            async test(a) {
+                this.isLoading = true;
+
+                new Promise(_ => {
+                    this.options = []
+                    a = a.toLowerCase();
+                    for (var i of this.allOptions) {
+                        let l = i.label.toLowerCase();
+                        let loc = i.location.toLowerCase();
+                        if (l.includes(a) || loc.includes(a)) {
+                            this.options.push(i)
+                        }
+                    }
+                })
+            }
         }
     }
 </script>
@@ -423,7 +444,7 @@
     .dashboard_multiselect .multiselect__content-wrapper.multiselect-leave {
         display: block !important;
         visibility: visible !important;
-        max-height: 400% !important;
+        max-height: 350% !important;
     }
 
     .dashboard_multiselect .multiselect__content-wrapper :-webkit-scrollbar {
