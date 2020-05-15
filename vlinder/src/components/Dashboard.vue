@@ -87,9 +87,11 @@
                             </b-button>
                             <b-modal id=temperature hide-footer
                                      title="Temperatuur">
-                                <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
-                                    luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
-                                    posuere.</p>
+                                <p class="my-4">De temperatuur wordt gemeten elke 5 minuten op 1.5 hoogte boven
+                                    oppervlak in een passief geventileerde stralingshut. De humidex-temperatuur houdt
+                                    rekening met de temperatuur en de relatieve vochtigheid om het thermisch comfort
+                                    in te schatten. Deze waarde is interessant tijdens warme episodes. Let op, deze
+                                    data werden niet gecontroleerd. </p>
                             </b-modal>
                         </b-col>
                     </b-row>
@@ -137,9 +139,11 @@
                             </b-button>
                             <b-modal id=rain hide-footer
                                      title="Neerslagsom">
-                                <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
-                                    luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
-                                    posuere.</p>
+                                <p class="my-4">De neerslag wordt gemeten met een zogenaamde tipping-bucket regenmeter.
+                                    Hieronder vind je de totale neerslagsom doorheen de geselecteerde periode.
+                                    Onderstaande data zijn meestal een beperkte onderschatting, zeker in het geval het
+                                    weerstation in een dichtbebouwde of beboste omgeving staat. Let op, deze data werden
+                                    niet gecontroleerd.</p>
                             </b-modal>
                         </b-col>
                     </b-row>
@@ -187,9 +191,10 @@
                             </b-button>
                             <b-modal id=pressure hide-footer
                                      title="Luchtdruk">
-                                <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
-                                    luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
-                                    posuere.</p>
+                                <p class="my-4">Hier kan je de luchtdrukwaarden (gemeten elke 5 minuten) aflezen. De
+                                    luchtdruk wordt niet alleen bepaald door het weer, maar ook door de hoogte boven
+                                    zeeniveau van het weerstation. Hoe hoger de ligging van het weerstation, hoe
+                                    lager de luchtdrukwaarde. Let op, deze data werden niet gecontroleerd.</p>
                             </b-modal>
                         </b-col>
                     </b-row>
@@ -224,9 +229,8 @@
                             </b-button>
                             <b-modal id=location hide-footer
                                      title="Locatie op kaart">
-                                <p class="my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consectetur
-                                    luctus nisl at facilisis. Ut euismod lorem et risus interdum, ac porttitor orci
-                                    posuere.</p>
+                                <p class="my-4">Op onderstaande kaartjes kan je de inplanting van het weerstation in
+                                    de ruime omgeving zien.</p>
                             </b-modal>
                         </b-col>
                     </b-row>

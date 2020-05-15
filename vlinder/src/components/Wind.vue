@@ -7,8 +7,11 @@
                     <b-icon icon="info-circle"/>
                 </b-button>
                 <b-modal id="modal-windrose" hide-footer title="Windroos">
-                    <p class="my-4">Voor elke windrichting toont de windroos hoeveel procent van de geselecteerde tijd
-                        de wind vanuit die richting waait, en hoe hard ze waait.</p>
+                    <p class="my-4">De windsnelheid en windrichting worden gemeten op een hoogte van ongeveer 2m
+                        boven het oppervlak. Obstakels in de omgeving van het weerstation (bomen, gebouwen,...) zullen
+                        een grote invloed hebben op de wind. Voor elke windrichting toont de windroos hoeveel procent
+                        van de geselecteerde tijd de wind vanuit die richting waait, en hoe hard deze waait. Let op,
+                        deze data werden niet gecontroleerd.</p>
                 </b-modal>
             </b-col>
         </b-row>
