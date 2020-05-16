@@ -3,22 +3,24 @@
         <b-col :id="id" style="height: 100%"/>
 <!--        <b-col v-bind:cols="2" id="d3-viz-line-legend" style="height: 100%"/>-->
     </b-container>
-    <b-row v-else>
-        <b-col cols="9" :id="id" style="height: 100%; width: 80%"></b-col>
-        <b-col cols="3" id="d3-viz-area-legend" style="height: 100%;padding-top: 10%">
-            <b-row v-for="(datadeel, index) in focusedVlinderData"
+    <b-container v-else>
+        <b-row  :id="id" style="height: 90%; width: 100%"></b-row>
+        <b-row  id="d3-viz-area-legend" style="width: 100%; height: 10%; padding-left: 40px">
+            <b-col v-for="(datadeel, index) in focusedVlinderData"
                             v-bind:key="stationNames[datadeel[0].id]"
                             style="padding-left: 10px">
-                <b-col cols="3" class="rect" >
-                    <svg width="fit-content" height="10">
-                          <rect width="10" height="10"
-                            v-bind:style="{ 'fill': colors[index] }"/>
-                    </svg>
-                </b-col>
-                <b-col style="width: fit-content; text-align: left">{{stationNames[datadeel[0].id]}}</b-col>
-            </b-row>
-        </b-col>
-    </b-row>
+                <b-row>
+                    <b-col cols="1" class="rect" >
+                        <svg width="10" height="10">
+                              <rect width="10" height="10"
+                                v-bind:style="{ 'fill': colors[index] }"/>
+                        </svg>
+                    </b-col>
+                    <b-col style="width: fit-content; text-align: left">{{stationNames[datadeel[0].id]}}</b-col>
+                </b-row>
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script>
