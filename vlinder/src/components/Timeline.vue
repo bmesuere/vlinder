@@ -7,6 +7,7 @@
     import * as d3 from "d3";
     import Popup from "../d3components/popup"
     import fillMissingData from "../utils/vlinderDataParse";
+    import {customFormat} from "../utils";
 
     export default {
         name: "Timeline",
@@ -133,6 +134,7 @@
 
             constructXAxis(height) {
                 const xAxis = d3.axisBottom() // create status_bars new bottom axis
+                    .tickFormat(customFormat)
                     .scale(this.xScale); // that uses the domain of the xScale
 
                 xAxis.ticks(this.ticks);
