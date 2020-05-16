@@ -1,6 +1,24 @@
 <template>
     <div id="d3-viz">
         <div id="map-div" class="svg-container"></div>
+        <div id="legend-div" />
+        <div id="radio">
+            <div style="height:30%">
+            <input type="radio" id="temp" v-bind:value='{"variable": "temp", "name": "Temperatuur", "unit": "°C",
+                                    "min": -5, "max": 30}' v-model="legend_values">
+            <label class="radio-label" for="temp">Temperatuur</label>
+            </div>
+            <div style="height:30%">
+            <input type="radio" id="hum" v-bind:value='{"variable": "humidity", "name": "Luchtvochtigheid", "unit": "%",
+                                    "min": 0, "max": 100}' v-model="legend_values">
+            <label class="radio-label" for="hum">Luchtvochtigheid</label>
+            </div>
+            <div style="height:30%">
+            <input type="radio" id="speed" v-bind:value='{"variable": "windSpeed", "name": "Windsnelheid", "unit": "m/s",
+                                    "min": 0, "max": 35}' v-model="legend_values">
+            <label class="radio-label" for="speed">Windsnelheid</label>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -36,6 +54,10 @@
             });
 
             this.map = svg.append("g");
+            this.legend = d3.select("#legend-div").append("svg").attrs({
+                preserveAspectRatio: "xMinYMin meet",
+                viewBox: `0 0 200 200`
+            })
 
             this.map.w = w;
             this.map.h = h;
@@ -50,12 +72,17 @@
             return {
                 map: {},
                 stations_component: {},
+                legend_values: {"variable": "temp", "name": "Temperatuur", "unit": "°C",
+                                "min": -5, "max": 30},
             }
         },
         props: {
             hovered: String,
         },
         watch: {
+            legend_values() {
+                this.make_colouring();
+            },
             stations() {
                 this.addStationsToMap();
             },
@@ -65,6 +92,7 @@
                     enter.select("circle")
                     .attr("selected", d => self.selectedStations.includes(d))
                 });
+                this.make_colouring();
             },
             latestVlinderData() {
                 if (this.stations_component.join) {
@@ -72,6 +100,7 @@
                         Popup(enter.select("circle"), this.map, this.latestVlinderData);
                     });
                 }
+                this.make_colouring();
             },
             hovered() {
                 let self = this;
@@ -106,6 +135,97 @@
                 this.stations_component.join(enter => {
                     Popup(enter.select("circle"), this.map, this.latestVlinderData);
                 });
+            },
+
+            create_step_list(min_value, max_value, steps) {
+                var step_size = (max_value - min_value)/steps
+                var l = [];
+                for (var i = 0; i <= steps; i++) {
+                    l.push(min_value + (step_size * i))
+                }
+                return l;
+            },
+
+            add_legend(text, unit, min_value, max_value) {
+                var i = 0;
+                var offset = 8;
+                var scale = d3.scaleLinear().range([min_value, max_value]).domain(0, 10)
+                var values = this.create_step_list(min_value, max_value, 6);
+                this.legend.selectAll("*").remove();
+                this.legend.selectAll("rect")
+                    .data([0, 1, 2, 3, 4, 5, 6])
+                    .enter()
+                    .append("rect")
+                    .attrs({
+                        "x": d => (d * 25) + 10,
+                        "y": 60,
+                        "fill": d => d3.interpolateSpectral(1 - (values[d] - min_value)/(max_value - min_value)),
+                        "width": 25,
+                        "height": 25
+                    })
+
+                this.legend.selectAll("text")
+                    .data([0, 6])
+                    .enter()
+                    .append("text")
+                    .attrs({
+                        "x": d => (d * 25) + 10,
+                        "y": 55,
+                        "fill": d => d3.interpolateSpectral(1 - (values[d] - min_value)/(max_value - min_value)),
+                        "font-size": "10px",
+                    }).text(d => values[d] + unit)
+
+                this.legend
+                    .append("text")
+                    .attrs({
+                        "x": 440/text.length,
+                        "y": 30,
+                        "fill": "#35495e",
+                        "font-size": "20px",
+                    }).text(text)
+            },
+            colour_circles(variable, text, unit, min_value, max_value) {
+                if (variable == null) {
+                    variable = "temp";
+                }
+
+                if (unit == null) {
+                    unit = "";
+                }
+
+                if (min_value == null) {
+                    min_value = 0;
+                }
+
+                if (max_value == null) {
+                    max_value = min_value + 1;
+                }
+
+                this.add_legend(text, unit, min_value, max_value)
+
+                if (this.stations_component.join && this.latestVlinderData) {
+                    var latestMap = {};
+                    for (var latestVlinder of this.latestVlinderData) {
+                        latestMap[latestVlinder.id] = latestVlinder;
+                    }
+                    this.stations_component.join(enter => {
+                        enter.select("circle").style("fill", d => {
+                            if (latestMap[d.id]) {
+                                var t = 1 - ((latestMap[d.id][variable] - min_value)/(max_value - min_value));
+                                return d3.interpolateSpectral(t);
+                            }
+                        });
+                    });
+                }
+            },
+
+            make_colouring() {
+                console.log(this.legend_values);
+                this.colour_circles(this.legend_values["variable"], 
+                    this.legend_values["name"], 
+                    this.legend_values["unit"],
+                    this.legend_values["min"],
+                    this.legend_values["max"]);
             }
         }
     }

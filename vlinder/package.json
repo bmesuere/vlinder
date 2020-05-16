@@ -17,6 +17,7 @@
     "circular-std": "^1.0.4",
     "core-js": "^3.6.4",
     "d3": "^5.15.0",
+    "d3-scale-chromatic": "^1.5.0",
     "d3-selection-multi": "^1.0.1",
     "font-awesome": "^4.7.0",
     "luxon": "^1.23.0",
