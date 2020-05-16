@@ -140,7 +140,8 @@
                     .style("visibility", "hidden")
                     .style("padding", "3px")
                     .style("border-radius", "2px")
-                    .style("background", "rgb(196,196,196)");
+                    .style("opacity", 0.9)
+                    .style("background", "rgb(203,203,203)");
 
                 this.update_data()
 

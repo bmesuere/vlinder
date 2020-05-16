@@ -87,6 +87,8 @@
                 this.height = Math.max(divBox.height, 100);
 
                 this.svg = div.append("svg", 0)
+                    .style("overflow", "visible")
+                    .style("z-index", 2)
                     .attr("width", this.width)
                     .attr("height", this.height);
 
@@ -296,6 +298,7 @@
                     this.tooltip_dots.style("display", "none");
                     this.tooltip_line.style("opacity", 0);
                     this.tooltip_box.style("display", "none");
+                    this.tooltip_box.raise();
                 }
             },
             updateToolTips() {
