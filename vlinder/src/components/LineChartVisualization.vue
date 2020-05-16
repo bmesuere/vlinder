@@ -1,5 +1,24 @@
 <template>
-    <div :id="id" style="height: 100%; width: 100%"></div>
+    <b-container v-if="this.focusedVlinderData.length <= 1 || this.selectedStations <= 1" style="width: 100%; height: 100%">
+        <b-col :id="id" style="height: 100%"/>
+<!--        <b-col v-bind:cols="2" id="d3-viz-line-legend" style="height: 100%"/>-->
+    </b-container>
+    <b-row v-else>
+        <b-col cols="9" :id="id" style="height: 100%; width: 80%"></b-col>
+        <b-col cols="3" id="d3-viz-area-legend" style="height: 100%;padding-top: 10%">
+            <b-row v-for="(datadeel, index) in focusedVlinderData"
+                            v-bind:key="stationNames[datadeel[0].id]"
+                            style="padding-left: 10px">
+                <b-col cols="3" class="rect" >
+                    <svg width="fit-content" height="10">
+                          <rect width="10" height="10"
+                            v-bind:style="{ 'fill': colors[index] }"/>
+                    </svg>
+                </b-col>
+                <b-col style="width: fit-content; text-align: left">{{stationNames[datadeel[0].id]}}</b-col>
+            </b-row>
+        </b-col>
+    </b-row>
 </template>
 
 <script>
@@ -21,7 +40,8 @@
                 titleSizeLegend: 16,
                 posX: -1,
                 posY: -1,
-                paddingLegend: 5
+                paddingLegend: 5,
+                stationNames: {}
             }
         },
         props: {
@@ -41,10 +61,13 @@
         watch: {
             focusedVlinderData() {
                     this.update_data(this.focusedVlinderData);
+            },
+            stations() {
+                this.$store.getters.stations.forEach(st => this.stationNames[st.id] = st.name)
             }
         },
         mounted() {
-
+            this.$store.getters.stations.forEach(st => this.stationNames[st.id] = st.name)
             this.div = d3.select("#" + this.id);
             let observer = new ResizeObserver(this.create_graph);
             observer.observe(this.div.node());
