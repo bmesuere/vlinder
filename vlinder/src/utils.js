@@ -37,7 +37,7 @@ d3.timeFormatDefaultLocale(
 var formatMillisecond = d3.timeFormat(".%L"),
     formatSecond = d3.timeFormat(":%S"),
     formatMinute = d3.timeFormat("%H:%M"),
-    formatHour = d3.timeFormat("%H:00"),
+    formatHour = d3.timeFormat("%Hu"),
     formatDay = d3.timeFormat("%a %d"),
     formatWeek = d3.timeFormat("%b %d"),
     formatMonth = d3.timeFormat("%B"),
