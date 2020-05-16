@@ -65,11 +65,11 @@
                     this.update_data(this.focusedVlinderData);
             },
             stations() {
-                this.$store.getters.stations.forEach(st => this.stationNames[st.id] = st.name)
+                this.$store.getters.stations.forEach(st =>{ if(!this.stationNames[st.id]) this.stationNames[st.id] = st.name})
             }
         },
         mounted() {
-            this.$store.getters.stations.forEach(st => this.stationNames[st.id] = st.name)
+            this.$store.getters.stations.forEach(st =>{ if(!this.stationNames[st.id]) this.stationNames[st.id] = st.name})
             this.div = d3.select("#" + this.id);
             let observer = new ResizeObserver(this.create_graph);
             observer.observe(this.div.node());
