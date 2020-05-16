@@ -92,7 +92,7 @@
                     .range([this.padding.left, this.width - this.padding.right]);
 
                 this.yScale = d3.scaleLinear()
-                    .domain([0, 1])
+                    .domain([0, 100])
                     .range([this.height - this.padding.bottom, this.padding.top]);
 
                 this.dataScale = d3.scaleLinear()
@@ -118,7 +118,7 @@
 
                 this.svg.select(".y.axis")
                     .append("text")
-                    .text('Omgeving')
+                    .text('Omgeving (%)')
                     .style("text-anchor", "end")
                     .attr("dx", -this.padding.top)
                     .attr("dy", "1em")
