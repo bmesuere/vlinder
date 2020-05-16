@@ -45,7 +45,7 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
                 typePerceivedTemperature: 'Geen',
                 options: [
                     { item: 'Geen', name: 'Geen',  },
-                    { item: 'Humindex', name: 'Humindex' },
+                    { item: 'Humidex', name: 'Humidex' },
                     { item: 'WCTI', name: 'WCTI' },
                 ]
             }
@@ -81,13 +81,13 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             },
 
             /**
-             * Compute the perceived temperature based on the humindex formula
+             * Compute the perceived temperature based on the humidex formula
              * source: https://en.wikipedia.org/wiki/Humidex
              * @param T current measured temperature in Celcius
              * @param H humidity
              * @returns {number}
              */
-            computePerceivedTemperatureHumindex(T, H) {
+            computePerceivedTemperatureHumidex(T, H) {
                 const tDew = this.dewPointTemperature(T, H);
                 return Math.round(10*(T+ 5/9*(6.11 * Math.pow(Math.E, (5417.7530*(1/273.16 - 1/(273.15+tDew)))) -10)) )/10;
             },
@@ -107,10 +107,10 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
                 if (this.typePerceivedTemperature) {
                    let self = this;
                    let perceivedTemp;
-                   if(this.typePerceivedTemperature === 'Humindex') {
+                   if(this.typePerceivedTemperature === 'Humidex') {
                        perceivedTemp = data.map(function (d) {
                            return {
-                               "temp": self.computePerceivedTemperatureHumindex(d['temp'], d['humidity']),
+                               "temp": self.computePerceivedTemperatureHumidex(d['temp'], d['humidity']),
                                "time": d['time']
                            };
                        });
@@ -132,7 +132,6 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             updateLineChart() {
                 let data = this.focusedVlinderData;
                 if (data && data.length === 1){
-
                     this.temperature.update_data(this.temperatureData(data[0]));
                 } else if (!data || data.length===0){
                     this.typePerceivedTemperature = null;

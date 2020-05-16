@@ -53,8 +53,8 @@
                     </div>
                 </b-col>
                 <b-col style="display: flex;">
-                    <b-button variant="info" @click="loadVlinderData">Selecteer</b-button>
-                    <b-button style="margin-left: 20px" variant="outline-info" @click="downloadCsv">Download</b-button>
+                    <b-button variant="info" @click="loadVlinderData">Periode toepassen</b-button>
+                    <b-button style="margin-left: 20px" variant="outline-info" @click="downloadCsv">Brondata downloaden</b-button>
                 </b-col>
             </b-row>
         </b-card>
