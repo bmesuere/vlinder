@@ -45,25 +45,6 @@
         },
         mounted() {
 
-
-            //var formatMillisecond = format(".%L"),
-            //    formatSecond = format(":%S"),
-            //    formatMinute = format("%I:%M"),
-            //    formatHour = format("%I %p"),
-            //    formatDay = format("%a %d"),
-            //    formatWeek = format("%b %d"),
-            //    formatMonth = format("%B"),
-            //    formatYear = format("%Y");
-
-            //function multiFormat(date) {
-            //    return (d3.timeSecond(date) < date ? formatMillisecond
-            //        : d3.timeMinute(date) < date ? formatSecond
-            //            : d3.timeHour(date) < date ? formatMinute
-            //                : d3.timeDay(date) < date ? formatHour
-            //                    : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
-            //                        : d3.timeYear(date) < date ? formatMonth
-            //                            : formatYear)(date);
-            //}
             this.div = d3.select("#" + this.id);
             let observer = new ResizeObserver(this.create_graph);
             observer.observe(this.div.node());
@@ -86,12 +67,6 @@
 
                 // setup everything
                 this.padding = {top: 20, left: 40, right: 20, bottom: 50};
-
-                //this.svg.append("text")
-                //    .text(this.xAxisUnit)
-                //    .attr("x", 0)
-                //    .attr("y", 15)
-                //    .style("font-size", "9px");
 
                 this.xScale = d3.scaleTime()
                     .range([this.padding.left + this.lineStrokeWidth / 2, this.width - this.padding.right]);
@@ -245,6 +220,7 @@
                     .attr("r", 3)
                     .attr("fill", (d, i) => this.colors[i])
                     .attr("stroke", "black")
+                    .style("pointer-events", "none")
                     .style("display", "none");
                 this.tooltip_dots.exit().remove();
                 // Add tooltip legend entries
@@ -409,8 +385,6 @@
                     .x(d => newX(new Date(d.time)))
                     .y(d => this.yScale(this.yAxisGetter(d)));
                 this.paths.attr("d", this.line);
-                //if (this.path)
-                //    this.path.attr("d", this.line);
                 this.updateToolTips();
             }
         }
