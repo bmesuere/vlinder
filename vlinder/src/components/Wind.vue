@@ -236,7 +236,7 @@
                     .attr("x", () => {
                         return -10;
                     })
-                    .text(this.y.tickFormat(5, "s"))
+                    .text(d => this.y.tickFormat(5, "s")(d) + '%')
                     .style("font-size", 14);
 
                 return this.svg.node();
