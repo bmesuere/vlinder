@@ -89,9 +89,9 @@
 
 
                 this.zoom = d3.zoom()
-                    .translateExtent([[this.padding.left, this.padding.top], [this.width - this.padding.right - this.padding.left, this.height - this.padding.bottom - this.padding.top]])
-                    .scaleExtent([1, Infinity])  // This control how much you can unzoom (x0.5) and zoom (x20)
-                    .extent([[this.padding.left, this.padding.top], [this.width - this.padding.left - this.padding.right, this.height - this.padding.top - this.padding.bottom]])
+                    .scaleExtent([1, Infinity])
+                    .extent([[this.padding.left, this.padding.top], [this.width + this.padding.left - this.padding.right, this.height + this.padding.top - this.padding.bottom]])
+                    .translateExtent([[this.padding.left, this.padding.top], [this.width + this.padding.left - this.padding.right, this.height + this.padding.top - this.padding.bottom]])
                     .on("zoom", this.updateChart);
 
                 this.clip = this.svg.append("defs").append("SVG:clipPath")
