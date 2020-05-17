@@ -383,7 +383,7 @@
             async test(a) {
                 this.isLoading = true;
 
-                new Promise(_ => {
+                new Promise(() => {
                     this.options = []
                     a = a.toLowerCase();
                     for (var i of this.allOptions) {

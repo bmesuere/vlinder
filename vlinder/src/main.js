@@ -11,7 +11,6 @@ import "circular-std";
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import 'vue-datetime/dist/vue-datetime.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css'
-import * as d3  from 'd3'
 
 Vue.config.productionTip = false;
 
