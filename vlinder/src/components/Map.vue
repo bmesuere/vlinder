@@ -1,22 +1,22 @@
 <template>
     <div id="d3-viz">
         <div id="map-div" class="svg-container"></div>
-        <div id="legend-div" />
+        <div id="legend-div"/>
         <div id="radio">
             <div style="height:30%">
-            <input type="radio" id="temp" v-bind:value='{"variable": "temp", "name": "Temperatuur", "unit": "°C",
+                <input type="radio" id="temp" v-bind:value='{"variable": "temp", "name": "Temperatuur", "unit": "°C",
                                     "min": -5, "max": 30}' v-model="legend_values">
-            <label class="radio-label" for="temp">Temperatuur</label>
+                <label class="radio-label" for="temp">Temperatuur</label>
             </div>
             <div style="height:30%">
-            <input type="radio" id="hum" v-bind:value='{"variable": "humidity", "name": "Luchtvochtigheid", "unit": "%",
+                <input type="radio" id="hum" v-bind:value='{"variable": "humidity", "name": "Luchtvochtigheid", "unit": "%",
                                     "min": 0, "max": 100}' v-model="legend_values">
-            <label class="radio-label" for="hum">Luchtvochtigheid</label>
+                <label class="radio-label" for="hum">Luchtvochtigheid</label>
             </div>
             <div style="height:30%">
-            <input type="radio" id="speed" v-bind:value='{"variable": "windSpeed", "name": "Windsnelheid", "unit": "m/s",
+                <input type="radio" id="speed" v-bind:value='{"variable": "windSpeed", "name": "Windsnelheid", "unit": "m/s",
                                     "min": 0, "max": 35}' v-model="legend_values">
-            <label class="radio-label" for="speed">Windsnelheid</label>
+                <label class="radio-label" for="speed">Windsnelheid</label>
             </div>
         </div>
     </div>
@@ -62,9 +62,21 @@
             this.map.w = w;
             this.map.h = h;
 
-            this.error = svg.append("g").attr("opacity",0)
-            this.error.append("text").text("Maximum aantal stations geselecteerd").attrs({x:940,y:670,fill:"#B61B1D","font-size":"24px",stroke:"#FFF","stroke-witdh":"32px"});
-            this.error.append("text").text("Maximum aantal stations geselecteerd").attrs({x:940,y:670,fill:"#B61B1D","font-size":"24px"});
+            this.error = svg.append("g").attr("opacity", 0)
+            this.error.append("text").text("Maximum aantal stations geselecteerd").attrs({
+                x: 940,
+                y: 670,
+                fill: "#B61B1D",
+                "font-size": "24px",
+                stroke: "#FFF",
+                "stroke-witdh": "32px"
+            });
+            this.error.append("text").text("Maximum aantal stations geselecteerd").attrs({
+                x: 940,
+                y: 670,
+                fill: "#B61B1D",
+                "font-size": "24px"
+            });
 
             this.map.projection = d3.geoMercator();
             this.map.path = d3.geoPath().projection(this.map.projection);
@@ -76,8 +88,10 @@
             return {
                 map: {},
                 stations_component: {},
-                legend_values: {"variable": "temp", "name": "Temperatuur", "unit": "°C",
-                                "min": -5, "max": 30},
+                legend_values: {
+                    "variable": "temp", "name": "Temperatuur", "unit": "°C",
+                    "min": -5, "max": 30
+                },
             }
         },
         props: {
@@ -90,11 +104,11 @@
             stations() {
                 this.addStationsToMap();
             },
-            selectedStations () {
+            selectedStations() {
                 let self = this;
                 this.stations_component.join(enter => {
                     enter.select("circle")
-                    .attr("selected", d => self.selectedStations.includes(d))
+                        .attr("selected", d => self.selectedStations.includes(d))
                 });
                 this.make_colouring();
             },
@@ -110,7 +124,7 @@
                 let self = this;
                 this.stations_component.join(enter => {
                     enter.select("circle")
-                    .attr("hovered", d => d.id == self.hovered)
+                        .attr("hovered", d => d.id === self.hovered)
                 });
             }
         },
@@ -131,8 +145,8 @@
                         } else if (self.selectedStations.length < 5) {
                             self.selectedStations.push(d);
                         } else {
-                            self.error.transition().duration(400).attr("opacity",1).transition().duration(1600).attr("opacity",0)
-                            d3.select(this).transition().duration(200).attr("selected","error").transition().duration(500).attr("selected",false)
+                            self.error.transition().duration(400).attr("opacity", 1).transition().duration(1600).attr("opacity", 0)
+                            d3.select(this).transition().duration(200).attr("selected", "error").transition().duration(500).attr("selected", false)
                         }
                     });
                 });
@@ -145,7 +159,7 @@
             },
 
             create_step_list(min_value, max_value, steps) {
-                var step_size = (max_value - min_value)/steps
+                var step_size = (max_value - min_value) / steps
                 var l = [];
                 for (var i = 0; i <= steps; i++) {
                     l.push(min_value + (step_size * i))
@@ -166,7 +180,7 @@
                     .attrs({
                         "x": d => (d * 25) + 10,
                         "y": 60,
-                        "fill": d => d3.interpolateSpectral(1 - (values[d] - min_value)/(max_value - min_value)),
+                        "fill": d => d3.interpolateSpectral(1 - (values[d] - min_value) / (max_value - min_value)),
                         "width": 25,
                         "height": 25
                     })
@@ -178,14 +192,14 @@
                     .attrs({
                         "x": d => (d * 25) + 10,
                         "y": 55,
-                        "fill": d => d3.interpolateSpectral(1 - (values[d] - min_value)/(max_value - min_value)),
+                        "fill": d => d3.interpolateSpectral(1 - (values[d] - min_value) / (max_value - min_value)),
                         "font-size": "10px",
                     }).text(d => values[d] + unit)
 
                 this.legend
                     .append("text")
                     .attrs({
-                        "x": 440/text.length,
+                        "x": 440 / text.length,
                         "y": 30,
                         "fill": "#35495e",
                         "font-size": "20px",
@@ -195,7 +209,6 @@
                 if (variable == null) {
                     variable = "temp";
                 }
-
                 if (unit == null) {
                     unit = "";
                 }
@@ -218,16 +231,14 @@
                     this.stations_component.join(enter => {
                         enter.select("circle").style("fill", d => {
                             if (latestMap[d.id]) {
-                                var t = 1 - ((latestMap[d.id][variable] - min_value)/(max_value - min_value));
+                                var t = 1 - ((latestMap[d.id][variable] - min_value) / (max_value - min_value));
                                 return d3.interpolateSpectral(t);
                             }
                         });
                     });
                 }
             },
-
             make_colouring() {
-                console.log(this.legend_values);
                 this.colour_circles(this.legend_values["variable"],
                     this.legend_values["name"],
                     this.legend_values["unit"],
