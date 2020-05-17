@@ -39,7 +39,7 @@
                             </b-row>
                         </b-col>
                         <b-col style="margin-left: 50px">
-                            <b-button variant="info" @click="loadData">Selecteer</b-button>
+                            <b-button variant="info" style="font-size: 15px" @click="loadData">Periode toepassen</b-button>
                         </b-col>
                     </b-row>
                 </b-card>
