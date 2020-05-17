@@ -19,10 +19,9 @@
             </b-row>
         <b-row style="height: 90%">
             <b-col cols="2" v-if="this.selectedStations.length > 1" style="height: 100%">
-               <b-tabs pills vertical>
-                    <b-tab v-for="(station, index) in selectedStations" v-bind:key="station.name"
-                            v-bind:title="station.name"
-                            v-on:click="update_data(index)">
+               <b-tabs pills vertical v-model="tabIndex">
+                    <b-tab v-for="station in selectedStations" v-bind:key="station.name"
+                            v-bind:title="station.name">
                     </b-tab>
                 </b-tabs> 
             </b-col> 
@@ -43,8 +42,17 @@
             VisualizationMixin
         ],
         watch: {
+            tabIndex() {
+                this.update_data();
+            },
             focusedVlinderData() {
                 this.update_data()
+            }
+        },
+
+        data () {
+            return {
+                tabIndex: 0,
             }
         },
 
@@ -147,7 +155,8 @@
 
 
             },
-            update_data(index=0) {
+            update_data() {
+                var self = this;
                 this.svg.selectAll("rect.area").remove();
 
                 if (this.selectedStations === undefined
@@ -155,9 +164,12 @@
                     || this.stations === undefined
                     || this.stations.length === 0) {
                     return;
+                } else if (this.selectedStations.length === 1){
+                    this.tabIndex = 0;
                 }
-                const landUse = this.selectedStations[index]["landUse"];
-
+                const station = this.selectedStations[this.tabIndex];
+                if(!station) { return; }
+                const landUse = station["landUse"];
                 let bars = this.svg
                     .selectAll("rect.area")
                     .data(landUse)
@@ -166,7 +178,6 @@
                     .classed('rect', true);
 
                 for(let k = 0; k < landUse[0]['usage'].length; k++){
-                    let self = this;
                     bars.append("rect")
                     .attr('class', 'area')
                     .attr("x", (d, i) => this.xScale(i + 0.6))
