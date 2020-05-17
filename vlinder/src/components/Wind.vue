@@ -99,9 +99,8 @@
 
                 this.y = d3.scaleLinear() //you can try scaleRadial but it scales differently
                     .range([this.innerRadius, this.outerRadius]);
-
                 this.z = d3.scaleOrdinal()
-                    .range(["#4242f4", "#42c5f4", "#42f4ce", "#42f456", "#adf442", "#f4e242", "#f4a142", "#f44242"]);
+                    .range(["#3288bd", "#66c2a5", "#abdda4", "#e6f598", "#fee08b", "#fdae61", "#f46d43", "#d53e4f"]);
 
                 this.add_legend();
 
@@ -127,7 +126,8 @@
                     });
                 if (this.currentSelectedTab !== undefined && this.selectedStations.length > 1) {
                     index = this.selectedStations.findIndex(x => x === this.currentSelectedTab);
-                    // when index is -1, the currentSelectedTab was deleted, this means that 
+                    // when index is -1, the currentSelectedTab was deleted
+                    if (index === -1) return;
                 }
                 this.g.selectAll("g").remove();
 
