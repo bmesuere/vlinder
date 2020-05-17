@@ -6,7 +6,7 @@ import {BootstrapVue, IconsPlugin, BootstrapVueIcons } from 'bootstrap-vue'
 import { Datetime } from 'vue-datetime'
 import VueSidebarMenu from 'vue-sidebar-menu'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExclamationTriangled, faTachometerAlt } from '@fortawesome/free-solid-svg-icons'
+import { faExclamationTriangle, faTachometerAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import '../scss/custom.scss';
