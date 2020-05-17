@@ -452,6 +452,14 @@
         -ms-overflow-style: none;
     }
 
+    .dashboard_multiselect .multiselect__tag-icon:hover {
+        background-color: #ff6a76;
+    }
+
+    .dashboard_multiselect .multiselect__tag-icon {
+        height: 5vw;
+    }
+
     .modal-backdrop {
         opacity: 0.6;
     }

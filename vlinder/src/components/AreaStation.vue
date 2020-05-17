@@ -140,7 +140,8 @@
                     .style("visibility", "hidden")
                     .style("padding", "3px")
                     .style("border-radius", "2px")
-                    .style("background", "rgb(196,196,196)");
+                    .style("opacity", 0.9)
+                    .style("background", "rgb(203,203,203)");
 
                 this.update_data()
 
@@ -197,7 +198,8 @@
                 let divBoxLegend = this.legend.node().getBoundingClientRect();
                 let w = divBoxLegend.width;
                 let h = divBoxLegend.height - this.padding.top;
-                const scaling_factor = h / 300;
+                if (h<=0) { h=200; }
+                const scaling_factor = h / 200;
                 this.legend.selectAll("*").remove();
 
                 this.svg_legend = this.legend.append("svg")
@@ -209,7 +211,7 @@
                     .data(this.types)
                     .enter().append("g")
                     .attr("transform", (d, i) => {
-                        return "translate(" + 0 + "," + ((((i - (3 - 1) / 2) * (20)) + h / 3) * scaling_factor) + ")";
+                        return "translate(" + 0 + "," + ((((i - 1) * 20) + h / 3) * scaling_factor) + ")";
                     });
 
                 this.g_legend.append("rect")

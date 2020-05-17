@@ -13,23 +13,15 @@
                 />
                 </b-col>
             </b-row>
-            <b-row>
-                <b-form-group style="padding-left: 7vh">
-                    <b-form-radio-group
-                        id="radio-group-1"
-                        v-model="typePerceivedTemperature"
-                        :options="options"
-                        value-field="item"
-                        text-field="name"
-                        name="Gevoelstemperatuur"
-                    ></b-form-radio-group>
-                </b-form-group>
+            <b-row align-v="end">
+                <b-col style="padding-left: 85px">
+                    <input type="checkbox" class="check" style="border-radius: 50%" id="perceived-checkbox" v-model="showPerceivedTemp"/>
+                    <label style="padding-left: 10px" for="perceived-checkbox">Humidex weergeven</label>
+                </b-col>
             </b-row>
         </b-container>
     </div>
 </template>
-
-this.padding = {top: 20, left: 40, right: 20, bottom: 50};
 
 <script>
     import VisualizationMixin from "../mixins/VisualizationMixin";
@@ -42,12 +34,7 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
         },
         data: function() {
             return {
-                typePerceivedTemperature: 'Geen',
-                options: [
-                    { item: 'Geen', name: 'Geen',  },
-                    { item: 'Humidex', name: 'Humidex' },
-                    { item: 'WCTI', name: 'WCTI' },
-                ]
+                showPerceivedTemp: false,
             }
         },
         mixins: [
@@ -57,7 +44,7 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             focusedVlinderData() {
                 this.updateLineChart();
             },
-            typePerceivedTemperature() {
+            showPerceivedTemp() {
                 this.updateLineChart();
             }
         },
@@ -104,26 +91,14 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
             },
 
             temperatureData(data) {
-                if (this.typePerceivedTemperature) {
+                if (this.showPerceivedTemp) {
                    let self = this;
-                   let perceivedTemp;
-                   if(this.typePerceivedTemperature === 'Humidex') {
-                       perceivedTemp = data.map(function (d) {
-                           return {
-                               "temp": self.computePerceivedTemperatureHumidex(d['temp'], d['humidity']),
-                               "time": d['time']
-                           };
-                       });
-                   } else if (this.typePerceivedTemperature === 'WCTI') {
-                       perceivedTemp = data.map(function (d) {
-                           return {
-                               "temp": self.computePerceivedTemperatureWCTI(d['temp'], d['windSpeed']),
-                               "time": d['time']
-                           };
-                       });
-                   } else {
-                       return [data];
-                   } 
+                   let perceivedTemp = data.map(function (d) {
+                       return {
+                           "temp": self.computePerceivedTemperatureHumidex(d['temp'], d['humidity']),
+                           "time": d['time']
+                       };
+                   });
                    return [data, perceivedTemp];
                 } else {
                     return [data];
@@ -140,8 +115,6 @@ this.padding = {top: 20, left: 40, right: 20, bottom: 50};
         }
     }
 </script>
-
-<style src="vue-multiselect/dist/vue-multiselect.min.css"/>
 
 <style scoped>
 </style>
