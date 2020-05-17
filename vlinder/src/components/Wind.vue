@@ -20,7 +20,7 @@
                 <b-tabs pills vertical>
                     <b-tab v-for="(station, index) in selectedStations" v-bind:key="station.name"
                            v-bind:title="station.name"
-                           v-on:click="update_data(index)">
+                           v-on:click="updateCurrentSelectedTab(station); update_data(index);">
                     </b-tab>
                 </b-tabs>
             </b-col>
@@ -35,6 +35,7 @@
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import * as d3 from 'd3'
     import ResizeObserver from 'resize-observer-polyfill';
+    import _ from "lodash";
 
     export default {
         name: "WindRose",
@@ -42,7 +43,7 @@
             VisualizationMixin
         ],
         props: {
-            selectedStation: String
+            stationNames: {}
         },
         watch: {
             focusedVlinderData() {
@@ -55,6 +56,7 @@
             let observer = new ResizeObserver(this.create_windrose);
             observer.observe(this.div.node());
             this.create_windrose();
+            this.currentSelectedTab = undefined;
         },
         methods: {
             create_windrose() {
@@ -105,8 +107,10 @@
 
                 this.update_data()
             },
+            updateCurrentSelectedTab(station) {
+                this.currentSelectedTab = station;
+            },
             update_data(index = 0) {
-                this.g.selectAll("g").remove();
                 if (this.selectedStations === undefined
                     || this.selectedStations.length === 0
                     || this.stations === undefined
@@ -115,9 +119,20 @@
                     || this.focusedVlinderData.length === 0) {
                     return;
                 }
+                // Sort focusedVlinderData alphabetically, deep copy is needed to prevent infinite loop.
+                let focusedVlinderCopy = _.cloneDeep(this.focusedVlinderData)
+                var self = this;
+                focusedVlinderCopy.sort( function(a, b) {
+                    return self.stationNames[a[0]['id']] < self.stationNames[b[0]['id']]
+                    });
+                if (this.currentSelectedTab !== undefined && this.selectedStations.length > 1) {
+                    index = this.selectedStations.findIndex(x => x === this.currentSelectedTab);
+                    // when index is -1, the currentSelectedTab was deleted, this means that 
+                }
+                this.g.selectAll("g").remove();
 
                 // Convert data to format needed for the windrose
-                const data_csv_format = this.convertData(this.focusedVlinderData[index]);
+                const data_csv_format = this.convertData(focusedVlinderCopy[index]);
                 const data = d3.csvParse(data_csv_format, (d, _, columns) => {
                     let total = 0;
                     for (let i = 1; i < columns.length; i++) total += d[columns[i]] = +d[columns[i]];

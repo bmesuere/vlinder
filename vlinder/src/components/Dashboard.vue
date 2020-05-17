@@ -119,7 +119,7 @@
                     :min-w="3"
                     :min-h="2"
                     drag-ignore-from="svg">
-                <WindRose v-bind:selectedStation="undefined" style="width: auto; height: 100%; padding-bottom: 10px;"/>
+                <WindRose v-bind:stationNames="stationNames" v-bind:selectedStation="undefined" style="width: auto; height: 100%; padding-bottom: 10px;"/>
             </grid-item>
             <grid-item
                     :x="layout[2].x"
