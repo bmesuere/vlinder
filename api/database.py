@@ -99,9 +99,9 @@ def add_status(vlinder_data, start_time):
 
 
 def fix_cumulative_rain(d_list):
-    delta = 0
     prev = d_list[0]['rainVolume']
-    for d in d_list[1:]:
+    delta = -prev
+    for d in d_list:
         if d['rainVolume'] < prev:
             delta += prev - d['rainVolume']
         prev = d['rainVolume']
