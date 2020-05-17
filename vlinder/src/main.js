@@ -5,16 +5,12 @@ import store from './store/store'
 import {BootstrapVue, IconsPlugin, BootstrapVueIcons } from 'bootstrap-vue'
 import { Datetime } from 'vue-datetime'
 import VueSidebarMenu from 'vue-sidebar-menu'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExclamationTriangle, faAd, faTachometerAlt } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import '../scss/custom.scss';
 import "circular-std";
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import 'vue-datetime/dist/vue-datetime.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css'
-import * as d3  from 'd3'
 
 Vue.config.productionTip = false;
 
@@ -25,10 +21,6 @@ Vue.use(IconsPlugin);
 Vue.use(BootstrapVueIcons);
 Vue.use(VueSidebarMenu);
 Vue.use(Datetime);
-
-library.add(faTachometerAlt)
-library.add(faExclamationTriangle)
-Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 new Vue({
     router,

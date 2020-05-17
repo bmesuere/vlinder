@@ -8,6 +8,7 @@ from static import station_metadata
 
 latest_vlinder_data = []
 last_request_time = None
+status_lookback = 3
 
 
 def get_connection():
@@ -45,9 +46,23 @@ def get_measurements_raw(id=None, start=None, end=None):
         global last_request_time, latest_vlinder_data
         now = datetime.now()
         if not last_request_time or now - last_request_time > timedelta(minutes=5):
+            group_length = status_lookback + 1
+            # Get len(vlinders) * status_lookback latest vlinder data
             latest_vlinder_data = list(
-                map(vlinder_data_transform, query(f"SELECT * FROM Vlinder ORDER BY datetime DESC LIMIT 59")))
-        last_request_time = now
+                map(vlinder_data_transform, query('SELECT * FROM Vlinder ORDER BY datetime DESC LIMIT ' +
+                                                  str(group_length * len(station_metadata)))))
+            # Reverse order => ascending in time
+            latest_vlinder_data = latest_vlinder_data[::-1]
+            # Group data points per vlinder
+            latest_vlinder_data_grouped = [
+                [latest_vlinder_data[i + x * len(station_metadata)] for x in range(group_length)] for i in
+                range(len(station_metadata))
+            ]
+            # Get time of first data point
+            start_d = latest_vlinder_data_grouped[0][0]['time']
+            # Add status to the data points and use only last data point per vlinder
+            latest_vlinder_data = [d[-1] for d in map(lambda d: add_status(d, start_d), latest_vlinder_data_grouped)]
+            last_request_time = now
         return latest_vlinder_data
     if start is None and end:
         raise ValueError()
@@ -65,12 +80,12 @@ def get_measurements_raw(id=None, start=None, end=None):
     return fix_cumulative_rain(add_status(data, start_d))
 
 
-def add_status(vlinder_data, start_time, look_back=3):
+def add_status(vlinder_data, start_time):
     prev = deque([])
     prev_time = start_time
     for d in vlinder_data:
         d['status'] = 'Ok'
-        if data_equal(prev, d):
+        if data_equal(prev, d, status_lookback):
             d['status'] = 'Server Failure'
             for d1 in prev:
                 d1['status'] = 'Server Failure'
@@ -78,15 +93,15 @@ def add_status(vlinder_data, start_time, look_back=3):
             d['status'] = 'Offline'
         prev_time = d['time']
         prev.append(d)
-        if len(prev) > look_back:
+        if len(prev) > status_lookback:
             prev.popleft()
     return vlinder_data
 
 
 def fix_cumulative_rain(d_list):
-    delta = 0
     prev = d_list[0]['rainVolume']
-    for d in d_list[1:]:
+    delta = -prev
+    for d in d_list:
         if d['rainVolume'] < prev:
             delta += prev - d['rainVolume']
         prev = d['rainVolume']
@@ -94,14 +109,14 @@ def fix_cumulative_rain(d_list):
     return d_list
 
 
-def data_equal(d_list, d):
+def data_equal(d_list, d, threshold):
     for d1 in d_list:
         if not (d1 is not None and d1['temp'] == d['temp'] and d1['humidity'] == d['humidity'] and
-                    d1['pressure'] == d['pressure'] and d1['windSpeed'] == d['windSpeed'] and
-                    d1['windDirection'] == d['windDirection'] and d1['rainIntensity'] == d['rainIntensity'] and
-                    d1['rainVolume'] == d['rainVolume'] and d1['windGust'] == d['windGust']):
+                d1['pressure'] == d['pressure'] and d1['windSpeed'] == d['windSpeed'] and
+                d1['windDirection'] == d['windDirection'] and d1['rainIntensity'] == d['rainIntensity'] and
+                d1['rainVolume'] == d['rainVolume'] and d1['windGust'] == d['windGust']):
             return False
-    return True
+    return len(d_list) >= threshold
 
 
 def vlinder_data_transform(row):

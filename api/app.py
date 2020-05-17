@@ -9,7 +9,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 base_url = open('../vlinder/.env').readline().split('=')[1].rstrip('\n')
 
 
-@app.route('/')
+@app.route('/api/')
 def root():
     return jsonify({
         "stations": base_url + "stations",
@@ -17,13 +17,13 @@ def root():
     })
 
 
-@app.route('/stations')
+@app.route('/api/stations')
 @cross_origin()
 def stations():
     return jsonify([station(**s) for s in get_stations_raw()])
 
 
-@app.route('/stations/<id>')
+@app.route('/api/stations/<id>')
 @cross_origin()
 def stations_id(id):
     if id is None or id == '':
@@ -31,13 +31,13 @@ def stations_id(id):
     return station(**get_stations_raw({id}))
 
 
-@app.route('/measurements')
+@app.route('/api/measurements')
 @cross_origin()
 def measurements():
     return jsonify(list(map(measurement, get_measurements_raw())))
 
 
-@app.route('/measurements/<id>')
+@app.route('/api/measurements/<id>')
 @cross_origin()
 def measurements_id(id):
     start_p = request.args.get('start')
