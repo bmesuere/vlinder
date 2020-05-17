@@ -45,9 +45,23 @@
                 </b-card>
                 </b-col>
             </b-row>
-            <b-row align-h="center">
-                <timeline :datas="data" :selection="selection" style="padding: 5px"/>
-            </b-row>
+            <b-card style="width:100%">
+                <b-row style="width=100%">
+                    <b-col><h3>Statusweergave</h3></b-col>
+                    <b-col>
+                    <b-button v-b-modal.status variant="info" style="float: right" class="float-right">
+                        <b-icon icon="info-circle"/>
+                    </b-button>
+                    <b-modal id=status hide-footer
+                                title="Statusweergave">
+                        <p class="my-4">Hieronder kan je op elk tijdstip zien of er voor een station data beschikbaar zijn. Als er geen data beschikbaar zijn, kan dit verschillende redenen hebben: een probleem met netwerk of database, een fysiek probleem aan het weerstation,... Wij trachten eventuele onderbrekingen zo snel mogelijk te verhelpen.</p>
+                    </b-modal>
+                    </b-col>
+                </b-row>
+                <b-row align-h="center">
+                    <timeline :datas="data" :selection="selection" style="padding: 5px"/>
+                </b-row>
+            </b-card>
         </b-container>
     </div>
 </template>

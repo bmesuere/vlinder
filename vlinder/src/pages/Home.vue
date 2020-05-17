@@ -24,7 +24,9 @@
         <Info :class="shown === 'info' ? '' : 'disabled'"/>
         <Status :class="shown === 'status' ? '' : 'disabled'"/>
 
-        <footer style="text-align: center; width: 100%; color: grey; font-size: small; margin-top: 5vh; background-color: #fff; box-shadow: 0 0 10px 0 rgba(0,0,0,0.10);">
+        <footer :class="shown === 'dashboard' ? 'dash_padding': (shown === 'info' ? 'info_padding' : 'status_padding')" 
+        
+        style="text-align: center; width: 100%; color: grey; font-size: small; background-color: #fff; box-shadow: 0 0 10px 0 rgba(0,0,0,0.10);">
             <div class="gallery" style="align-content: center">
                 <div class="flex" style="max-width: 100%; padding-top: 40px; padding-bottom: 10px">
                     <img :src="`${publicPath}partners/ugent.png`" alt="" style="max-width:  7%; padding: 1%">
@@ -74,5 +76,18 @@
 <style scoped>
     .disabled {
         display: none;
+    }
+
+    .status_padding {
+        margin-top: 35vh;
+    }
+
+    .dashboard_padding {
+        margin-top: 0
+    }
+
+    .info_padding {
+        display: inline-block;
+        margin-top: 180vh;
     }
 </style>
