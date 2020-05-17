@@ -56,20 +56,22 @@ input[type=radio] {
 }
 
 .circles {
-    stroke: #3c373d;
+    stroke: #35495e;
 	fill: #999999;
 	cursor: pointer;
     vector-effect: non-scaling-stroke;
 }
 
 .circles:hover {
-	stroke: #004477;
-    stroke-width: 2px;
+    stroke: #35495e;
+    fill: #6685f7 !important;
+    stroke-width: 3px;
 }
 
 .circles[hovered*=true] {
-    stroke: #004477;
-    stroke-width: 2px;
+    stroke: #35495e;
+    fill: #6685f7 !important;
+    stroke-width: 3px;
 }
 
 .circles[selected*="error"]{
@@ -78,7 +80,13 @@ input[type=radio] {
 }
 
 .circles[selected*=true]{
-	stroke: #0066cc;
+	stroke: #6685f7;
+    stroke-width: 3px;
+}
+
+.circles[selected*=true]:hover{
+    stroke: #B61B1D;
+    fill: #ff6a76 !important;
     stroke-width: 3px;
 }
 
