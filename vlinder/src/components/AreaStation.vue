@@ -167,7 +167,9 @@
                 } else if (this.selectedStations.length === 1){
                     this.tabIndex = 0;
                 }
-                const landUse = this.selectedStations[this.tabIndex]["landUse"];
+                const station = this.selectedStations[this.tabIndex];
+                if(!station) { return; }
+                const landUse = station["landUse"];
                 let bars = this.svg
                     .selectAll("rect.area")
                     .data(landUse)
