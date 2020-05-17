@@ -62,6 +62,8 @@
             this.map.w = w;
             this.map.h = h;
 
+            this.error = svg.append("text").attr("opacity",0).text("Maximum aantal stations geselecteerd").attrs({x:1100,y:670});
+
             this.map.projection = d3.geoMercator();
             this.map.path = d3.geoPath().projection(this.map.projection);
             this.map.zoom = d3.zoom().scaleExtent([1, 12]).on("zoom", zoomed);
@@ -124,8 +126,10 @@
                         let index = self.selectedStations.findIndex(el => el === d);
                         if (index !== -1) {
                             self.selectedStations.splice(index, 1);
-                        } else {
+                        } else if (self.selectedStations.length < 5) {
                             self.selectedStations.push(d);
+                        } else {
+                            self.error.transition().duration(400).attr("opacity",1).transition().duration(400).attr("opacity",0)
                         }
                     });
                 });
@@ -221,8 +225,8 @@
 
             make_colouring() {
                 console.log(this.legend_values);
-                this.colour_circles(this.legend_values["variable"], 
-                    this.legend_values["name"], 
+                this.colour_circles(this.legend_values["variable"],
+                    this.legend_values["name"],
                     this.legend_values["unit"],
                     this.legend_values["min"],
                     this.legend_values["max"]);
