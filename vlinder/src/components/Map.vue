@@ -218,6 +218,9 @@
                     this.stations_component.join(enter => {
                         enter.select("circle").style("fill", d => {
                             if (latestMap[d.id]) {
+                                if (latestMap[d.id].status != "Ok") {
+                                    return "grey"
+                                }
                                 var t = 1 - ((latestMap[d.id][variable] - min_value)/(max_value - min_value));
                                 return d3.interpolateSpectral(t);
                             }

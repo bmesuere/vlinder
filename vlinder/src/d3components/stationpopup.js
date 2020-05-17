@@ -20,12 +20,13 @@ export default function popup(root, map, dataExtension) {
 
     root.on("mouseover.popup", function (d) {
         extendData(d, dataExtension);
-
-        popup.set_coordinates(map.projection(coordinates(d.coordinates))); // can't use this for timeline so either duplicate code or find solution
-        popup.set_status(d.status); // undefined for now
+        let coords = map.projection(coordinates(d.coordinates));
+        popup.set_offset(15, -30)
+        popup.set_coordinates(coords); // can't use this for timeline so either duplicate code or find solution
+        popup.set_status(d.status);
         popup.set_title(d.given_name);
-        popup.add_line(d3.timeFormat("%d/%m/%Y, %H:%M")(d.time ? new Date(d.time) : new Date()));
-        popup.add_line("🌡 " + d.temp + "°C\t" + "🌧️ " + d.humidity + "%");
+
+        popup.add_lines(d3.timeFormat("%d/%m/%Y, %H:%M")(d.time ? new Date(d.time) : new Date()), d.temp, d.humidity, d.windSpeed, d.windDirection, d.city)
         
         popup.display(true);
     });

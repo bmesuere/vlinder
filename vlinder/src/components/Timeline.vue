@@ -193,14 +193,17 @@
             },
 
             handleMouseOver(d, xpos, ypos, name) {
-                let x = xpos - 60;
+                let x = xpos - 120;
                 let y = ypos;
 
+                this.popup.set_offset(0, -60);
                 this.popup.set_coordinates([x, y])
                 this.popup.set_title(name);
                 this.popup.set_status(d.status);
-                this.popup.add_line(d3.timeFormat("%d/%m/%Y, %H:%M")(d.time ? new Date(d.time) : new Date()));
-                this.popup.add_line("🌡 " + d.temp + "°C\t" + "🌧️ " + d.humidity + "%");
+
+                this.popup.add_lines(d3.timeFormat("%d/%m/%Y, %H:%M")(d.time ? new Date(d.time) : new Date()),
+                    d.temp, d.humidity, d.windSpeed, d.windDirection)
+
                 this.popup.display(true);
 
             },

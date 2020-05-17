@@ -84,8 +84,12 @@ input[type=radio] {
 
 .circles[status*="Ok"]{
     fill:  #77b58c;
+    stroke: white;
+    stroke-width: 3px;
 }
 
 .circles[status*="Server Failure"]{
     fill: #FF8888;
+    stroke: white;
+    stroke-width: 3px;
 }
