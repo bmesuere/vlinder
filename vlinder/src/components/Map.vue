@@ -168,10 +168,7 @@
             },
 
             add_legend(text, unit, min_value, max_value) {
-                var i = 0;
-                var offset = 8;
-                var scale = d3.scaleLinear().range([min_value, max_value]).domain(0, 10)
-                var values = this.create_step_list(min_value, max_value, 6);
+                let values = this.create_step_list(min_value, max_value, 6);
                 this.legend.selectAll("*").remove();
                 this.legend.selectAll("rect")
                     .data([0, 1, 2, 3, 4, 5, 6])
