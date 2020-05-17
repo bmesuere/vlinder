@@ -72,6 +72,11 @@ input[type=radio] {
     stroke-width: 2px;
 }
 
+.circles[selected*="error"]{
+	stroke: #B61B1D;
+    stroke-width: 3px;
+}
+
 .circles[selected*=true]{
 	stroke: #0066cc;
     stroke-width: 3px;

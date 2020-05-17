@@ -18,7 +18,7 @@ export default class Stations extends Callable {
                     transform: (d) => `translate(${X(map.projection(coordinates(d.coordinates)))},${Y(map.projection(coordinates(d.coordinates)))})`,
                 });
                 const c = g.append("circle").attrs({
-                    class: "circles", selected: false, r: "5px",
+                    class: "circles", selected: false, r: "7px",
                     status: (d) => (d.status)? d.status : "offline",
                 });
                 for (let guest of self.guests) guest.enter(g);
@@ -35,7 +35,7 @@ export default class Stations extends Callable {
         );
         map.zoom.on("zoom.circles",()=>{
             const t = d3.event.transform;
-            circles.attrs({r:5/Math.pow(t.k,0.5),});
+            circles.attrs({r:7/Math.pow(t.k,0.5),});
         })
     }
 
