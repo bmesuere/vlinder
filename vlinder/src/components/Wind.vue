@@ -78,8 +78,9 @@
                     .style("z-index", "10")
                     .style("visibility", "hidden")
                     .style("padding", "5px")
-                    .style("border-radius", "10px")
-                    .style("background", "#fff");
+                    .style("border-radius", "2px")
+                    .style("opacity", 0.9)
+                    .style("background", "rgb(203,203,203)");
 
                 this.svg = this.div.append("svg", 0)
                     .style("width", this.width + 'px')

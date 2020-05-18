@@ -146,7 +146,7 @@
                     .append("div")
                     .style("position", "absolute")
                     .style("visibility", "hidden")
-                    .style("padding", "3px")
+                    .style("padding", "5px")
                     .style("border-radius", "2px")
                     .style("opacity", 0.9)
                     .style("background", "rgb(203,203,203)");
