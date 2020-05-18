@@ -17,7 +17,7 @@
         </b-row>
         <b-row style="height: 100%">
             <b-col cols="2" v-if="this.selectedStations.length > 1" style="height: 100%">
-                <b-tabs pills vertical>
+                <b-tabs pills vertical v-model="tabIndex">
                     <b-tab v-for="station in selectedStations" v-bind:key="station.name"
                            v-bind:title="station.name"
                            v-on:click="updateCurrentSelectedTab(station)">
@@ -45,6 +45,11 @@
         props: {
             stationNames: {}
         },
+        data () {
+            return{
+                tabIndex: 0
+            }
+        },
         watch: {
             focusedVlinderData() {
                 if (this.focusedVlinderData === undefined || this.focusedVlinderData.length < 1) {
@@ -52,6 +57,9 @@
                 } else {
                     this.updateCurrentSelectedTab(this.selectedStations[0]);
                 }
+            },
+            selectedStations () {
+                this.tabIndex = 0;
             }
         },
         mounted() {
