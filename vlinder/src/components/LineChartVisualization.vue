@@ -165,6 +165,7 @@
                     .attr("y1", this.padding.top)
                     .attr("y2", this.yScale(0)) //TODO: checken wat dit geeft voor negatieve waarden
                     .style("opacity", 0)
+                    .style("pointer-events", "none")
                     .style("stroke", "gray");
                 this.tooltip_box = this.svg
                     .append("g")
