@@ -55,8 +55,7 @@
                 if (this.focusedVlinderData === undefined || this.focusedVlinderData.length < 1) {
                     this.updateCurrentSelectedTab(null)
                 } else {
-                    this.updateCurrentSelectedTab(this.selectedStations[0]);
-                    this.tabIndex = 0;
+                    this.updateCurrentSelectedTab(this.selectedStations[this.tabIndex]);
                 }
             },
         },
