@@ -5,7 +5,9 @@
         <div id="radio">
             <div style="height:30%">
                 <input type="radio" id="temp" v-bind:value='{"variable": "temp", "name": "Temperatuur", "unit": "°C",
-                                    "min": -5, "max": 30}' v-model="legend_values">
+                                    // oh god forgive me for what i am about to do
+                                    "min":  [[-15, 20], [-5, 30], [0, 45], [-10, 25]][(Math.floor((new Date().getMonth() / 12 * 4)) % 4)][0], 
+                                    "max":  [[-15, 20], [-5, 30], [0, 45], [-10, 25]][(Math.floor((new Date().getMonth() / 12 * 4)) % 4)][1]}' v-model="legend_values">
                 <label class="radio-label" for="temp">Temperatuur</label>
             </div>
             <div style="height:30%">
@@ -33,6 +35,11 @@
     import Popup from '../d3components/stationpopup.js';
     import '../utils/extentions.js';
 
+
+    const getSeason = d => [[-15, 20], [-5, 30], [0, 45], [-10, 25]][(Math.floor((new Date().getMonth() / 12 * 4)) % 4)]
+
+    const min_temp = getSeason()[0];
+    const max_temp = getSeason()[1];
     export default {
         name: "Map",
         mixins: [
@@ -43,6 +50,9 @@
                 const t = d3.event.transform;
                 this.map.attr('transform', t)
             };
+
+            
+
 
             // Main
             const w = 1400, h = 700;
@@ -90,7 +100,7 @@
                 stations_component: {},
                 legend_values: {
                     "variable": "temp", "name": "Temperatuur", "unit": "°C",
-                    "min": -5, "max": 30
+                    "min": min_temp, "max": max_temp
                 },
             }
         },
@@ -182,6 +192,8 @@
                         "height": 25
                     })
 
+                let i = 0;
+                let symbol = ["≤", "≥"]
                 this.legend.selectAll("text")
                     .data([0, 6])
                     .enter()
@@ -191,7 +203,7 @@
                         "y": 55,
                         "fill": d => d3.interpolateSpectral(1 - (values[d] - min_value) / (max_value - min_value)),
                         "font-size": "10px",
-                    }).text(d => values[d] + unit)
+                    }).text(d => symbol[i++] + values[d] + unit)
 
                 this.legend
                     .append("text")
