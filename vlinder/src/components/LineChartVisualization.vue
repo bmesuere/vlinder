@@ -1,19 +1,20 @@
 <template>
-    <b-container v-if="this.focusedVlinderData.length <= 1 || this.selectedStations <= 1" style="width: 100%; height: 100%">
+    <b-container v-if="this.focusedVlinderData.length <= 1 || this.selectedStations <= 1"
+                 style="width: 100%; height: 100%">
         <b-col :id="id" style="height: 100%"/>
-<!--        <b-col v-bind:cols="2" id="d3-viz-line-legend" style="height: 100%"/>-->
+        <!--        <b-col v-bind:cols="2" id="d3-viz-line-legend" style="height: 100%"/>-->
     </b-container>
     <b-container v-else>
-        <b-row  :id="id" style="height: 90%; width: 100%"></b-row>
-        <b-row  id="d3-viz-area-legend" style="width: 100%; height: 10%; padding-left: 40px">
+        <b-row :id="id" style="height: 90%; width: 100%"></b-row>
+        <b-row id="d3-viz-area-legend" style="width: 100%; height: 10%; padding-left: 40px">
             <b-col v-for="(datadeel, index) in focusedVlinderData"
-                            v-bind:key="stationNames[datadeel[0].id]"
-                            style="padding-left: 10px">
+                   v-bind:key="stationNames[datadeel[0].id]"
+                   style="padding-left: 10px">
                 <b-row>
-                    <b-col cols="1" class="rect" >
+                    <b-col cols="1" class="rect">
                         <svg width="10" height="10">
-                              <rect width="10" height="10"
-                                v-bind:style="{ 'fill': colors[index] }"/>
+                            <rect width="10" height="10"
+                                  v-bind:style="{ 'fill': colors[index] }"/>
                         </svg>
                     </b-col>
                     <b-col style="width: fit-content; text-align: left">{{stationNames[datadeel[0].id]}}</b-col>
@@ -62,14 +63,18 @@
         ],
         watch: {
             focusedVlinderData() {
-                    this.update_data(this.focusedVlinderData);
+                this.update_data(this.focusedVlinderData);
             },
             stations() {
-                this.$store.getters.stations.forEach(st =>{ if(!this.stationNames[st.id]) this.stationNames[st.id] = st.name})
+                this.$store.getters.stations.forEach(st => {
+                    if (!this.stationNames[st.id]) this.stationNames[st.id] = st.name
+                })
             }
         },
         mounted() {
-            this.$store.getters.stations.forEach(st =>{ if(!this.stationNames[st.id]) this.stationNames[st.id] = st.name})
+            this.$store.getters.stations.forEach(st => {
+                if (!this.stationNames[st.id]) this.stationNames[st.id] = st.name
+            });
             this.div = d3.select("#" + this.id);
             let observer = new ResizeObserver(this.create_graph);
             observer.observe(this.div.node());
@@ -77,7 +82,7 @@
             this.create_graph();
         },
         methods: {
-            create_graph(){
+            create_graph() {
                 let div = d3.select("#" + this.id);
 
                 this.div.selectAll("*").remove();
@@ -119,7 +124,7 @@
                     .scaleExtent([1, Infinity])
                     .extent([[this.padding.left, this.padding.top], [this.width + this.padding.left - this.padding.right, this.height + this.padding.top - this.padding.bottom]])
                     .translateExtent([[this.padding.left, this.padding.top], [this.width + this.padding.left - this.padding.right, this.height + this.padding.top - this.padding.bottom]])
-                    .on("zoom", this.updateChart);
+                    .on("zoom", this.updateZoom);
 
                 this.clip = this.svg.append("defs").append("SVG:clipPath")
                     .attr("id", "clip" + this.id)
@@ -190,7 +195,7 @@
                     .on("mouseout", this.hideToolTips)
                     .on("mousemove", this.updateHighlightedPosition);
 
-                if(this.current_data !== undefined){
+                if (this.current_data !== undefined) {
                     this.update_data(this.current_data);
                 }
 
@@ -227,7 +232,7 @@
                     .merge(this.selected);
 
                 this.paths = path_data
-                    .attr("clip-path", "url(#clip"+this.id+")")
+                    .attr("clip-path", "url(#clip" + this.id + ")")
                     .attr("stroke", (d, i) => this.colors[i])
                     .attr("fill", "white")
                     .attr("fill-opacity", 0)
@@ -260,7 +265,7 @@
                     .enter()
                     .append("g")
                     .attr("class", "entry")
-                    .attr("height",20);
+                    .attr("height", 20);
                 new_entries.append("circle")
                     .attr("class", "color-dot")
                     .attr("r", 2);
@@ -269,19 +274,19 @@
                     .attr("fill", "black");
 
                 legend_entries.merge(new_entries)
-                    .attr("transform", (d, i) => "translate(0, " + (i+1)*20 + ")");
+                    .attr("transform", (d, i) => "translate(0, " + (i + 1) * 20 + ")");
 
 
-                if(data && data.length> 0 && min===max){
+                if (data && data.length > 0 && min === max) {
                     this.svg
                         .append("text")
                         .attr("class", "empty")
-                        .attr("y", this.height/2)
+                        .attr("y", this.height / 2)
                         .text(this.msgEmpty)
                         .style("fill", "#95999c")
                         .style("font-size", "11px")
                         .attr("width", this.width)
-                        .attr("x", this.width/2)
+                        .attr("x", this.width / 2)
                         .style("text-anchor", "middle");
                 } else {
                     this.svg.selectAll("text.empty").remove();
@@ -314,8 +319,8 @@
                     let d0 = this.current_data[0][i - 1],
                         d1 = this.current_data[0][i];
                     let selectedIndex = (d1 !== undefined) &&
-                                new Date(valueX) - new Date(d0.time) > new Date(d1.time) - new Date(valueX) ?
-                                i : i - 1;
+                    new Date(valueX) - new Date(d0.time) > new Date(d1.time) - new Date(valueX) ?
+                        i : i - 1;
 
                     valueX = new Date(this.current_data[0][selectedIndex].time);
                     let toolTipX = currentXScale(valueX);
@@ -339,14 +344,14 @@
                         .selectAll("g.entry text.y-value")
                         .data(valuesY)
                         .attr("fill", "black")
-                        .attr("dx", 2*this.paddingLegend)
+                        .attr("dx", 2 * this.paddingLegend)
                         .style("font-size", this.textSizeLegend + "px")
-                        .text(d => d+this.xAxisUnit);
+                        .text(d => d + this.xAxisUnit);
                     this.tooltip_box
                         .selectAll("g.entry circle.color-dot")
                         .data(valuesY)
                         .attr("r", 2)
-                        .attr("transform", "translate(" + (1+this.paddingLegend) + ", "+ (1-this.paddingLegend) + ")")
+                        .attr("transform", "translate(" + (1 + this.paddingLegend) + ", " + (1 - this.paddingLegend) + ")")
                         .attr("fill", (d, i) => this.colors[i])
                         .attr("stroke", "black")
                     ;
@@ -355,11 +360,11 @@
                     var textElements = this.tooltip_box
                         .selectAll("text.y-value");
 
-                    var width_entries = d3.max(textElements.nodes(), y => y.getComputedTextLength()) + 3*this.paddingLegend;
-                    var width_title = this.tooltip_box.select("text.title").node().getComputedTextLength() + 2*this.paddingLegend;
+                    var width_entries = d3.max(textElements.nodes(), y => y.getComputedTextLength()) + 3 * this.paddingLegend;
+                    var width_title = this.tooltip_box.select("text.title").node().getComputedTextLength() + 2 * this.paddingLegend;
                     var width = Math.max(width_entries, width_title);
 
-                    var height = (1+textElements.nodes().length)*20 + this.paddingLegend;
+                    var height = (1 + textElements.nodes().length) * 20 + this.paddingLegend;
 
                     this.tooltip_box.select('rect')
                         .attr("y", -20)
@@ -369,29 +374,29 @@
 
                     // Update tooltip information box
                     let translate_x = this.posX + 5;
-                    if (this.posX + 5 + width > this.width - this.padding.right){
+                    if (this.posX + 5 + width > this.width - this.padding.right) {
                         translate_x = this.posX - 5 - width;
                     }
                     this.tooltip_box.attr("transform", "translate(" + translate_x + ", " + (this.posY + 15) + ")");
 
                     this.tooltip_box.select("text.title")
-                        .text(d3.timeFormat((this.endDate - this.startDate) < 93600000?
-                        "%H:%M" : "%d/%m/%y %H:%M")(new Date(valueX)))
-                        .style("font-size", this.titleSizeLegend+"px")
+                        .text(d3.timeFormat((this.endDate - this.startDate) < 93600000 ?
+                            "%H:%M" : "%d/%m/%y %H:%M")(new Date(valueX)))
+                        .style("font-size", this.titleSizeLegend + "px")
                         .attr("dx", this.paddingLegend)
                         .attr("dy", 0)
                     ;
 
                 }
             },
-            updateHighlightedPosition(){
+            updateHighlightedPosition() {
                 let BB = this.svg.node().getBoundingClientRect();
                 this.posX = d3.event.clientX - BB.x;
                 this.posY = d3.event.clientY - BB.y + 20;
                 this.updateToolTips();
             },
-            updateChart() {
-                if (this.current_data && this.current_data.length <= 0 || this.current_data[0].length <= 0){
+            updateZoom() {
+                if (this.current_data && this.current_data.length <= 0 || this.current_data[0].length <= 0) {
                     return
                 }
 

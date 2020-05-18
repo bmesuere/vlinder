@@ -18,9 +18,9 @@
         <b-row style="height: 100%">
             <b-col cols="2" v-if="this.selectedStations.length > 1" style="height: 100%">
                 <b-tabs pills vertical>
-                    <b-tab v-for="(station, index) in selectedStations" v-bind:key="station.name"
+                    <b-tab v-for="station in selectedStations" v-bind:key="station.name"
                            v-bind:title="station.name"
-                           v-on:click="updateCurrentSelectedTab(station); update_data(index);">
+                           v-on:click="updateCurrentSelectedTab(station)">
                     </b-tab>
                 </b-tabs>
             </b-col>
@@ -47,7 +47,11 @@
         },
         watch: {
             focusedVlinderData() {
-                this.update_data()
+                if (this.focusedVlinderData === undefined || this.focusedVlinderData.length <  1){
+                    this.update_data(null);
+                }else{
+                    this.update_data(this.focusedVlinderData[0])
+                }
             }
         },
         mounted() {
@@ -56,7 +60,7 @@
             let observer = new ResizeObserver(this.create_windrose);
             observer.observe(this.div.node());
             this.create_windrose();
-            this.currentSelectedTab = undefined;
+            this.currentSelectedStation  = null;
         },
         methods: {
             create_windrose() {
@@ -105,65 +109,55 @@
 
                 this.add_legend();
 
-                this.update_data()
+                if (this.currentSelectedStation !== null){
+                    this.updateCurrentSelectedTab(this.currentSelectedStation);
+                }
             },
             updateCurrentSelectedTab(station) {
-                this.currentSelectedTab = station;
+                this.currentSelectedStation = station;
+                let index = this.focusedVlinderData.findIndex((data) => data.length > 0 && data[0].id === station.id);
+                let data =  index === -1 ? null : this.focusedVlinderData[index];
+                this.update_data(data)
             },
-            update_data(index = 0) {
-                if (this.selectedStations === undefined
-                    || this.selectedStations.length === 0
-                    || this.stations === undefined
-                    || this.stations.length === 0
-                    || this.focusedVlinderData === undefined
-                    || this.focusedVlinderData.length === 0) {
-                    return;
-                }
-                // Sort focusedVlinderData alphabetically, deep copy is needed to prevent infinite loop.
-                let focusedVlinderCopy = _.cloneDeep(this.focusedVlinderData);
-                var self = this;
-                focusedVlinderCopy.sort( function(a, b) {
-                    return self.stationNames[a[0]['id']] < self.stationNames[b[0]['id']]
-                    });
-                if (this.currentSelectedTab !== undefined && this.selectedStations.length > 1) {
-                    index = this.selectedStations.findIndex(x => x === this.currentSelectedTab);
-                    // when index is -1, the currentSelectedTab was deleted
-                    if (index === -1) return;
-                }
+            update_data(data) {
                 this.g.selectAll("g").remove();
+                if (data === null){
+                    return
+                }
 
                 // Convert data to format needed for the windrose
-                const data_csv_format = this.convertData(focusedVlinderCopy[index]);
-                const data = d3.csvParse(data_csv_format, (d, _, columns) => {
+                const converted_data = this.convertData(data);
+                //const converted_data = this.convertData(focusedVlinderCopy[index]);
+                const parsed_data = d3.csvParse(converted_data, (d, _, columns) => {
                     let total = 0;
                     for (let i = 1; i < columns.length; i++) total += d[columns[i]] = +d[columns[i]];
                     d.total = total;
                     return d;
                 });
 
-                this.x.domain(data.map((d) => {
+                this.x.domain(parsed_data.map((d) => {
                     return d.angle;
                 }));
 
-                this.y.domain([0, d3.max(data, (d) => {
+                this.y.domain([0, d3.max(parsed_data, (d) => {
                     return d.total;
                 })]);
 
-                this.z.domain(data.columns.slice(1));
+                this.z.domain(parsed_data.columns.slice(1));
 
-                this.angle.domain([0, d3.max(data, (d, i) => {
+                this.angle.domain([0, d3.max(parsed_data, (d, i) => {
                     return i + 1;
                 })]);
 
-                this.radius.domain([0, d3.max(data, (d) => {
+                this.radius.domain([0, d3.max(parsed_data, (d) => {
                     return d.y0 + d.y;
                 })]);
 
-                this.angleOffset = -360.0 / data.length / 2.0;
+                this.angleOffset = -360.0 / parsed_data.length / 2.0;
 
                 this.g.append("g")
                     .selectAll("g")
-                    .data(d3.stack().keys(data.columns.slice(1))(data))
+                    .data(d3.stack().keys(parsed_data.columns.slice(1))(parsed_data))
                     .enter().append("g")
                     .attr("fill", (d) => {
                         return this.z(d.key);
@@ -204,7 +198,7 @@
 
                 const label = this.g.append("g")
                     .selectAll("g")
-                    .data(data)
+                    .data(parsed_data)
                     .enter().append("g")
                     .attr("text-anchor", "middle")
                     .attr("transform", (d) => {
