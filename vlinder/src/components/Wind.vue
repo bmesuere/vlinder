@@ -47,10 +47,10 @@
         },
         watch: {
             focusedVlinderData() {
-                if (this.focusedVlinderData === undefined || this.focusedVlinderData.length <  1){
-                    this.update_data(null);
-                }else{
-                    this.update_data(this.focusedVlinderData[0])
+                if (this.focusedVlinderData === undefined || this.focusedVlinderData.length < 1) {
+                    this.updateCurrentSelectedTab(null)
+                } else {
+                    this.updateCurrentSelectedTab(this.selectedStations[0]);
                 }
             }
         },
@@ -60,7 +60,7 @@
             let observer = new ResizeObserver(this.create_windrose);
             observer.observe(this.div.node());
             this.create_windrose();
-            this.currentSelectedStation  = null;
+            this.currentSelectedStation = null;
         },
         methods: {
             create_windrose() {
@@ -109,25 +109,30 @@
 
                 this.add_legend();
 
-                if (this.currentSelectedStation !== null){
-                    this.updateCurrentSelectedTab(this.currentSelectedStation);
-                }
+                //if (this.currentSelectedStation !== null) {
+                this.updateCurrentSelectedTab(this.currentSelectedStation);
+                //}
             },
             updateCurrentSelectedTab(station) {
                 this.currentSelectedStation = station;
-                let index = this.focusedVlinderData.findIndex((data) => data.length > 0 && data[0].id === station.id);
-                let data =  index === -1 ? null : this.focusedVlinderData[index];
-                this.update_data(data)
+                let data;
+                if (station !== null && station !== undefined) {
+                    let index = this.focusedVlinderData.findIndex((data) =>
+                        data !== undefined && data.length > 0 && data[0].id === station.id);
+                    data = index === -1 ? null : this.focusedVlinderData[index];
+                }else {
+                    data = null;
+                }
+                this.update_data(data);
             },
             update_data(data) {
                 this.g.selectAll("g").remove();
-                if (data === null){
+                if (data === null) {
                     return
                 }
 
                 // Convert data to format needed for the windrose
                 const converted_data = this.convertData(data);
-                //const converted_data = this.convertData(focusedVlinderCopy[index]);
                 const parsed_data = d3.csvParse(converted_data, (d, _, columns) => {
                     let total = 0;
                     for (let i = 1; i < columns.length; i++) total += d[columns[i]] = +d[columns[i]];
