@@ -56,11 +56,9 @@
                     this.updateCurrentSelectedTab(null)
                 } else {
                     this.updateCurrentSelectedTab(this.selectedStations[0]);
+                    this.tabIndex = 0;
                 }
             },
-            selectedStations () {
-                this.tabIndex = 0;
-            }
         },
         mounted() {
             this.div = d3.select('#d3-viz-windrose');
