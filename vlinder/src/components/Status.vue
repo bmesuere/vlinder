@@ -46,7 +46,7 @@
                 </b-col>
             </b-row>
             <b-card style="width:100%">
-                <b-row style="width=100%">
+                <b-row style="width:100%">
                     <b-col><h3>Statusweergave</h3></b-col>
                     <b-col>
                     <b-button v-b-modal.status variant="info" style="float: right" class="float-right">

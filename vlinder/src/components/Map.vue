@@ -67,12 +67,12 @@
             this.legend = d3.select("#legend-div").append("svg").attrs({
                 preserveAspectRatio: "xMinYMin meet",
                 viewBox: `0 0 200 200`
-            })
+            });
 
             this.map.w = w;
             this.map.h = h;
 
-            this.error = svg.append("g").attr("opacity", 0)
+            this.error = svg.append("g").attr("opacity", 0);
             this.error.append("text").text("Maximum aantal stations geselecteerd").attrs({
                 x: 940,
                 y: 670,
@@ -155,7 +155,7 @@
                         } else if (self.selectedStations.length < 5) {
                             self.selectedStations.push(d);
                         } else {
-                            self.error.transition().duration(400).attr("opacity", 1).transition().duration(1600).attr("opacity", 0)
+                            self.error.transition().duration(400).attr("opacity", 1).transition().duration(1600).attr("opacity", 0);
                             d3.select(this).transition().duration(200).attr("selected", "error").transition().duration(500).attr("selected", false)
                         }
                     });
@@ -169,7 +169,7 @@
             },
 
             create_step_list(min_value, max_value, steps) {
-                var step_size = (max_value - min_value) / steps
+                var step_size = (max_value - min_value) / steps;
                 var l = [];
                 for (var i = 0; i <= steps; i++) {
                     l.push(min_value + (step_size * i))
@@ -190,10 +190,10 @@
                         "fill": d => d3.interpolateSpectral(1 - (values[d] - min_value) / (max_value - min_value)),
                         "width": 25,
                         "height": 25
-                    })
+                    });
 
                 let i = 0;
-                let symbol = ["≤", "≥"]
+                let symbol = ["≤", "≥"];
                 this.legend.selectAll("text")
                     .data([0, 6])
                     .enter()
@@ -203,7 +203,7 @@
                         "y": 55,
                         "fill": d => d3.interpolateSpectral(1 - (values[d] - min_value) / (max_value - min_value)),
                         "font-size": "10px",
-                    }).text(d => symbol[i++] + values[d] + unit)
+                    }).text(d => symbol[i++] + values[d] + unit);
 
                 this.legend
                     .append("text")
@@ -230,7 +230,7 @@
                     max_value = min_value + 1;
                 }
 
-                this.add_legend(text, unit, min_value, max_value)
+                this.add_legend(text, unit, min_value, max_value);
 
                 if (this.stations_component.join && this.latestVlinderData) {
                     var latestMap = {};
@@ -240,7 +240,7 @@
                     this.stations_component.join(enter => {
                         enter.select("circle").style("fill", d => {
                             if (latestMap[d.id]) {
-                                if (latestMap[d.id].status != "Ok") {
+                                if (latestMap[d.id].status !== "Ok") {
                                     return "grey"
                                 }
                                 var t = 1 - ((latestMap[d.id][variable] - min_value)/(max_value - min_value));

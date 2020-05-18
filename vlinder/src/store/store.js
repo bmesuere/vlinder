@@ -25,7 +25,6 @@ export default new Vuex.Store({
             state.focusedVlinderData = vlinderData
         },
         addVlinderData(state, vlinderData) {
-            // state.vlinderData.push(...vlinderData);
             state.focusedVlinderData.push(...[vlinderData]);
         },
         setFocusedVlinderData(state, focusedVlinderData) {
@@ -43,11 +42,9 @@ export default new Vuex.Store({
         },
         loadVlinderData({commit}, object) {
             let data = [];
-            //commit('setVlinderData', []);
             object.ids.forEach(id => {
                 vlinderService.getVlinderData(id, object.start, object.end).then(response => {
                     data.push(...[response.data])
-                    //commit('addVlinderData', response.data)
                 })
             });
             commit('setVlinderData', data)

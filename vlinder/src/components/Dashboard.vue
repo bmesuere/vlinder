@@ -286,6 +286,7 @@
         },
         data() {
             return {
+                timout: null,
                 multiSelectValues: [],
                 options: [],
                 isLoading: false,
@@ -300,7 +301,6 @@
                     {"x": 6, "y": 3, "w": 6, "h": 2, "i": "3"},
                     {"x": 0, "y": 6, "w": 6, "h": 3, "i": "4"},
                     {"x": 6, "y": 6, "w": 6, "h": 3, "i": "5"},
-                    //{"x": 0, "y": 1, "w": 5.5, "h": 3, "i": "5"},
                 ],
                 breakpoints: {
                     lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0
@@ -337,7 +337,10 @@
                         }
                     })
                 }
-                this.loadVlinderData();
+                if (this.timeout !== null){
+                    clearTimeout(this.timeout);
+                }
+                this.timeout = setTimeout(() => this.loadVlinderData(), 300);
             },
             multiSelectValues() {
                 let ids = this.multiSelectValues.map(x => x['value']);
@@ -384,7 +387,7 @@
                 this.isLoading = true;
 
                 new Promise(() => {
-                    this.options = []
+                    this.options = [];
                     a = a.toLowerCase();
                     for (var i of this.allOptions) {
                         let l = i.label.toLowerCase();

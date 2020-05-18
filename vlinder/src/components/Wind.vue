@@ -120,7 +120,7 @@
                     return;
                 }
                 // Sort focusedVlinderData alphabetically, deep copy is needed to prevent infinite loop.
-                let focusedVlinderCopy = _.cloneDeep(this.focusedVlinderData)
+                let focusedVlinderCopy = _.cloneDeep(this.focusedVlinderData);
                 var self = this;
                 focusedVlinderCopy.sort( function(a, b) {
                     return self.stationNames[a[0]['id']] < self.stationNames[b[0]['id']]

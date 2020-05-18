@@ -33,7 +33,7 @@
             // the h_padding has to be less than the width because this is actually just
             // implemented as a border around the bar, but this off part of the actual bar
             this.bars = {width: 3, height: 40, h_padding: 1.5, v_padding: 1};
-            this.padding = {left: 150, right: 50, top: 80, bottom: 70}
+            this.padding = {left: 150, right: 50, top: 80, bottom: 70};
 
             this.width = 288 * this.bars.width;
 
@@ -42,11 +42,11 @@
 
             this.xScale = d3
                 .scaleTime()
-                .range([this.padding.left + 3, this.width + this.padding.left - this.padding.right])
+                .range([this.padding.left + 3, this.width + this.padding.left - this.padding.right]);
             this.xScale.ticks(d3.timeMinute, 5);
 
             this.yScale = d3
-                .scaleLinear()
+                .scaleLinear();
 
             this.transitionLength = 500;
         },
@@ -69,10 +69,10 @@
             construct_graph(datas, selection, selectedNames) {
                 const height = (selection.length + 1) * this.bars.height;
 
-                this.updateXScale(datas)
-                this.updateYScale(selection, height)
+                this.updateXScale(datas);
+                this.updateYScale(selection, height);
 
-                this.rescaleViewBox(height)
+                this.rescaleViewBox(height);
                 this.constructAxes(selectedNames, height);
 
                 let status_bars = this.graph.selectAll("rect").data(datas);
@@ -167,7 +167,7 @@
                 let startDate = dates[0];
                 let endDate = dates[1];
 
-                this.xScale.domain([startDate, new Date(endDate.getTime() + 5 * 60000)])
+                this.xScale.domain([startDate, new Date(endDate.getTime() + 5 * 60000)]);
 
                 return this.xScale;
             },
@@ -197,12 +197,12 @@
                 let y = ypos;
 
                 this.popup.set_offset(0, -60);
-                this.popup.set_coordinates([x, y])
+                this.popup.set_coordinates([x, y]);
                 this.popup.set_title(name);
                 this.popup.set_status(d.status);
 
                 this.popup.add_lines(d3.timeFormat("%d/%m/%Y, %H:%M")(d.time ? new Date(d.time) : new Date()),
-                    d.temp, d.humidity, d.windSpeed, d.windDirection)
+                    d.temp, d.humidity, d.windSpeed, d.windDirection);
 
                 this.popup.display(true);
 

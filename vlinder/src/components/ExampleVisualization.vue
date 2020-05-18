@@ -49,7 +49,7 @@
 
                 let nameDiv = d3.select('#selected-vlinder').selectAll('text').data(datas);
                 nameDiv.exit().remove();
-                nameDiv.transition().text(d => "the temperature at station " + d.id + " is " + d.temp + ", ")
+                nameDiv.transition().text(d => "the temperature at station " + d.id + " is " + d.temp + ", ");
                 nameDiv.enter()
                        .append("text")
                        .text(d => "the temperature at station " + d.id + " is " + d.temp + ", ")
