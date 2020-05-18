@@ -36,7 +36,7 @@
     import '../utils/extentions.js';
 
 
-    const getSeason = d => [[-15, 20], [-5, 30], [0, 45], [-10, 25]][(Math.floor((new Date().getMonth() / 12 * 4)) % 4)]
+    const getSeason = () => [[-15, 20], [-5, 30], [0, 45], [-10, 25]][(Math.floor((new Date().getMonth() / 12 * 4)) % 4)]
 
     const min_temp = getSeason()[0];
     const max_temp = getSeason()[1];

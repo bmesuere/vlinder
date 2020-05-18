@@ -4,7 +4,6 @@ import vlinderService from '../services/vlinderService'
 
 Vue.use(Vuex);
 
-let id = 0;
 export default new Vuex.Store({
     state: {
         stations: [],
