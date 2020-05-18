@@ -4,6 +4,7 @@ import vlinderService from '../services/vlinderService'
 
 Vue.use(Vuex);
 
+let id = 0;
 export default new Vuex.Store({
     state: {
         stations: [],
@@ -41,12 +42,15 @@ export default new Vuex.Store({
             })
         },
         loadVlinderData({commit}, object) {
-            commit('setVlinderData', []);
+            let data = [];
+            //commit('setVlinderData', []);
             object.ids.forEach(id => {
                 vlinderService.getVlinderData(id, object.start, object.end).then(response => {
-                    commit('addVlinderData', response.data)
+                    data.push(...[response.data])
+                    //commit('addVlinderData', response.data)
                 })
-            })
+            });
+            commit('setVlinderData', data)
         },
         updateFocusedVlinderdata({commit}, data) {
             commit('setFocusedVlinderData', data)
