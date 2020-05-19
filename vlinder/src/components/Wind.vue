@@ -35,7 +35,6 @@
     import VisualizationMixin from "../mixins/VisualizationMixin";
     import * as d3 from 'd3'
     import ResizeObserver from 'resize-observer-polyfill';
-    import _ from "lodash";
 
     export default {
         name: "WindRose",
