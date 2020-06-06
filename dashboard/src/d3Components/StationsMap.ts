@@ -7,11 +7,11 @@ export class StationsMap {
   private readonly selectedProperty: 'temp';
 
   // remote data
-  private belgium: Topo | undefined;
-  private stations: [Station] | undefined;
-  private measurements: [Measurement] | undefined;
+  private belgium: TopoJSON.Topology | undefined;
+  private stations: Station[] | undefined;
+  private measurements: Measurement[] | undefined;
 
-  private measurementsMap: Map<string, Measurement> | undefined;
+  private measurementsMap: Map<string, Measurement> = new Map();
 
   private readonly properties = new Map([
     ['temp', { property: 'temp', name: 'Temperatuur', title: 'Temperatuur (°C)' }],
@@ -25,7 +25,7 @@ export class StationsMap {
   private readonly width = 700;
   private readonly height = 400;
 
-  constructor (selector: string, selectedProperty = 'temp') {
+  constructor (selector: string, selectedProperty: 'temp' = 'temp') {
     this.selector = selector;
     this.selectedProperty = selectedProperty;
   }
@@ -39,43 +39,58 @@ export class StationsMap {
     const measurements = fetch('https://mooncake.ugent.be/api/measurements')
       .then(r => r.json());
 
-    this.belgium = await belgium as Topo;
+    this.belgium = await belgium as TopoJSON.Topology;
     this.stations = await stations as [Station];
     this.measurements = await measurements as [Measurement];
 
     // prepare data
     this.measurementsMap = new Map(this.measurements.map(m => [m.id, m]));
+    // @ts-ignore
     this.belgium.objects.municipalities.geometries = this.belgium.objects.municipalities.geometries.filter(d => d.properties.reg_nis !== '03000');
   }
 
   async init () {
     await this.fetchData();
 
+    // appease the type checker
+    if (!this.measurements) return;
+    if (!this.belgium) return;
+    if (!this.stations) return;
+
     const color = d3.scaleSequential(d3.interpolateViridis)
-      .domain(d3.extent(this.measurements, d => d[this.selectedProperty]));
+      .domain(d3.extent(this.measurements, d => d[this.selectedProperty]) as [number, number]);
 
     // fit the map for what we want to show
+
     const projection = d3.geoMercator()
-      .fitExtent([[this.margin.left, this.margin.top], [this.width - this.margin.right, this.height - this.margin.bottom]], topojson.feature(this.belgium, this.belgium.objects.municipalities));
+      .fitExtent(
+        [
+          [this.margin.left, this.margin.top],
+          [this.width - this.margin.right, this.height - this.margin.bottom]
+        // @ts-ignore
+        ], topojson.feature(this.belgium, this.belgium.objects.municipalities));
 
     const path = d3.geoPath().projection(projection);
 
     const svg = d3.select(this.selector).append('svg')
-      .attr('viewBox', [0, 0, this.width, this.height])
+      .attr('viewBox', `0, 0, ${this.width}, ${this.height}`)
       .style('width', this.width);
 
     // draw muni's
     svg.append('g')
       .selectAll('.muni')
+      // @ts-ignore
       .data(topojson.feature(this.belgium, this.belgium.objects.municipalities).features)
       .join('path')
       .attr('class', 'muni')
       .attr('fill', '#eeeeee')
       .attr('stroke', 'white')
       .attr('stroke-linejoin', 'round')
+      // @ts-ignore
       .attr('d', path)
       .append('title')
-      .text(d => d.properties.name_nl);
+      // @ts-ignore
+      .text(d => d?.properties?.name_nl);
 
     // draw stations
     svg.append('g')
@@ -83,13 +98,15 @@ export class StationsMap {
       .data(this.stations)
       .join('circle')
       .attr('class', 'station')
-      .attr('r', d => this.measurementsMap.get(d.id).status === 'Ok' ? 4 : 1)
-      .attr('fill-opacity', d => this.measurementsMap.get(d.id).status === 'Ok' ? 0.7 : 1)
+      .attr('r', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 1)
+      .attr('fill-opacity', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 0.7 : 1)
       .attr('fill', d => {
         const m = this.measurementsMap.get(d.id);
-        return m.status === 'Ok' ? color(m[this.selectedProperty]) : 'black';
+        return m?.status === 'Ok' ? color(m[this.selectedProperty]) : 'black';
       })
+      // @ts-ignore
       .attr('cx', d => projection([d.coordinates.longitude, d.coordinates.latitude])[0])
+      // @ts-ignore
       .attr('cy', d => projection([d.coordinates.longitude, d.coordinates.latitude])[1])
       .append('title')
       .text(d => `${d.given_name} - ${d.city}`);
@@ -122,15 +139,4 @@ interface Measurement {
   windDirection: number;
   windGust: number;
   windSpeed: number;
-}
-interface Topo {
-  objects: {
-    municipalities: {
-      geometries: {
-        properties: {
-          reg_nis: string;
-        };
-      }[];
-    };
-  };
 }

@@ -19,7 +19,8 @@ module.exports = {
     'no-console': 'off',
     'no-debugger': 'off',
     'no-extra-semi': 'off',
-    'semi': ["error", "always"]
+    'semi': ["error", "always"],
+    '@typescript-eslint/ban-ts-ignore': 'off'
   },
 
   'extends': [
