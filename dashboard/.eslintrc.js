@@ -17,7 +17,9 @@ module.exports = {
 
   rules: {
     'no-console': 'off',
-    'no-debugger': 'off'
+    'no-debugger': 'off',
+    'no-extra-semi': 'off',
+    'semi': ["error", "always"]
   },
 
   'extends': [

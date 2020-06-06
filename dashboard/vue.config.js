@@ -5,4 +5,4 @@ module.exports = {
   publicPath: process.env.CI
     ? '/vlinder/'
     : '/'
-}
+};
