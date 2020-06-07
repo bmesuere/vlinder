@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 import { legend } from './Legend';
@@ -20,13 +22,13 @@ export class D3StationsMap {
   private measurementsMap: Map<string, Measurement> = new Map();
 
   public static readonly weatherProperties = {
-    temp: { property: 'temp', name: 'Temperatuur', legend: 'Temperatuur (°C)', icon: 'mdi-thermometer', title: 'Temperatuur op dit moment' },
-    rainVolume: { property: 'rainVolume', name: 'Neerslag', legend: 'Neerslag vandaag (l/m²)', icon: 'mdi-weather-rainy', title: 'Neerslag sinds middernacht' },
-    windSpeed: { property: 'windSpeed', name: 'Windsnelheid', legend: 'Windsnelheid (km/u)', icon: 'mdi-weather-windy', title: 'Windsnelheid op dit moment' }
+    temp: { property: 'temp', name: 'Temperatuur', legend: 'Temperatuur (°C)', icon: 'mdi-thermometer', title: 'Temperatuur op dit moment', unit: '°C' },
+    rainVolume: { property: 'rainVolume', name: 'Neerslag', legend: 'Neerslag vandaag (l/m²)', icon: 'mdi-weather-rainy', title: 'Neerslag sinds middernacht', unit: 'l/m²' },
+    windSpeed: { property: 'windSpeed', name: 'Windsnelheid', legend: 'Windsnelheid (km/u)', icon: 'mdi-weather-windy', title: 'Windsnelheid op dit moment', unit: 'km/u' }
   };
 
   // settings
-  private readonly margin = { top: 5, right: 5, bottom: 50, left: 5 };
+  private readonly margin = { top: 5, right: 10, bottom: 50, left: 10 };
   private readonly width = 900;
   private readonly height = 420;
 
@@ -83,6 +85,17 @@ export class D3StationsMap {
     const svg = d3.select(this.selector).append('svg')
       .attr('viewBox', `0, 0, ${this.width}, ${this.height}`);
 
+    const tooltip = d3.select('body').append('div')
+      .attr('class', 'tooltip')
+      .style('position', 'absolute')
+      .style('visibility', 'visible')
+      .style('background-color', 'white')
+      .style('padding', '6px')
+      .style('border', '1px solid #dddddd')
+      .style('border-radius', '3px')
+      .style('pointer-events', 'none')
+      .style('font', '12px Roboto');
+
     // draw muni's
     svg.append('g')
       .selectAll('.muni')
@@ -105,6 +118,7 @@ export class D3StationsMap {
       .data(this.stations)
       .join('circle')
       .attr('class', 'station')
+      .attr('id', d => 'station-' + d.id)
       .attr('r', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 1)
       .attr('fill-opacity', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 0.7 : 1)
       .attr('fill', d => {
@@ -114,9 +128,19 @@ export class D3StationsMap {
       // @ts-ignore
       .attr('cx', d => projection([d.coordinates.longitude, d.coordinates.latitude])[0])
       // @ts-ignore
-      .attr('cy', d => projection([d.coordinates.longitude, d.coordinates.latitude])[1]);
-    this.stationDots.append('title')
-      .text(d => `${d.given_name} - ${d.city}`);
+      .attr('cy', d => projection([d.coordinates.longitude, d.coordinates.latitude])[1])
+      .on('mouseenter', datum => {
+        d3.select('#station-' + datum.id)
+          .attr('fill-opacity', 1)
+          .attr('r', 5);
+        this.tooltip(tooltip, datum, d3.event.pageX, d3.event.pageY);
+      })
+      .on('mouseleave', datum => {
+        d3.select('#station-' + datum.id)
+          .attr('r', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 1)
+          .attr('fill-opacity', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 0.7 : 1);
+        this.tooltip(tooltip, null);
+      });
 
     this.legend = svg.append('g')
       .attr('transform', `translate(${this.margin.left}, ${this.height - this.margin.top - 40})`);
@@ -124,7 +148,21 @@ export class D3StationsMap {
     this.legend.append(() => legend({ color: this.colorScale, title: D3StationsMap.weatherProperties[this.selectedProperty].legend, width: 200, tickSize: -10, ticks: 4 }));
   }
 
-  setProperty (property: string) {
+  private tooltip (div, station: Station | null, x?: number, y?: number) {
+    if (!station) return div.style('visibility', 'hidden');
+
+    div.style('visibility', 'visible')
+      .style('top', (y + 5) + 'px')
+      .style('left', (x + 15) + 'px')
+      .html('');
+
+    let tooltipHtml = `<b>${station.given_name}</b> - ${station.city}`;
+    tooltipHtml += ['temp', 'rainVolume', 'windSpeed'].map(prop => `<br>${D3StationsMap.weatherProperties[prop].name}: <b>${this.measurementsMap.get(station.id)[prop]} ${D3StationsMap.weatherProperties[prop].unit}</b>`).join('');
+
+    div.html(tooltipHtml);
+  }
+
+  private setProperty (property: string) {
     this.selectedProperty = (D3StationsMap.weatherProperties.hasOwnProperty(property) ? property : 'temp') as weatherPropertyName;
   }
 
@@ -133,7 +171,7 @@ export class D3StationsMap {
     this.update();
   }
 
-  update () {
+  private update () {
     this.legend.html('');
     this.colorScale.domain(d3.extent(this.measurements, d => d[this.selectedProperty]) as [number, number]);
     // @ts-ignore
