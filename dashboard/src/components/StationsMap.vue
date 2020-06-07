@@ -2,15 +2,14 @@
   <div>
     <div v-bind:id="mapId"></div>
     <v-btn-toggle v-model="weatherProperty" mandatory>
-      <v-btn value="temp">
-        <v-icon>mdi-thermometer</v-icon>
-      </v-btn>
-      <v-btn value="rainVolume">
-        <v-icon>mdi-weather-rainy</v-icon>
-      </v-btn>
-      <v-btn value="windSpeed">
-        <v-icon>mdi-weather-windy</v-icon>
-      </v-btn>
+      <v-tooltip top v-for="p in weatherProperties" :key="p.property">
+        <template v-slot:activator="{ on }">
+          <v-btn :value="p.property" v-on="on">
+            <v-icon>{{ p.icon }}</v-icon>
+          </v-btn>
+        </template>
+        <span>{{ p.name }}</span>
+      </v-tooltip>
     </v-btn-toggle>
   </div>
 </template>
@@ -24,6 +23,7 @@ import { D3StationsMap } from '../d3Components/D3StationsMap';
 export default class StationsMap extends Vue {
   @Prop({ default: 'stationsMap' }) mapId!: string
 
+  weatherProperties = D3StationsMap.weatherProperties;
   map: D3StationsMap | undefined;
   weatherProperty = 'temp';
 
