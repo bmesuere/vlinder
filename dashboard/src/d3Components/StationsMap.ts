@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
+import { legend } from './Legend';
 
 export class StationsMap {
   // arguments
@@ -111,9 +112,10 @@ export class StationsMap {
       .append('title')
       .text(d => `${d.given_name} - ${d.city}`);
 
-    /* svg.append('g')
+    svg.append('g')
       .attr('transform', `translate(${this.margin.left}, ${this.height - this.margin.top - 40})`)
-      .append(() => legend({ color, title: properties.get(selectedProperty).title, width: 200, tickSize: -10, ticks: 4 })); */
+      // @ts-ignore
+      .append(() => legend({ color, title: this.properties.get(this.selectedProperty).title, width: 200, tickSize: -10, ticks: 4 }));
   }
 }
 
