@@ -1,16 +1,20 @@
 <template>
-  <div>
+  <div class="text-center">
+    <v-toolbar flat>
+      <v-toolbar-title>{{ weatherProperties[weatherProperty].title }}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn-toggle v-model="weatherProperty" mandatory>
+        <v-tooltip bottom v-for="p in weatherProperties" :key="p.property">
+          <template v-slot:activator="{ on }">
+            <v-btn :value="p.property" v-on="on">
+              <v-icon>{{ p.icon }}</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ p.name }}</span>
+        </v-tooltip>
+      </v-btn-toggle>
+    </v-toolbar>
     <div v-bind:id="mapId"></div>
-    <v-btn-toggle v-model="weatherProperty" mandatory>
-      <v-tooltip top v-for="p in weatherProperties" :key="p.property">
-        <template v-slot:activator="{ on }">
-          <v-btn :value="p.property" v-on="on">
-            <v-icon>{{ p.icon }}</v-icon>
-          </v-btn>
-        </template>
-        <span>{{ p.name }}</span>
-      </v-tooltip>
-    </v-btn-toggle>
   </div>
 </template>
 

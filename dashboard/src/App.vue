@@ -13,8 +13,8 @@
 
     <v-content>
       <v-container>
-        <v-row class="text-center">
-          <v-col cols="12">
+        <v-row>
+          <v-col sm="12" md="10" offset-md="1">
             <StationsMap />
           </v-col>
         </v-row>
