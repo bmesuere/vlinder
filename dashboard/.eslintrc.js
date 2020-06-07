@@ -20,7 +20,8 @@ module.exports = {
     'no-debugger': 'off',
     'no-extra-semi': 'off',
     'semi': ["error", "always"],
-    '@typescript-eslint/ban-ts-ignore': 'off'
+    '@typescript-eslint/ban-ts-ignore': 'off',
+    '@typescript-eslint/no-explicit-any': 'off'
   },
 
   'extends': [

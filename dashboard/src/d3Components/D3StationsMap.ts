@@ -2,15 +2,18 @@ import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 import { legend } from './Legend';
 
-export class StationsMap {
+export class D3StationsMap {
   // arguments
   private readonly selector: string;
-  private readonly selectedProperty: 'temp';
+  private selectedProperty: 'temp' | 'rainVolume' | 'windSpeed';
 
   // remote data
-  private belgium: TopoJSON.Topology | undefined;
-  private stations: Station[] | undefined;
-  private measurements: Measurement[] | undefined;
+  // @ts-ignore
+  private belgium: TopoJSON.Topology;
+  // @ts-ignore
+  private stations: Station[];
+  // @ts-ignore
+  private measurements: Measurement[];
 
   private measurementsMap: Map<string, Measurement> = new Map();
 
@@ -26,9 +29,17 @@ export class StationsMap {
   private readonly width = 700;
   private readonly height = 400;
 
-  constructor (selector: string, selectedProperty: 'temp' = 'temp') {
+  // D3 internals
+  // @ts-ignore
+  private stationDots: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, Station, SVGGElement, unknown>;
+  // @ts-ignore
+  private colorScale: d3.ScaleSequential<string>;
+  // @ts-ignore
+  private legend: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
+
+  constructor (selector: string, selectedProperty = 'temp') {
     this.selector = selector;
-    this.selectedProperty = selectedProperty;
+    this.selectedProperty = (this.properties.has(selectedProperty) ? selectedProperty : 'temp') as 'temp' | 'rainVolume' | 'windSpeed';
   }
 
   async fetchData () {
@@ -53,12 +64,7 @@ export class StationsMap {
   async init () {
     await this.fetchData();
 
-    // appease the type checker
-    if (!this.measurements) return;
-    if (!this.belgium) return;
-    if (!this.stations) return;
-
-    const color = d3.scaleSequential(d3.interpolateViridis)
+    this.colorScale = d3.scaleSequential(d3.interpolateViridis)
       .domain(d3.extent(this.measurements, d => d[this.selectedProperty]) as [number, number]);
 
     // fit the map for what we want to show
@@ -94,7 +100,7 @@ export class StationsMap {
       .text(d => d?.properties?.name_nl);
 
     // draw stations
-    svg.append('g')
+    this.stationDots = svg.append('g')
       .selectAll('.station')
       .data(this.stations)
       .join('circle')
@@ -103,19 +109,38 @@ export class StationsMap {
       .attr('fill-opacity', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 0.7 : 1)
       .attr('fill', d => {
         const m = this.measurementsMap.get(d.id);
-        return m?.status === 'Ok' ? color(m[this.selectedProperty]) : 'black';
+        return m?.status === 'Ok' ? this.colorScale(m[this.selectedProperty]) : 'black';
       })
       // @ts-ignore
       .attr('cx', d => projection([d.coordinates.longitude, d.coordinates.latitude])[0])
       // @ts-ignore
-      .attr('cy', d => projection([d.coordinates.longitude, d.coordinates.latitude])[1])
-      .append('title')
+      .attr('cy', d => projection([d.coordinates.longitude, d.coordinates.latitude])[1]);
+    this.stationDots.append('title')
       .text(d => `${d.given_name} - ${d.city}`);
 
-    svg.append('g')
-      .attr('transform', `translate(${this.margin.left}, ${this.height - this.margin.top - 40})`)
-      // @ts-ignore
-      .append(() => legend({ color, title: this.properties.get(this.selectedProperty).title, width: 200, tickSize: -10, ticks: 4 }));
+    this.legend = svg.append('g')
+      .attr('transform', `translate(${this.margin.left}, ${this.height - this.margin.top - 40})`);
+    // @ts-ignore
+    this.legend.append(() => legend({ color: this.colorScale, title: this.properties.get(this.selectedProperty).title, width: 200, tickSize: -10, ticks: 4 }));
+  }
+
+  updateProperty (property: string) {
+    this.selectedProperty = (this.properties.has(property) ? property : 'temp') as 'temp' | 'rainVolume' | 'windSpeed';
+    this.update();
+  }
+
+  update () {
+    this.legend.html('');
+    // @ts-ignore
+    this.legend.append(() => legend({ color: this.colorScale, title: this.properties.get(this.selectedProperty).title, width: 200, tickSize: -10, ticks: 4 }));
+    this.colorScale.domain(d3.extent(this.measurements, d => d[this.selectedProperty]) as [number, number]);
+    this.stationDots.transition()
+      .attr('r', (d: Station) => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 1)
+      .attr('fill-opacity', (d: Station) => this.measurementsMap.get(d.id)?.status === 'Ok' ? 0.7 : 1)
+      .attr('fill', (d: Station) => {
+        const m = this.measurementsMap.get(d.id);
+        return m?.status === 'Ok' ? this.colorScale(m[this.selectedProperty]) : 'black';
+      });
   }
 }
 

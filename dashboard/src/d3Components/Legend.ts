@@ -2,6 +2,7 @@
 // @ts-nocheck
 import * as d3 from 'd3';
 
+// adapted from https://observablehq.com/@d3/color-legend
 export function legend ({
   color,
   title,
