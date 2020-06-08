@@ -2,6 +2,7 @@
 // @ts-nocheck
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
+import { Station } from '../app/types';
 import { legend } from './Legend';
 
 type weatherPropertyName = 'temp' | 'rainVolume' | 'windSpeed';
@@ -119,7 +120,7 @@ export class D3StationsMap {
       .join('circle')
       .attr('class', 'station')
       .attr('id', d => 'station-' + d.id)
-      .attr('r', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 1)
+      .attr('r', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 2)
       .attr('fill-opacity', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 0.7 : 1)
       .attr('fill', d => {
         const m = this.measurementsMap.get(d.id);
@@ -137,7 +138,7 @@ export class D3StationsMap {
       })
       .on('mouseleave', datum => {
         d3.select('#station-' + datum.id)
-          .attr('r', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 1)
+          .attr('r', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 2)
           .attr('fill-opacity', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 0.7 : 1);
         this.tooltip(tooltip, null);
       });
@@ -184,15 +185,6 @@ export class D3StationsMap {
         return m?.status === 'Ok' ? this.colorScale(m[this.selectedProperty]) : 'black';
       });
   }
-}
-
-interface Station {
-  city: string;
-  coordinates: { latitude: number; longitude: number };
-  given_name: string;
-  id: string;
-  measurements: string;
-  name: string;
 }
 interface Measurement {
   humidity: number;

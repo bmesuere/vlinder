@@ -18,24 +18,34 @@
             <StationsMap />
           </v-col>
         </v-row>
+        <v-row>
+          <v-col sm="3" v-for="s in stations" :key="s.id" >
+            <StationCard :station="s" />
+          </v-col>
+        </v-row>
       </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { Vue, Component } from 'vue-property-decorator';
 import StationsMap from './components/StationsMap.vue';
+import StationCard from './components/StationCard.vue';
+import { Station } from './app/types';
 
-export default Vue.extend({
-  name: 'App',
-
+@Component({
   components: {
-    StationsMap
-  },
+    StationsMap, StationCard
+  }
+})
+export default class App extends Vue {
+  stations: Station[] = [];
 
-  data: () => ({
-    //
-  })
-});
+  mounted () {
+    fetch('https://mooncake.ugent.be/api/stations')
+      .then(r => r.json())
+      .then(s => { this.stations.push(s[0]); });
+  }
+}
 </script>
