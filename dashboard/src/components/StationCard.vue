@@ -14,8 +14,8 @@
 
     <v-list dense subheader>
       <v-list-item v-for="p in weatherProperties" :key="p.property">
-        <v-list-item-subtitle><v-icon class='pr-1'>{{p.icon}}</v-icon> {{p.name}}</v-list-item-subtitle>
-        <v-list-item-title class="text-right">28.3 {{p.unit}}</v-list-item-title>
+        <v-list-item-subtitle><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ p.name }}</v-list-item-subtitle>
+        <v-list-item-title class="text-right">{{ measurements[p.property] }} {{ p.unit }}</v-list-item-title>
       </v-list-item>
     </v-list>
 
@@ -30,6 +30,7 @@ import { weatherProperties as wp } from '../app/weatherProperties';
 @Component
 export default class StationCard extends Vue {
   @Prop() station!: Station
+  @Prop() measurements!: any
 
   weatherProperties = wp;
 

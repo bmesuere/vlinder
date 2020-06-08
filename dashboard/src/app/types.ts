@@ -9,3 +9,19 @@ export interface Station {
   measurements: string;
   name: string;
 }
+
+export interface Measurement {
+  humidity: number;
+  id: string;
+  measurements: string;
+  pressure: number;
+  rainIntensity: number;
+  rainVolume: number;
+  station: string;
+  status: string;
+  temp: number;
+  time: string;
+  windDirection: number;
+  windGust: number;
+  windSpeed: number;
+}

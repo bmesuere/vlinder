@@ -37,6 +37,7 @@ export default class StationsMap extends Vue {
     this.map.init();
   }
 
+  // when a different property is selected, we have to manually update the D3 map
   @Watch('weatherProperty')
   weatherPropertyChanged (value: string, oldValue: string) {
     if (this.map) {

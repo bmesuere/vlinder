@@ -3,7 +3,7 @@
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 
-import { Station } from '../app/types';
+import { Station, Measurement } from '../app/types';
 import { weatherProperties } from '../app/weatherProperties';
 import { legend } from './Legend';
 
@@ -182,19 +182,4 @@ export class D3StationsMap {
         return m?.status === 'Ok' ? this.colorScale(m[this.selectedProperty]) : 'black';
       });
   }
-}
-interface Measurement {
-  humidity: number;
-  id: string;
-  measurements: string;
-  pressure: number;
-  rainIntensity: number;
-  rainVolume: number;
-  station: string;
-  status: string;
-  temp: number;
-  time: string;
-  windDirection: number;
-  windGust: number;
-  windSpeed: number;
 }

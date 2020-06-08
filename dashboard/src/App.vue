@@ -20,7 +20,7 @@
         </v-row>
         <v-row>
           <v-col sm="3" v-for="s in stations" :key="s.id" >
-            <StationCard :station="s" />
+            <StationCard :station="s" :measurements="measurementsMap.get(s.id) || {}" />
           </v-col>
         </v-row>
       </v-container>
@@ -32,7 +32,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import StationsMap from './components/StationsMap.vue';
 import StationCard from './components/StationCard.vue';
-import { Station } from './app/types';
+import { Station, Measurement } from './app/types';
 
 @Component({
   components: {
@@ -41,11 +41,15 @@ import { Station } from './app/types';
 })
 export default class App extends Vue {
   stations: Station[] = [];
+  measurementsMap: Map<string, Measurement> = new Map();
 
   mounted () {
     fetch('https://mooncake.ugent.be/api/stations')
       .then(r => r.json())
-      .then(s => { this.stations.push(s[0]); });
+      .then((s: Station[]) => { this.stations.push(s[0], s[1]); });
+    fetch('https://mooncake.ugent.be/api/measurements')
+      .then(r => r.json())
+      .then((ms: Measurement[]) => { this.measurementsMap = new Map(ms.map(m => [m.id, m])); });
   }
 }
 </script>
