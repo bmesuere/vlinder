@@ -19,7 +19,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col sm="3" v-for="s in stations" :key="s.id" >
+          <v-col sm="6" md="4" lg="3" v-for="s in stations" :key="s.id" >
             <StationCard :station="s" :measurements="measurementsMap.get(s.id) || {}" />
           </v-col>
         </v-row>
