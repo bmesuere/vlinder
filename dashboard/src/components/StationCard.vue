@@ -13,17 +13,9 @@
     </v-list-item>
 
     <v-list dense subheader>
-      <v-list-item>
-        <v-list-item-subtitle><v-icon class='pr-1'>mdi-thermometer</v-icon> Temperatuur</v-list-item-subtitle>
-        <v-list-item-title class="text-right">28.3 °C</v-list-item-title>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-subtitle><v-icon class='pr-1'>mdi-weather-rainy</v-icon> Neerslag</v-list-item-subtitle>
-        <v-list-item-title class="text-right">7 l/m²</v-list-item-title>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-subtitle><v-icon class='pr-1'>mdi-weather-windy</v-icon> Windsnelheid</v-list-item-subtitle>
-        <v-list-item-title class="text-right">45 km/u</v-list-item-title>
+      <v-list-item v-for="p in weatherProperties" :key="p.property">
+        <v-list-item-subtitle><v-icon class='pr-1'>{{p.icon}}</v-icon> {{p.name}}</v-list-item-subtitle>
+        <v-list-item-title class="text-right">28.3 {{p.unit}}</v-list-item-title>
       </v-list-item>
     </v-list>
 
@@ -33,10 +25,13 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { Station } from '../app/types';
+import { weatherProperties as wp } from '../app/weatherProperties';
 
 @Component
 export default class StationCard extends Vue {
   @Prop() station!: Station
+
+  weatherProperties = wp;
 
   mounted () {
     //

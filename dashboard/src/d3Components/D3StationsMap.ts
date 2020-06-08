@@ -2,8 +2,11 @@
 // @ts-nocheck
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
+
 import { Station } from '../app/types';
+import { weatherProperties } from '../app/weatherProperties';
 import { legend } from './Legend';
+
 
 type weatherPropertyName = 'temp' | 'rainVolume' | 'windSpeed';
 
@@ -21,12 +24,6 @@ export class D3StationsMap {
   private measurements: Measurement[];
 
   private measurementsMap: Map<string, Measurement> = new Map();
-
-  public static readonly weatherProperties = {
-    temp: { property: 'temp', name: 'Temperatuur', legend: 'Temperatuur (°C)', icon: 'mdi-thermometer', title: 'Temperatuur op dit moment', unit: '°C' },
-    rainVolume: { property: 'rainVolume', name: 'Neerslag', legend: 'Neerslag vandaag (l/m²)', icon: 'mdi-weather-rainy', title: 'Neerslag sinds middernacht', unit: 'l/m²' },
-    windSpeed: { property: 'windSpeed', name: 'Windsnelheid', legend: 'Windsnelheid (km/u)', icon: 'mdi-weather-windy', title: 'Windsnelheid op dit moment', unit: 'km/u' }
-  };
 
   // settings
   private readonly margin = { top: 5, right: 10, bottom: 50, left: 10 };
@@ -146,7 +143,7 @@ export class D3StationsMap {
     this.legend = svg.append('g')
       .attr('transform', `translate(${this.margin.left}, ${this.height - this.margin.top - 40})`);
     // @ts-ignore
-    this.legend.append(() => legend({ color: this.colorScale, title: D3StationsMap.weatherProperties[this.selectedProperty].legend, width: 200, tickSize: -10, ticks: 4 }));
+    this.legend.append(() => legend({ color: this.colorScale, title: weatherProperties[this.selectedProperty].legend, width: 200, tickSize: -10, ticks: 4 }));
   }
 
   private tooltip (div, station: Station | null, x?: number, y?: number) {
@@ -158,13 +155,13 @@ export class D3StationsMap {
       .html('');
 
     let tooltipHtml = `<b>${station.given_name}</b> - ${station.city}`;
-    tooltipHtml += ['temp', 'rainVolume', 'windSpeed'].map(prop => `<br>${D3StationsMap.weatherProperties[prop].name}: <b>${this.measurementsMap.get(station.id)[prop]} ${D3StationsMap.weatherProperties[prop].unit}</b>`).join('');
+    tooltipHtml += ['temp', 'rainVolume', 'windSpeed'].map(prop => `<br>${weatherProperties[prop].name}: <b>${this.measurementsMap.get(station.id)[prop]} ${weatherProperties[prop].unit}</b>`).join('');
 
     div.html(tooltipHtml);
   }
 
   private setProperty (property: string) {
-    this.selectedProperty = (D3StationsMap.weatherProperties.hasOwnProperty(property) ? property : 'temp') as weatherPropertyName;
+    this.selectedProperty = (weatherProperties.hasOwnProperty(property) ? property : 'temp') as weatherPropertyName;
   }
 
   updateProperty (property: string) {
@@ -176,7 +173,7 @@ export class D3StationsMap {
     this.legend.html('');
     this.colorScale.domain(d3.extent(this.measurements, d => d[this.selectedProperty]) as [number, number]);
     // @ts-ignore
-    this.legend.append(() => legend({ color: this.colorScale, title: D3StationsMap.weatherProperties[this.selectedProperty].legend, width: 200, tickSize: -10, ticks: 4 }));
+    this.legend.append(() => legend({ color: this.colorScale, title: weatherProperties[this.selectedProperty].legend, width: 200, tickSize: -10, ticks: 4 }));
     this.stationDots.transition()
       .attr('r', (d: Station) => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 1)
       .attr('fill-opacity', (d: Station) => this.measurementsMap.get(d.id)?.status === 'Ok' ? 0.7 : 1)

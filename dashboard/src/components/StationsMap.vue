@@ -20,6 +20,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import { weatherProperties as wp } from '../app/weatherProperties';
 
 import { D3StationsMap } from '../d3Components/D3StationsMap';
 
@@ -27,7 +28,7 @@ import { D3StationsMap } from '../d3Components/D3StationsMap';
 export default class StationsMap extends Vue {
   @Prop({ default: 'stationsMap' }) mapId!: string
 
-  weatherProperties = D3StationsMap.weatherProperties;
+  weatherProperties = wp;
   map: D3StationsMap | undefined;
   weatherProperty = 'temp';
 
