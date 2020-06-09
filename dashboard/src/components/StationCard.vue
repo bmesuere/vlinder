@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-img
-      :src="require('../assets/vlinder01.png')"
+      :src="require('../assets/maps/' + station.name + '.png')"
     />
 
     <v-list-item three-line>
