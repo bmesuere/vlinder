@@ -3,8 +3,8 @@
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 
-import { Station, Measurement } from '../app/types';
-import { weatherProperties } from '../app/weatherProperties';
+import { Station, Measurement } from '../types';
+import { weatherProperties } from '../weatherProperties';
 import { legend } from './Legend';
 
 type weatherPropertyName = 'temp' | 'rainVolume' | 'windSpeed';

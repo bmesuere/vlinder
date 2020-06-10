@@ -22,7 +22,7 @@
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 import { weatherProperties as wp } from '../app/weatherProperties';
 
-import { D3StationsMap } from '../d3Components/D3StationsMap';
+import { D3StationsMap } from '../app/d3/D3StationsMap';
 import { Station } from '../app/types';
 
 @Component
