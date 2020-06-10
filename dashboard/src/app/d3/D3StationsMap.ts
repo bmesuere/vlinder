@@ -35,33 +35,29 @@ export class D3StationsMap {
   private colorScale!: d3.ScaleSequential<string>;
   private legend!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
 
-  constructor (selector: string, selectedProperty = 'temp', selectedStations, toggleStationCallback: Function) {
+  constructor (selector: string, selectedProperty = 'temp', selectedStations: Station[], toggleStationCallback: Function) {
     this.selector = selector;
     this.setProperty(selectedProperty);
     this.selectedStations = selectedStations;
     this.toggleCallback = toggleStationCallback;
   }
 
-  async fetchData () {
+  async prepareData (stations: Station[], measurements: Measurement[]) {
     // fetch data
     const belgium = fetch('https://raw.githubusercontent.com/bmesuere/belgium-topojson/master/belgium.json')
       .then(r => r.json());
-    const stations = fetch('https://mooncake.ugent.be/api/stations')
-      .then(r => r.json());
-    const measurements = fetch('https://mooncake.ugent.be/api/measurements')
-      .then(r => r.json());
 
     this.belgium = await belgium as TopoJSON.Topology;
-    this.stations = await stations as [Station];
-    this.measurements = await measurements as [Measurement];
+    this.stations = stations;
+    this.measurements = measurements;
 
     // prepare data
     this.measurementsMap = new Map(this.measurements.map(m => [m.id, m]));
     this.belgium.objects.municipalities.geometries = this.belgium.objects.municipalities.geometries.filter(d => d.properties.reg_nis !== '03000');
   }
 
-  async init () {
-    await this.fetchData();
+  async init (stations: Station[], measurements: Measurement[]) {
+    await this.prepareData(stations, measurements);
 
     this.colorScale = d3.scaleSequential(d3.interpolateViridis)
       .domain(d3.extent(this.measurements, d => d[this.selectedProperty]) as [number, number]);
@@ -158,6 +154,12 @@ export class D3StationsMap {
   }
 
   updateSelectedStations () {
+    this.update();
+  }
+
+  updateMeasurements (measurements: Measurement[]) {
+    this.measurements = measurements;
+    this.measurementsMap = new Map(this.measurements.map(m => [m.id, m]));
     this.update();
   }
 

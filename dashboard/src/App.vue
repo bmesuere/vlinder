@@ -15,7 +15,7 @@
       <v-container>
         <v-row>
           <v-col sm="12" md="10" offset-md="1">
-            <StationsMap :stations="stations" :selectedStations="selectedStations" />
+            <StationsMap :measurements="measurements" :stations="stations" :selectedStations="selectedStations" :dataLoaded="initialDataLoaded" />
           </v-col>
         </v-row>
         <v-row>
@@ -42,18 +42,38 @@ import { Station, Measurement } from './app/types';
 export default class App extends Vue {
   stations: Station[] = [];
   selectedStations: Station[] = [];
+  measurements: Measurement[] = [];
   measurementsMap: Map<string, Measurement> = new Map();
+  private resolveDataLoaded!: Function;
+  initialDataLoaded = new Promise((resolve) => { this.resolveDataLoaded = resolve; });
 
   created () {
-    fetch('https://mooncake.ugent.be/api/stations')
+    // fetch data a first time
+    const stationsPromise = this.fetchStations();
+    stationsPromise.then(s => this.selectedStations.push(s[1], s[20], s[40]));
+    const measurementsPromise = this.fetchMeasurements();
+    Promise.all([stationsPromise, measurementsPromise])
+      .then((d) => { this.resolveDataLoaded(d); });
+    setInterval(this.fetchMeasurements, 60000);
+  }
+
+  async fetchStations (): Promise<Station[]> {
+    return fetch('https://mooncake.ugent.be/api/stations')
       .then(r => r.json())
       .then((s: Station[]) => {
         this.stations = s;
-        this.selectedStations.push(s[1], s[20], s[40]);
+        return s;
       });
-    fetch('https://mooncake.ugent.be/api/measurements')
+  }
+
+  async fetchMeasurements (): Promise<Measurement[]> {
+    return fetch('https://mooncake.ugent.be/api/measurements')
       .then(r => r.json())
-      .then((ms: Measurement[]) => { this.measurementsMap = new Map(ms.map(m => [m.id, m])); });
+      .then((ms: Measurement[]) => {
+        this.measurements = ms;
+        this.measurementsMap = new Map(ms.map(m => [m.id, m]));
+        return ms;
+      });
   }
 }
 </script>

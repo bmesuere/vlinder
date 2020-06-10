@@ -23,21 +23,24 @@ import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 import { weatherProperties as wp } from '../app/weatherProperties';
 
 import { D3StationsMap } from '../app/d3/D3StationsMap';
-import { Station } from '../app/types';
+import { Station, Measurement } from '../app/types';
 
 @Component
 export default class StationsMap extends Vue {
-  @Prop({ default: 'stationsMap' }) readonly mapId!: string
-  @Prop() readonly stations!: Station[]
-  @Prop() readonly selectedStations!: Station[]
+  @Prop({ default: 'stationsMap' }) readonly mapId!: string;
+  @Prop() readonly stations!: Station[];
+  @Prop() readonly measurements!: Measurement[];
+  @Prop() readonly selectedStations!: Station[];
+  @Prop() readonly dataLoaded!: Promise<[Station[], Measurement[]]>;
 
   weatherProperties = wp;
   map: D3StationsMap | undefined;
   selectedProperty = 'temp';
 
-  mounted () {
+  async mounted () {
     this.map = new D3StationsMap(`#${this.mapId}`, this.selectedProperty, this.selectedStations, this.toggleStation);
-    this.map.init();
+    const [s, m] = await this.dataLoaded;
+    this.map.init(s, m);
   }
 
   // adds or removes a station to the list of selected stations
@@ -66,6 +69,14 @@ export default class StationsMap extends Vue {
   selectedPropertyChanged () {
     if (this.map) {
       this.map.updateProperty(this.selectedProperty);
+    }
+  }
+
+  // when measurements are updated, we have to manually update the D3 map
+  @Watch('measurements')
+  measurementsChanged () {
+    if (this.map) {
+      this.map.updateMeasurements(this.measurements);
     }
   }
 }
