@@ -36,23 +36,34 @@ export default class StationsMap extends Vue {
   selectedProperty = 'temp';
 
   mounted () {
-    this.map = new D3StationsMap(`#${this.mapId}`, this.selectedProperty, {
-      selectStation: this.selectStation
-    });
+    this.map = new D3StationsMap(`#${this.mapId}`, this.selectedProperty, this.selectedStations, this.toggleStation);
     this.map.init();
   }
 
-  // adds a station to the list of list of selected stations
-  selectStation (stationId: string) {
+  // adds or removes a station to the list of selected stations
+  toggleStation (stationId: string) {
     const station = this.stations.find(s => s.id === stationId);
-    if (station && !this.selectedStations.includes(station)) {
-      this.selectedStations.push(station);
+    if (station) {
+      if (this.selectedStations.includes(station)) {
+        // remove the station from the list
+        this.selectedStations.splice(this.selectedStations.indexOf(station), 1);
+      } else {
+        this.selectedStations.push(station);
+      }
+    }
+  }
+
+  // when stations are added or removed, update the D3 map
+  @Watch('selectedStations')
+  selectedStationsChanged () {
+    if (this.map) {
+      this.map.updateSelectedStations();
     }
   }
 
   // when a different property is selected, we have to manually update the D3 map
   @Watch('selectedProperty')
-  selectedPropertyChanged (value: string, oldValue: string) {
+  selectedPropertyChanged () {
     if (this.map) {
       this.map.updateProperty(this.selectedProperty);
     }
