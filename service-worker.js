@@ -14,10 +14,10 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/vlinder/precache-manifest.1b4fcc1b66798dbce9f0842f89325835.js"
+  "/vlinder/precache-manifest.ea57498aaa407cd71f44dcc9adab1130.js"
 );
 
-workbox.core.setCacheNameDetails({prefix: "dashboard"});
+workbox.core.setCacheNameDetails({prefix: "vlinder-dashboard"});
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
