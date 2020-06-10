@@ -7,21 +7,18 @@ import { Station, Measurement } from '../app/types';
 import { weatherProperties } from '../app/weatherProperties';
 import { legend } from './Legend';
 
-
 type weatherPropertyName = 'temp' | 'rainVolume' | 'windSpeed';
 
 export class D3StationsMap {
   // arguments
   private readonly selector: string;
   private selectedProperty: weatherPropertyName = 'temp';
+  private readonly selectCallback: Function;
 
   // remote data
-  // @ts-ignore
-  private belgium: TopoJSON.Topology;
-  // @ts-ignore
-  private stations: Station[];
-  // @ts-ignore
-  private measurements: Measurement[];
+  private belgium!: TopoJSON.Topology;
+  private stations!: Station[];
+  private measurements!: Measurement[];
 
   private measurementsMap: Map<string, Measurement> = new Map();
 
@@ -31,16 +28,14 @@ export class D3StationsMap {
   private readonly height = 420;
 
   // D3 internals
-  // @ts-ignore
-  private stationDots: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, Station, SVGGElement, unknown>;
-  // @ts-ignore
-  private colorScale: d3.ScaleSequential<string>;
-  // @ts-ignore
-  private legend: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
+  private stationDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, Station, SVGGElement, unknown>;
+  private colorScale!: d3.ScaleSequential<string>;
+  private legend!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
 
-  constructor (selector: string, selectedProperty = 'temp') {
+  constructor (selector: string, selectedProperty = 'temp', callbacks: {selectStation: Function} = { selectStation: () => { /**/ } }) {
     this.selector = selector;
     this.setProperty(selectedProperty);
+    this.selectCallback = callbacks.selectStation;
   }
 
   async fetchData () {
@@ -58,7 +53,6 @@ export class D3StationsMap {
 
     // prepare data
     this.measurementsMap = new Map(this.measurements.map(m => [m.id, m]));
-    // @ts-ignore
     this.belgium.objects.municipalities.geometries = this.belgium.objects.municipalities.geometries.filter(d => d.properties.reg_nis !== '03000');
   }
 
@@ -75,7 +69,6 @@ export class D3StationsMap {
         [
           [this.margin.left, this.margin.top],
           [this.width - this.margin.right, this.height - this.margin.bottom]
-        // @ts-ignore
         ], topojson.feature(this.belgium, this.belgium.objects.municipalities));
 
     const path = d3.geoPath().projection(projection);
@@ -97,17 +90,14 @@ export class D3StationsMap {
     // draw muni's
     svg.append('g')
       .selectAll('.muni')
-      // @ts-ignore
       .data(topojson.feature(this.belgium, this.belgium.objects.municipalities).features)
       .join('path')
       .attr('class', 'muni')
       .attr('fill', '#eeeeee')
       .attr('stroke', 'white')
       .attr('stroke-linejoin', 'round')
-      // @ts-ignore
       .attr('d', path)
       .append('title')
-      // @ts-ignore
       .text(d => d?.properties?.name_nl);
 
     // draw stations
@@ -123,10 +113,9 @@ export class D3StationsMap {
         const m = this.measurementsMap.get(d.id);
         return m?.status === 'Ok' ? this.colorScale(m[this.selectedProperty]) : 'black';
       })
-      // @ts-ignore
       .attr('cx', d => projection([d.coordinates.longitude, d.coordinates.latitude])[0])
-      // @ts-ignore
       .attr('cy', d => projection([d.coordinates.longitude, d.coordinates.latitude])[1])
+      .style('cursor', 'pointer')
       .on('mouseenter', datum => {
         d3.select('#station-' + datum.id)
           .attr('fill-opacity', 1)
@@ -138,11 +127,11 @@ export class D3StationsMap {
           .attr('r', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 2)
           .attr('fill-opacity', d => this.measurementsMap.get(d.id)?.status === 'Ok' ? 0.7 : 1);
         this.tooltip(tooltip, null);
-      });
+      })
+      .on('click', datum => { this.selectCallback(datum.id); });
 
     this.legend = svg.append('g')
       .attr('transform', `translate(${this.margin.left}, ${this.height - this.margin.top - 40})`);
-    // @ts-ignore
     this.legend.append(() => legend({ color: this.colorScale, title: weatherProperties[this.selectedProperty].legend, width: 200, tickSize: -10, ticks: 4 }));
   }
 
@@ -172,7 +161,6 @@ export class D3StationsMap {
   private update () {
     this.legend.html('');
     this.colorScale.domain(d3.extent(this.measurements, d => d[this.selectedProperty]) as [number, number]);
-    // @ts-ignore
     this.legend.append(() => legend({ color: this.colorScale, title: weatherProperties[this.selectedProperty].legend, width: 200, tickSize: -10, ticks: 4 }));
     this.stationDots.transition()
       .attr('r', (d: Station) => this.measurementsMap.get(d.id)?.status === 'Ok' ? 4 : 1)

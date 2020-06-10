@@ -15,11 +15,11 @@
       <v-container>
         <v-row>
           <v-col sm="12" md="10" offset-md="1">
-            <StationsMap />
+            <StationsMap :stations="stations" :selectedStations="selectedStations" />
           </v-col>
         </v-row>
         <v-row>
-          <v-col sm="6" md="4" lg="3" v-for="s in stations" :key="s.id" >
+          <v-col sm="6" md="4" lg="3" v-for="s in selectedStations" :key="s.id" >
             <StationCard :station="s" :measurements="measurementsMap.get(s.id) || {}" />
           </v-col>
         </v-row>
@@ -41,12 +41,16 @@ import { Station, Measurement } from './app/types';
 })
 export default class App extends Vue {
   stations: Station[] = [];
+  selectedStations: Station[] = [];
   measurementsMap: Map<string, Measurement> = new Map();
 
-  mounted () {
+  created () {
     fetch('https://mooncake.ugent.be/api/stations')
       .then(r => r.json())
-      .then((s: Station[]) => { this.stations.push(s[0], s[1]); });
+      .then((s: Station[]) => {
+        this.stations = s;
+        this.selectedStations.push(s[0], s[1]);
+      });
     fetch('https://mooncake.ugent.be/api/measurements')
       .then(r => r.json())
       .then((ms: Measurement[]) => { this.measurementsMap = new Map(ms.map(m => [m.id, m])); });
