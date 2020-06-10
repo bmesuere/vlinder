@@ -169,23 +169,29 @@ export class D3StationsMap {
     this.legend.append(() => legend({ color: this.colorScale, title: weatherProperties[this.selectedProperty].legend, width: 200, tickSize: -10, ticks: 4 }));
     this.stationDots.transition()
       .attr('r', d => this.stationRadius(d))
-      .attr('stroke', d => this.selectedStations.map(s => s.id).includes(d.id) ? '#263238' : 'none')
-      .attr('stroke-width', d => this.selectedStations.map(s => s.id).includes(d.id) ? 2 : 0)
+      .attr('stroke', d => this.isSelectedStation(d) ? this.stationColor(d) : 'none')
+      .attr('stroke-width', d => this.isSelectedStation(d) ? 4 : 0)
       .attr('fill-opacity', d => this.stationFillOpacity(d))
-      .attr('fill', (d: Station) => {
-        const m = this.measurementsMap.get(d.id);
-        return m?.status === 'Ok' ? this.colorScale(m[this.selectedProperty]) : 'black';
-      });
+      .attr('fill', d => this.isSelectedStation(d) ? 'white' : this.stationColor(d));
+  }
+
+  private isSelectedStation (station: Station): boolean {
+    return this.selectedStations.map(s => s.id).includes(station.id);
   }
 
   private stationRadius (station: Station): number {
     if (this.measurementsMap.get(station.id)?.status !== 'Ok') {
       return 1;
     }
-    if (this.selectedStations.map(s => s.id).includes(station.id)) {
+    if (this.isSelectedStation(station)) {
       return 5;
     }
     return 4;
+  }
+
+  private stationColor (station: Station): string {
+    const m = this.measurementsMap.get(station.id);
+    return m?.status === 'Ok' ? this.colorScale(m[this.selectedProperty]) : 'black';
   }
 
   private stationFillOpacity (station: Station): number {
