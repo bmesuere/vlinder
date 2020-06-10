@@ -49,7 +49,7 @@ export default class App extends Vue {
       .then(r => r.json())
       .then((s: Station[]) => {
         this.stations = s;
-        this.selectedStations.push(s[0], s[1]);
+        this.selectedStations.push(s[1], s[20], s[40]);
       });
     fetch('https://mooncake.ugent.be/api/measurements')
       .then(r => r.json())
