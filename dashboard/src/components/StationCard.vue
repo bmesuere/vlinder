@@ -1,5 +1,9 @@
 <template>
   <v-card>
+    <v-btn fab absolute right x-small elevation="3" class="mr-n2 mt-1" v-on:click="$emit('remove-station', station)">
+      <v-icon>mdi-close</v-icon>
+    </v-btn>
+
     <v-img
       :src="require('../assets/maps/' + station.name + '.png')"
     />

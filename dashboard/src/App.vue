@@ -20,7 +20,7 @@
         </v-row>
         <v-row>
           <v-col sm="6" md="4" lg="3" v-for="s in selectedStations" :key="s.id" >
-            <StationCard :station="s" :measurements="measurementsMap.get(s.id) || {}" />
+            <StationCard :station="s" :measurements="measurementsMap.get(s.id) || {}" v-on:remove-station="removeStation" />
           </v-col>
         </v-row>
       </v-container>
@@ -55,6 +55,12 @@ export default class App extends Vue {
     Promise.all([stationsPromise, measurementsPromise])
       .then((d) => { this.resolveDataLoaded(d); });
     setInterval(this.fetchMeasurements, 60000);
+  }
+
+  removeStation (station: Station) {
+    if (this.selectedStations.includes(station)) {
+      this.selectedStations.splice(this.selectedStations.indexOf(station), 1);
+    }
   }
 
   async fetchStations (): Promise<Station[]> {
