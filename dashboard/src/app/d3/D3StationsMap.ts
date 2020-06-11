@@ -139,7 +139,12 @@ export class D3StationsMap {
       .html('');
 
     let tooltipHtml = `<b>${station.given_name}</b> - ${station.city}`;
-    tooltipHtml += ['temp', 'rainVolume', 'windSpeed'].map(prop => `<br>${weatherProperties[prop].name}: <b>${this.measurementsMap.get(station.id)[prop]} ${weatherProperties[prop].unit}</b>`).join('');
+    if (this.measurementsMap.get(station.id)?.status === "Ok") {
+      tooltipHtml += ['temp', 'rainVolume', 'windSpeed'].map(prop => `<br>${weatherProperties[prop].name}: <b>${this.measurementsMap.get(station.id)[prop]} ${weatherProperties[prop].unit}</b>`).join('');
+    } else {
+      tooltipHtml += "<br>station offline";
+    }
+    
 
     div.html(tooltipHtml);
   }
@@ -183,7 +188,7 @@ export class D3StationsMap {
 
   private stationRadius (station: Station): number {
     if (this.measurementsMap.get(station.id)?.status !== 'Ok') {
-      return 1;
+      return 2;
     }
     if (this.isSelectedStation(station)) {
       return 5;
