@@ -72,7 +72,9 @@ export class D3StationsMap {
 
     const path = d3.geoPath().projection(projection);
 
-    const svg = d3.select(this.selector).append('svg')
+    const svg = d3.select(this.selector)
+      .html("")
+      .append('svg')
       .attr('viewBox', `0, 0, ${this.width}, ${this.height}`);
 
     const tooltip = d3.select('body').append('div')
