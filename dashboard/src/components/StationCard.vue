@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-btn fab absolute right x-small elevation="3" class="mr-n2 mt-1" v-on:click="$emit('remove-station', station)">
+    <v-btn fab absolute right x-small elevation="3" class="mr-n2 mt-1" v-on:click="removeFromList">
       <v-icon>mdi-close</v-icon>
     </v-btn>
 
@@ -38,8 +38,8 @@ export default class StationCard extends Vue {
 
   weatherProperties = wp;
 
-  mounted () {
-    //
+  removeFromList () {
+    this.$store.dispatch('deselectStationById', this.station.id);
   }
 }
 </script>

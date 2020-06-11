@@ -20,14 +20,8 @@ module.exports = {
     'no-debugger': 'off',
     'no-extra-semi': 'off',
     'no-prototype-builtins': 'off',
-    'semi': ["error", "always"],
+    semi: ['error', 'always'],
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/no-explicit-any': 'off'
   },
-
-  'extends': [
-    'plugin:vue/essential',
-    '@vue/standard',
-    '@vue/typescript/recommended'
-  ]
-}
+};

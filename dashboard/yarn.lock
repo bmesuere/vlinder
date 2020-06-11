@@ -1369,7 +1369,7 @@
     webpack "^4.0.0"
     yorkie "^2.0.0"
 
-"@vue/cli-plugin-vuex@^4.4.1":
+"@vue/cli-plugin-vuex@^4.4.1", "@vue/cli-plugin-vuex@~4.4.0":
   version "4.4.1"
   resolved "https://registry.yarnpkg.com/@vue/cli-plugin-vuex/-/cli-plugin-vuex-4.4.1.tgz#98d18fc5d36fa6e0d1fc2ecaeea37aa965564f19"
   integrity sha512-FtOFsDP0qznwVaCz0BZmTzUm5vhHSJzX2/XD3L5dLTkrNxyDEbZmbKoX0n1OzBcQwZC7dkJZP2tdoCQx0mX//g==
@@ -9080,6 +9080,11 @@ vuetify@^2.2.11:
   version "2.2.32"
   resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-2.2.32.tgz#53a511916382e4fd6a0f01347233e67f817d95f9"
   integrity sha512-53K8jRS3bnk6SZwZ9DVJMl3EqED5rEVoq8DHXPf90Pdbt4rr9JTKtuVu17m3k/sJ3GvpmIgMl6iwH2qCo29nAQ==
+
+vuex@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/vuex/-/vuex-3.4.0.tgz#20cc086062d750769fce1febb34e7fceeaebde45"
+  integrity sha512-ajtqwEW/QhnrBZQsZxCLHThZZaa+Db45c92Asf46ZDXu6uHXgbfVuBaJ4gzD2r4UX0oMJHstFwd2r2HM4l8umg==
 
 watchpack-chokidar2@^2.0.0:
   version "2.0.0"

@@ -15,12 +15,12 @@
       <v-container>
         <v-row>
           <v-col sm="12" md="10" offset-md="1">
-            <StationsMap :measurements="measurements" :stations="stations" :selectedStations="selectedStations" :dataLoaded="initialDataLoaded" />
+            <StationsMap :measurements="measurements" :dataLoaded="initialDataLoaded" />
           </v-col>
         </v-row>
         <v-row>
           <v-col sm="6" md="4" lg="3" v-for="s in selectedStations" :key="s.id" >
-            <StationCard :station="s" :measurements="measurementsMap.get(s.id) || {}" v-on:remove-station="removeStation" />
+            <StationCard :station="s" :measurements="measurementsMap.get(s.id) || {}" />
           </v-col>
         </v-row>
       </v-container>
@@ -40,8 +40,6 @@ import { Station, Measurement } from './app/types';
   }
 })
 export default class App extends Vue {
-  stations: Station[] = [];
-  selectedStations: Station[] = [];
   measurements: Measurement[] = [];
   measurementsMap: Map<string, Measurement> = new Map();
   private resolveDataLoaded!: Function;
@@ -49,27 +47,24 @@ export default class App extends Vue {
 
   created () {
     // fetch data a first time
-    const stationsPromise = this.fetchStations();
-    stationsPromise.then(s => this.selectedStations.push(s[1], s[20], s[40]));
+    const stationsPromise = this.$store.dispatch('fetchStations');
+    stationsPromise.then(() => {
+      this.$store.dispatch('selectStationById', 'zZ6ZeSg11dJ5zp5GrNwNck9A');
+      this.$store.dispatch('selectStationById', 'Do5lLMfezIdmUCzzsE0IwIbE');
+      this.$store.dispatch('selectStationById', 'XeIIA97QzN5xxk6AvdzAPquY');
+    });
     const measurementsPromise = this.fetchMeasurements();
     Promise.all([stationsPromise, measurementsPromise])
       .then((d) => { this.resolveDataLoaded(d); });
     setInterval(this.fetchMeasurements, 60000);
   }
 
-  removeStation (station: Station) {
-    if (this.selectedStations.includes(station)) {
-      this.selectedStations.splice(this.selectedStations.indexOf(station), 1);
-    }
+  get selectedStations (): Station[] {
+    return this.$store.state.selectedStations;
   }
 
-  async fetchStations (): Promise<Station[]> {
-    return fetch('https://mooncake.ugent.be/api/stations')
-      .then(r => r.json())
-      .then((s: Station[]) => {
-        this.stations = s;
-        return s;
-      });
+  get stations (): Station[] {
+    return this.$store.state.stations;
   }
 
   async fetchMeasurements (): Promise<Measurement[]> {

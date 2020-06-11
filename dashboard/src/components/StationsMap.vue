@@ -28,9 +28,7 @@ import { Station, Measurement } from '../app/types';
 @Component
 export default class StationsMap extends Vue {
   @Prop({ default: 'stationsMap' }) readonly mapId!: string;
-  @Prop() readonly stations!: Station[];
   @Prop() readonly measurements!: Measurement[];
-  @Prop() readonly selectedStations!: Station[];
   @Prop() readonly dataLoaded!: Promise<[Station[], Measurement[]]>;
 
   weatherProperties = wp;
@@ -45,15 +43,15 @@ export default class StationsMap extends Vue {
 
   // adds or removes a station to the list of selected stations
   toggleStation (stationId: string) {
-    const station = this.stations.find(s => s.id === stationId);
-    if (station) {
-      if (this.selectedStations.includes(station)) {
-        // remove the station from the list
-        this.selectedStations.splice(this.selectedStations.indexOf(station), 1);
-      } else {
-        this.selectedStations.push(station);
-      }
-    }
+    this.$store.dispatch('toggleStationById', stationId);
+  }
+
+  get selectedStations (): Station[] {
+    return this.$store.state.selectedStations;
+  }
+
+  get stations (): Station[] {
+    return this.$store.state.stations;
   }
 
   // when stations are added or removed, update the D3 map
