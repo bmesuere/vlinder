@@ -28,7 +28,6 @@ import { Station, Measurement } from '../app/types';
 @Component
 export default class StationsMap extends Vue {
   @Prop({ default: 'stationsMap' }) readonly mapId!: string;
-  @Prop() readonly measurements!: Measurement[];
   @Prop() readonly dataLoaded!: Promise<[Station[], Measurement[]]>;
 
   weatherProperties = wp;
@@ -52,6 +51,10 @@ export default class StationsMap extends Vue {
 
   get stations (): Station[] {
     return this.$store.state.stations;
+  }
+
+  get measurements (): Measurement[] {
+    return this.$store.state.liveMeasurements;
   }
 
   // when stations are added or removed, update the D3 map

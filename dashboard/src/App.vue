@@ -15,12 +15,12 @@
       <v-container>
         <v-row>
           <v-col sm="12" md="10" offset-md="1">
-            <StationsMap :measurements="measurements" :dataLoaded="initialDataLoaded" />
+            <StationsMap :dataLoaded="initialDataLoaded" />
           </v-col>
         </v-row>
         <v-row>
           <v-col sm="6" md="4" lg="3" v-for="s in selectedStations" :key="s.id" >
-            <StationCard :station="s" :measurements="measurementsMap.get(s.id) || {}" />
+            <StationCard :station="s" />
           </v-col>
         </v-row>
       </v-container>
@@ -40,8 +40,6 @@ import { Station, Measurement } from './app/types';
   }
 })
 export default class App extends Vue {
-  measurements: Measurement[] = [];
-  measurementsMap: Map<string, Measurement> = new Map();
   private resolveDataLoaded!: Function;
   initialDataLoaded = new Promise((resolve) => { this.resolveDataLoaded = resolve; });
 
@@ -53,28 +51,16 @@ export default class App extends Vue {
       this.$store.dispatch('selectStationById', 'Do5lLMfezIdmUCzzsE0IwIbE');
       this.$store.dispatch('selectStationById', 'XeIIA97QzN5xxk6AvdzAPquY');
     });
-    const measurementsPromise = this.fetchMeasurements();
+    const measurementsPromise: Promise<Measurement[]> = this.$store.dispatch('fetchMeasurements');
+
     Promise.all([stationsPromise, measurementsPromise])
       .then((d) => { this.resolveDataLoaded(d); });
-    setInterval(this.fetchMeasurements, 60000);
+
+    setInterval(() => this.$store.dispatch('fetchMeasurements'), 60000);
   }
 
   get selectedStations (): Station[] {
     return this.$store.state.selectedStations;
-  }
-
-  get stations (): Station[] {
-    return this.$store.state.stations;
-  }
-
-  async fetchMeasurements (): Promise<Measurement[]> {
-    return fetch('https://mooncake.ugent.be/api/measurements')
-      .then(r => r.json())
-      .then((ms: Measurement[]) => {
-        this.measurements = ms;
-        this.measurementsMap = new Map(ms.map(m => [m.id, m]));
-        return ms;
-      });
   }
 }
 </script>

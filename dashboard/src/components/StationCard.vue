@@ -28,18 +28,21 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { Station } from '../app/types';
+import { Station, Measurement } from '../app/types';
 import { weatherProperties as wp } from '../app/weatherProperties';
 
 @Component
 export default class StationCard extends Vue {
   @Prop() station!: Station
-  @Prop() measurements!: any
 
   weatherProperties = wp;
 
   removeFromList () {
     this.$store.dispatch('deselectStationById', this.station.id);
+  }
+
+  get measurements (): Measurement | {} {
+    return (this.$store.state.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
   }
 }
 </script>

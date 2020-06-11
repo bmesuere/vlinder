@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { Station } from '../app/types';
+import { Station, Measurement } from '../app/types';
 
 Vue.use(Vuex);
 
@@ -9,11 +9,15 @@ export default new Vuex.Store({
   state: {
     stationsLoaded: false,
     stations: Array<Station>(),
-    selectedStations: Array<Station>()
+    selectedStations: Array<Station>(),
+    liveMeasurements: Array<Measurement>()
   },
   mutations: {
     setStations (state, stations: Station[]) {
       state.stations = stations;
+    },
+    setLiveMeasurements (state, measurements: Measurement[]) {
+      state.liveMeasurements = measurements;
     },
     stationsLoaded (state) {
       state.stationsLoaded = true;
@@ -35,6 +39,14 @@ export default new Vuex.Store({
           commit('setStations', s);
           commit('stationsLoaded');
           return s;
+        });
+    },
+    fetchMeasurements ({ commit }): Promise<Measurement[]> {
+      return fetch('https://mooncake.ugent.be/api/measurements')
+        .then(r => r.json())
+        .then((m: Measurement[]) => {
+          commit('setLiveMeasurements', m);
+          return m;
         });
     },
     selectStationById ({ commit, state }, stationId: string) {
