@@ -94,7 +94,7 @@ export class D3StationsMap {
       .data(topojson.feature(this.belgium, this.belgium.objects.municipalities).features)
       .join('path')
       .attr('class', 'muni')
-      .attr('fill', '#dddddd')
+      .attr('fill', '#e5e5e5')
       .attr('stroke', 'white')
       .attr('stroke-linejoin', 'round')
       .attr('d', path)

@@ -25,3 +25,9 @@ export interface Measurement {
   windGust: number;
   windSpeed: number;
 }
+
+export interface MeasurementSeries {
+  property: string;
+  series: {stationId: string; values: number[]}[];
+  timestamps: string[];
+}

@@ -23,20 +23,26 @@
             <StationCard :station="s" />
           </v-col>
         </v-row>
+        <v-row>
+          <v-col sm="12" md="6" lg="4" >
+            <TempGraphCard />
+          </v-col>
+        </v-row>
       </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Watch } from 'vue-property-decorator';
 import StationsMap from './components/StationsMap.vue';
 import StationCard from './components/StationCard.vue';
+import TempGraphCard from './components/TempGraphCard.vue';
 import { Station, Measurement } from './app/types';
 
 @Component({
   components: {
-    StationsMap, StationCard
+    StationsMap, StationCard, TempGraphCard
   }
 })
 export default class App extends Vue {
@@ -61,6 +67,13 @@ export default class App extends Vue {
 
   get selectedStations (): Station[] {
     return this.$store.state.selectedStations;
+  }
+
+  // when the selected stations are changed, update the historic measurements
+  // might eventually move to another component
+  @Watch('selectedStations')
+  selectedPropertyChanged () {
+    this.$store.dispatch('fetchHistoricMeasurements');
   }
 }
 </script>
