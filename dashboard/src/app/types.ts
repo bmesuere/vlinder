@@ -31,3 +31,14 @@ export interface MeasurementSeries {
   series: {stationId: string; values: number[]}[];
   timestamps: string[];
 }
+
+export interface WeatherProperty {
+  property: string;
+  name: string;
+  legend: string;
+  icon: string;
+  title: string;
+  unit: string;
+}
+
+export type WeatherPropertyName = 'temp' | 'rainVolume' | 'windSpeed';

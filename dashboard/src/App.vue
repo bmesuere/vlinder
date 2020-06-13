@@ -25,7 +25,13 @@
         </v-row>
         <v-row>
           <v-col sm="12" md="6" lg="4" >
-            <TempGraphCard />
+            <GraphCard :weatherProperty="weatherProperties.temp"/>
+          </v-col>
+          <v-col sm="12" md="6" lg="4" >
+            <GraphCard :weatherProperty="weatherProperties.rainVolume"/>
+          </v-col>
+          <v-col sm="12" md="6" lg="4" >
+            <GraphCard :weatherProperty="weatherProperties.windSpeed"/>
           </v-col>
         </v-row>
       </v-container>
@@ -37,12 +43,14 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import StationsMap from './components/StationsMap.vue';
 import StationCard from './components/StationCard.vue';
-import TempGraphCard from './components/TempGraphCard.vue';
+import GraphCard from './components/GraphCard.vue';
+
+import { weatherProperties } from './app/weatherProperties';
 import { Station, Measurement } from './app/types';
 
 @Component({
   components: {
-    StationsMap, StationCard, TempGraphCard
+    StationsMap, StationCard, GraphCard
   }
 })
 export default class App extends Vue {
@@ -63,6 +71,10 @@ export default class App extends Vue {
       .then((d) => { this.resolveDataLoaded(d); });
 
     setInterval(() => this.$store.dispatch('fetchMeasurements'), 60000);
+  }
+
+  get weatherProperties () {
+    return weatherProperties;
   }
 
   get selectedStations (): Station[] {

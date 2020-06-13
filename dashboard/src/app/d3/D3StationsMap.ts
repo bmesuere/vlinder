@@ -3,16 +3,14 @@
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 
-import { Station, Measurement } from '../types';
+import { Station, Measurement, WeatherPropertyName } from '../types';
 import { weatherProperties } from '../weatherProperties';
 import { legend } from './Legend';
-
-type weatherPropertyName = 'temp' | 'rainVolume' | 'windSpeed';
 
 export class D3StationsMap {
   // arguments
   private readonly selector: string;
-  private selectedProperty: weatherPropertyName = 'temp';
+  private selectedProperty: WeatherPropertyName = 'temp';
   private readonly selectedStations: Station[];
   private readonly toggleCallback: Function;
 
@@ -152,7 +150,7 @@ export class D3StationsMap {
   }
 
   private setProperty (property: string) {
-    this.selectedProperty = (weatherProperties.hasOwnProperty(property) ? property : 'temp') as weatherPropertyName;
+    this.selectedProperty = (weatherProperties.hasOwnProperty(property) ? property : 'temp') as WeatherPropertyName;
   }
 
   updateProperty (property: string) {

@@ -1,12 +1,12 @@
 import * as d3 from 'd3';
 import { multiFormat } from './TimeFormatter';
 
-import { Station, Measurement, MeasurementSeries } from '../types';
-import { weatherProperties } from '../weatherProperties';
+import { Station, WeatherProperty, MeasurementSeries } from '../types';
 
-export class D3TempGraph {
+export class D3Graph {
   private readonly selector: string;
   private readonly selectedStations: Station[];
+  private readonly property: WeatherProperty;
 
   // data
   private measurements!: MeasurementSeries;
@@ -26,8 +26,9 @@ export class D3TempGraph {
   private yAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
   private lines!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
 
-  constructor (selector: string, selectedStations: Station[]) {
+  constructor (selector: string, property: WeatherProperty, selectedStations: Station[]) {
     this.selector = selector;
+    this.property = property;
     this.selectedStations = selectedStations;
     this.setLocale();
   }

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { Station, Measurement, MeasurementSeries } from '../app/types';
+import { Station, Measurement, MeasurementSeries, WeatherPropertyName } from '../app/types';
 
 Vue.use(Vuex);
 
@@ -92,14 +92,14 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    tempData: (state) => {
-      const data: MeasurementSeries = { property: 'temp', series: [], timestamps: [] };
+    historicData: (state) => (prop: WeatherPropertyName) => {
+      const data: MeasurementSeries = { property: prop, series: [], timestamps: [] };
       if (state.historicMeasurements.length > 0) {
         data.timestamps = state.historicMeasurements[0].map(m => m.time);
         state.historicMeasurements.forEach(ms => {
           data.series.push({
             stationId: ms[0].id,
-            values: ms.map(m => m.temp)
+            values: ms.map(m => m[prop])
           });
         });
       }
