@@ -30,7 +30,6 @@ export class D3Graph {
     this.selector = selector;
     this.property = property;
     this.selectedStations = selectedStations;
-    this.setLocale();
   }
 
   init () {
@@ -39,7 +38,7 @@ export class D3Graph {
       .append('svg')
       .attr('viewBox', `0, 0, ${this.width}, ${this.height}`);
 
-    this.x = d3.scaleTime()
+    this.x = d3.scaleUtc()
       .range([this.margin.left, this.width - this.margin.right]);
 
     this.y = d3.scaleLinear()
@@ -97,18 +96,5 @@ export class D3Graph {
       // @ts-ignore
       .attr('d', d => this.line(d.values))
       .attr('stroke', d => this.color(d.stationId));
-  }
-
-  private setLocale () {
-    d3.timeFormatDefaultLocale({
-      dateTime: '%a %e %B %Y %T',
-      date: '%d-%m-%Y',
-      time: '%H:%M:%S',
-      periods: ['AM', 'PM'],
-      days: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'],
-      shortDays: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
-      months: ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
-      shortMonths: ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
-    });
   }
 }
