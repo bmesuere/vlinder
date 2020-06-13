@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { multiFormat } from './TimeFormatter';
 
 import { Station, Measurement, MeasurementSeries } from '../types';
 import { weatherProperties } from '../weatherProperties';
@@ -7,16 +8,106 @@ export class D3TempGraph {
   private readonly selector: string;
   private readonly selectedStations: Station[];
 
+  // data
+  private measurements!: MeasurementSeries;
+
+  // settings
+  private readonly margin = { top: 20, right: 20, bottom: 30, left: 30 };
+  private readonly width = 400;
+  private readonly height = 300;
+
+  // svg stuff
+  private svg!: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
+  private x!: d3.ScaleTime<number, number>;
+  private y!: d3.ScaleLinear<number, number>;
+  private color!: d3.ScaleOrdinal<string, string>;
+  private line!: d3.Line<[number, number]>;
+  private xAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
+  private yAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
+  private lines!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
+
   constructor (selector: string, selectedStations: Station[]) {
     this.selector = selector;
     this.selectedStations = selectedStations;
+    this.setLocale();
   }
 
   init () {
-    //
+    this.svg = d3.select(this.selector)
+      .html('')
+      .append('svg')
+      .attr('viewBox', `0, 0, ${this.width}, ${this.height}`);
+
+    this.x = d3.scaleTime()
+      .range([this.margin.left, this.width - this.margin.right]);
+
+    this.y = d3.scaleLinear()
+      .range([this.height - this.margin.bottom, this.margin.top]);
+
+    this.color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    this.line = d3.line()
+      .curve(d3.curveCardinal)
+      // @ts-ignore
+      .defined(d => !isNaN(d))
+      .x((d, i) => this.x(Date.parse(this.measurements.timestamps[i])))
+      // @ts-ignore
+      .y(d => this.y(d));
+
+    this.lines = this.svg.append('g')
+      .attr('fill', 'none')
+      .attr('stroke-width', 1.5)
+      .attr('stroke-linejoin', 'round');
+
+    this.xAxis = this.svg.append('g')
+      .attr('transform', `translate(0,${this.height - this.margin.bottom})`)
+      // @ts-ignore
+      .call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(multiFormat));
+
+    this.yAxis = this.svg.append('g')
+      .attr('transform', `translate(${this.margin.left},0)`)
+      .call(d3.axisLeft(this.y));
   }
 
   updateData (measurements: MeasurementSeries) {
-    console.log(measurements);
+    this.measurements = measurements;
+    this.update();
+  }
+
+  private update () {
+    if (!this.svg) return;
+    if (this.measurements.timestamps.length === 0) return;
+
+    // update scales
+    this.x.domain(d3.extent(this.measurements.timestamps, d => Date.parse(d)) as [number, number]);
+    this.y.domain([d3.min(this.measurements.series, d => d3.min(d.values)) as number, d3.max(this.measurements.series, d => d3.max(d.values)) as number]).nice();
+
+    // redraw axes
+    // @ts-ignore
+    this.xAxis.transition().call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(multiFormat));
+    this.yAxis.transition().call(d3.axisLeft(this.y));
+
+    // redraw lines
+    this.lines.selectAll('path')
+      // @ts-ignore
+      .data(this.measurements.series, d => d.stationId)
+      .join('path')
+      .transition()
+      // @ts-ignore
+      .attr('d', d => this.line(d.values))
+      .attr('stroke', d => this.color(d.stationId));
+  }
+
+  private setLocale () {
+    d3.timeFormatDefaultLocale({
+      dateTime: '%a %e %B %Y %T',
+      date: '%d-%m-%Y',
+      time: '%H:%M:%S',
+      periods: ['AM', 'PM'],
+      days: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'],
+      shortDays: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
+      months: ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
+      shortMonths: ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
+    });
   }
 }

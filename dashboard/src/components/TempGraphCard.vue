@@ -18,6 +18,7 @@ export default class TempGraphCard extends Vue {
 
   mounted () {
     this.graph = new D3TempGraph(`#${this.tempGraphId}`, this.selectedStations);
+    this.graph.init();
   }
 
   get measurements (): Measurement[][] {
