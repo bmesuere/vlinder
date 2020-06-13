@@ -23,6 +23,7 @@
             <StationCard :station="s" />
           </v-col>
         </v-row>
+        <v-toolbar-title class="mt-3">Afgelopen 24u</v-toolbar-title>
         <v-row>
           <v-col sm="12" md="6" lg="4" >
             <GraphCard :weatherProperty="weatherProperties.temp"/>
@@ -71,6 +72,7 @@ export default class App extends Vue {
       .then((d) => { this.resolveDataLoaded(d); });
 
     setInterval(() => this.$store.dispatch('fetchMeasurements'), 60000);
+    setInterval(() => this.$store.dispatch('fetchHistoricMeasurements'), 60000);
   }
 
   get weatherProperties () {

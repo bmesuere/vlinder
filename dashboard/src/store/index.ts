@@ -15,6 +15,7 @@ export default new Vuex.Store({
     stations: Array<Station>(),
     selectedStations: Array<Station>(),
     liveMeasurements: Array<Measurement>(),
+    loadingHistoricMeasurements: true,
     historicMeasurements: Array<Array<Measurement>>()
   },
   mutations: {
@@ -26,6 +27,9 @@ export default new Vuex.Store({
     },
     setHistoricMeasurements (state, measurements: Measurement[][]) {
       state.historicMeasurements = measurements;
+    },
+    setLoadingHistoricMeasurements (state, loading: boolean) {
+      state.loadingHistoricMeasurements = loading;
     },
     stationsLoaded (state) {
       state.stationsLoaded = true;
@@ -58,6 +62,7 @@ export default new Vuex.Store({
         });
     },
     fetchHistoricMeasurements ({ commit, state }): Promise<Measurement[][]> {
+      commit('setLoadingHistoricMeasurements', true);
       return Promise.all(
         state.selectedStations.map(s => {
           return fetch(API_URL + MEASUREMENTS_PATH + '/' + s.id)
@@ -65,6 +70,7 @@ export default new Vuex.Store({
         })
       ).then(ms => {
         commit('setHistoricMeasurements', ms);
+        commit('setLoadingHistoricMeasurements', false);
         return ms;
       });
     },

@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :loading="loading">
     <v-list-item two-line>
       <v-list-item-content>
         <v-list-item-title class="mb-1">{{ weatherProperty.name }}</v-list-item-title>
@@ -34,6 +34,10 @@ export default class GraphCard extends Vue {
 
   get selectedStations (): Station[] {
     return this.$store.state.selectedStations;
+  }
+
+  get loading (): boolean {
+    return this.$store.state.loadingHistoricMeasurements;
   }
 
   get consolidatedGraphId (): string {
