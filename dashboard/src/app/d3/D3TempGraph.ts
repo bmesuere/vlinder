@@ -12,9 +12,9 @@ export class D3TempGraph {
   private measurements!: MeasurementSeries;
 
   // settings
-  private readonly margin = { top: 20, right: 20, bottom: 30, left: 30 };
+  private readonly margin = { top: 5, right: 30, bottom: 30, left: 40 };
   private readonly width = 400;
-  private readonly height = 300;
+  private readonly height = 250;
 
   // svg stuff
   private svg!: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
@@ -85,7 +85,7 @@ export class D3TempGraph {
     // redraw axes
     // @ts-ignore
     this.xAxis.transition().call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(multiFormat));
-    this.yAxis.transition().call(d3.axisLeft(this.y));
+    this.yAxis.transition().call(d3.axisLeft(this.y).ticks(5));
 
     // redraw lines
     this.lines.selectAll('path')

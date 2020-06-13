@@ -1,5 +1,11 @@
 <template>
-  <v-card min-height="100">
+  <v-card>
+    <v-list-item two-line>
+      <v-list-item-content>
+        <v-list-item-title class="mb-1">Temperatuur</v-list-item-title>
+        <v-list-item-subtitle>°C</v-list-item-subtitle>
+      </v-list-item-content>
+    </v-list-item>
     <div v-bind:id="tempGraphId">
     </div>
   </v-card>
