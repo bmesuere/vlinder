@@ -47,7 +47,7 @@ export class D3Graph {
     this.color = d3.scaleOrdinal(d3.schemeCategory10);
 
     this.line = d3.line()
-      .curve(d3.curveCardinal)
+      .curve(d3.curveMonotoneX)
       // @ts-ignore
       .defined(d => !isNaN(d))
       .x((d, i) => this.x(Date.parse(this.measurements.timestamps[i])))

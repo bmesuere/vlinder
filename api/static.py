@@ -1,7 +1,7 @@
 import csv
 
 station_metadata = []
-with open('data.csv', 'r') as f:
+with open('data.csv', 'r', encoding="utf-8") as f:
     csv_reader = csv.DictReader(f)
     for row in csv_reader:
         for key in ["lat", "lon", "water20", "verhard20", "groen20", "water50", "verhard50", "groen50", "water100",
