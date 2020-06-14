@@ -38,7 +38,7 @@ export class D3Graph {
       .append('svg')
       .attr('viewBox', `0, 0, ${this.width}, ${this.height}`);
 
-    this.x = d3.scaleUtc()
+    this.x = d3.scaleTime()
       .range([this.margin.left, this.width - this.margin.right]);
 
     this.y = d3.scaleLinear()

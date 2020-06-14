@@ -11,21 +11,21 @@ const f = d3.timeFormatLocale({
   shortMonths: ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
 });
 
-const formatMillisecond = f.utcFormat('.%L');
-const formatSecond = f.utcFormat(':%S');
-const formatMinute = f.utcFormat('%H:%M'); // default: %I:%M
-const formatHour = f.utcFormat('%H:%M'); // default: %I %p
-const formatDay = f.utcFormat('%a %d');
-const formatWeek = f.utcFormat('%b %d');
-const formatMonth = f.utcFormat('%B');
-const formatYear = f.utcFormat('%Y');
+const formatMillisecond = f.format('.%L');
+const formatSecond = f.format(':%S');
+const formatMinute = f.format('%H:%M'); // default: %I:%M
+const formatHour = f.format('%H:%M'); // default: %I %p
+const formatDay = f.format('%a %d');
+const formatWeek = f.format('%a %d %b');
+const formatMonth = f.format('%B');
+const formatYear = f.format('%Y');
 
 export function multiFormat (date: Date) {
-  return (d3.utcSecond(date) < date ? formatMillisecond
-    : d3.utcMinute(date) < date ? formatSecond
-      : d3.utcHour(date) < date ? formatMinute
-        : d3.utcDay(date) < date ? formatHour
-          : d3.utcMonth(date) < date ? (d3.utcWeek(date) < date ? formatDay : formatWeek)
-            : d3.utcYear(date) < date ? formatMonth
+  return (d3.timeSecond(date) < date ? formatMillisecond
+    : d3.timeMinute(date) < date ? formatSecond
+      : d3.timeHour(date) < date ? formatMinute
+        : d3.timeDay(date) < date ? formatHour
+          : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
+            : d3.timeYear(date) < date ? formatMonth
               : formatYear)(date);
 }
