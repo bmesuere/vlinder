@@ -82,7 +82,7 @@ def get_measurements_raw(id=None, start=None, end=None):
 
 def add_status(vlinder_data, start_time):
     prev = deque([])
-    prev_time = start_time
+    prev_time = start_time.replace(tzinfo=None)
     for d in vlinder_data:
         d['status'] = 'Ok'
         if data_equal(prev, d, status_lookback):
