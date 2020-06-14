@@ -1,5 +1,5 @@
 import json
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from collections import deque
 
 import pymysql
@@ -67,9 +67,9 @@ def get_measurements_raw(id=None, start=None, end=None):
     if start is None and end:
         raise ValueError()
 
-    start_d = datetime.now() - timedelta(hours=24) if not start else datetime.strptime(start,
+    start_d = datetime.now(timezone.utc) - timedelta(hours=24) if not start else datetime.strptime(start,
                                                                                        '%Y-%m-%dT%H:%M:%S.%fZ')
-    end_d = datetime.now() if not end else datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
+    end_d = datetime.now(timezone.utc) if not end else datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
     if start_d >= end_d:
         raise ValueError()
 
