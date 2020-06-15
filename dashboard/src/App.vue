@@ -71,8 +71,17 @@ export default class App extends Vue {
     Promise.all([stationsPromise, measurementsPromise])
       .then((d) => { this.resolveDataLoaded(d); });
 
-    setInterval(() => this.$store.dispatch('fetchMeasurements'), 60000);
-    setInterval(() => this.$store.dispatch('fetchHistoricMeasurements'), 60000);
+    this.scheduleFetch('fetchMeasurements');
+    this.scheduleFetch('fetchHistoricMeasurements');
+  }
+
+  scheduleFetch (fetch: string) {
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        this.scheduleFetch(fetch);
+        this.$store.dispatch(fetch);
+      });
+    }, 60000);
   }
 
   get weatherProperties () {
