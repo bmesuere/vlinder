@@ -1,10 +1,14 @@
 from database import get_stations_raw, get_measurements_raw
+from static import stations_last_modified
+
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+
+modified_format = "%a, %d %b %Y %I:%M:%S %Z"
 
 base_url = open('../vlinder/.env').readline().split('=')[1].rstrip('\n')
 
@@ -20,7 +24,9 @@ def root():
 @app.route('/api/stations')
 @cross_origin()
 def stations():
-    return jsonify([station(**s) for s in get_stations_raw()])
+    if request.if_modified_since and request.if_modified_since >= stations_last_modified:
+        return '', 304
+    return jsonify([station(**s) for s in get_stations_raw()]), 200, {'Last-Modified': stations_last_modified.strftime(modified_format)}
 
 
 @app.route('/api/stations/<id>')
@@ -29,7 +35,6 @@ def stations_id(id):
     if id is None or id == '':
         abort(400)
     return station(**get_stations_raw({id}))
-
 
 @app.route('/api/measurements')
 @cross_origin()

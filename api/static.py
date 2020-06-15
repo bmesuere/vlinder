@@ -1,4 +1,6 @@
 import csv
+from os import path
+from datetime import datetime
 
 station_metadata = []
 with open('data.csv', 'r', encoding="utf-8") as f:
@@ -11,6 +13,8 @@ with open('data.csv', 'r', encoding="utf-8") as f:
         station_metadata.append(row)
     for row in station_metadata:
         vlinder = row['VLINDER']
+
+stations_last_modified = datetime.fromtimestamp(path.getmtime("data.csv")).replace(microsecond=0)
 
 d = {"lon": "longitude", "lat": "latitude"}
 
