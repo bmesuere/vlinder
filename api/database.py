@@ -5,6 +5,7 @@ from collections import deque
 import pymysql
 import pymysql.cursors
 from static import station_metadata
+import math as m
 
 latest_vlinder_data = []
 last_request_time = None
@@ -46,17 +47,16 @@ def get_measurements_raw(id=None, start=None, end=None):
         global last_request_time, latest_vlinder_data
         now = datetime.now()
         if not last_request_time or now - last_request_time > timedelta(minutes=5):
-            group_length = status_lookback + 1
-            # Get len(vlinders) * status_lookback latest vlinder data
-            latest_vlinder_data = list(
-                map(vlinder_data_transform, query('SELECT * FROM Vlinder ORDER BY datetime DESC LIMIT ' +
-                                                  str(group_length * len(station_metadata)))))
+            num_data_points = status_lookback + 1
+            lookback_window = (datetime.now( timezone.utc) - timedelta(minutes=(5 * num_data_points))).strftime('%Y-%m-%d %H:%M')
+            latest_vlinder_data = list(map(vlinder_data_transform, query('SELECT * FROM Vlinder WHERE datetime > "' + lookback_window + '" ORDER BY datetime DESC')))
             # Reverse order => ascending in time
             latest_vlinder_data = latest_vlinder_data[::-1]
+            num_of_stations = m.floor(len(latest_vlinder_data) / num_data_points)
             # Group data points per vlinder
             latest_vlinder_data_grouped = [
-                [latest_vlinder_data[i + x * len(station_metadata)] for x in range(group_length)] for i in
-                range(len(station_metadata))
+                [latest_vlinder_data[i + x * num_of_stations] for x in range(num_data_points)] for i in
+                range(num_of_stations)
             ]
             # Get time of first data point
             start_d = latest_vlinder_data_grouped[0][0]['time']
@@ -67,8 +67,7 @@ def get_measurements_raw(id=None, start=None, end=None):
     if start is None and end:
         raise ValueError()
 
-    start_d = datetime.now(timezone.utc) - timedelta(hours=24) if not start else datetime.strptime(start,
-                                                                                       '%Y-%m-%dT%H:%M:%S.%fZ')
+    start_d = datetime.now(timezone.utc) - timedelta(hours=24) if not start else datetime.strptime(start, '%Y-%m-%dT%H:%M:%S.%fZ')
     end_d = datetime.now(timezone.utc) if not end else datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%fZ')
     if start_d >= end_d:
         raise ValueError()
