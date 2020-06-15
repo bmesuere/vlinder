@@ -1,0 +1,3 @@
+Flask==1.1.2
+Flask-Cors==3.0.8
+PyMySQL==0.9.3
