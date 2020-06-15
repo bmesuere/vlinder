@@ -34,7 +34,9 @@ def stations():
 def stations_id(id):
     if id is None or id == '':
         abort(400)
-    return station(**get_stations_raw({id}))
+    if request.if_modified_since and request.if_modified_since >= stations_last_modified:
+        return '', 304
+    return station(**get_stations_raw({id})), 200, {'Last-Modified': stations_last_modified.strftime(modified_format)}
 
 @app.route('/api/measurements')
 @cross_origin()
