@@ -33,7 +33,7 @@ def get_stations_raw(id=None):
     # row (csv data + status) zie app.py station
     if id is None:
         return station_metadata
-    return [station for station in station_metadata if station['ID'] in id]
+    return [station for station in station_metadata if station['ID'] in id][0]
 
 
 def get_measurements_raw(id=None, start=None, end=None):
