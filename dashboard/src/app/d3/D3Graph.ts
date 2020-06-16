@@ -26,6 +26,8 @@ export class D3Graph {
   private yAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
   private lines!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
   private bisector!: (array: ArrayLike<string>, x: unknown, lo?: number | undefined, hi?: number | undefined) => number;
+  private mouseG!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
+  private mouseDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
 
   constructor (selector: string, property: WeatherProperty, selectedStations: Station[]) {
     this.selector = selector;
@@ -69,9 +71,9 @@ export class D3Graph {
       .attr('transform', `translate(${this.margin.left},0)`)
       .call(d3.axisLeft(this.y));
 
-    const mouseG = this.svg.append('g').attr('class', 'mouse-over');
-    const mouseLine = mouseG.append('line') // this is the black vertical line to follow mouse
-      .attr('class', 'v-line')
+    this.mouseG = this.svg.append('g').attr('class', 'mouse-over');
+    const mouseLine = this.mouseG.append('line') // this is the black vertical line to follow mouse
+      .attr('class', 'mouseover-line')
       .attr('y1', this.y.range()[0])
       .attr('y2', this.y.range()[1])
       .style('stroke', 'black')
@@ -81,13 +83,23 @@ export class D3Graph {
     this.bisector = d3.bisector((d: string) => Date.parse(d)).left;
 
     this.svg.on('touchmove mousemove', () => {
-      const timestamp = this.bisect(d3.mouse(this.svg.node() as SVGSVGElement)[0]);
+      const { timestamp, i } = this.bisect(d3.mouse(this.svg.node() as SVGSVGElement)[0]);
       mouseLine
         .style('opacity', 1)
         .attr('x1', this.x(timestamp))
         .attr('x2', this.x(timestamp));
+      this.mouseDots
+        .attr('r', 4)
+        .attr('cx', this.x(timestamp))
+        .attr('cy', d => this.y(d.values[i]));
     });
-    this.svg.on('touchend mouseleave', () => mouseLine.style('opacity', 0));
+    this.svg.on('touchend mouseleave', () => {
+      mouseLine.style('opacity', 0);
+      this.mouseDots
+        .attr('r', 3)
+        .attr('cx', () => this.x(Date.parse(this.measurements.timestamps[this.measurements.timestamps.length - 1])))
+        .attr('cy', d => this.y(d.values[d.values.length - 1]));
+    });
   }
 
   updateData (measurements: MeasurementSeries) {
@@ -117,14 +129,31 @@ export class D3Graph {
       // @ts-ignore
       .attr('d', d => this.line(d.values))
       .attr('stroke', d => this.color(d.stationId));
+
+    this.mouseDots = this.mouseG.selectAll('.mouseover-dot')
+      // @ts-ignore
+      .data(this.measurements.series, d => d.stationId)
+      .join('circle')
+      .attr('class', 'mouseover-dot')
+      .attr('r', 3)
+      .attr('cx', () => this.x(Date.parse(this.measurements.timestamps[this.measurements.timestamps.length - 1])))
+      .attr('cy', d => this.y(d.values[d.values.length - 1]))
+      .style('fill', d => this.color(d.stationId));
   }
 
-  private bisect (mx: number): number {
+  private bisect (mx: number): {timestamp: number; i: number} {
+    if (!this.measurements) {
+      return { timestamp: 0, i: 0 };
+    }
     const date = this.x.invert(mx);
     const index = this.bisector(this.measurements.timestamps, date, 1);
     const a = Date.parse(this.measurements.timestamps[index - 1]);
     const b = Date.parse(this.measurements.timestamps[index]);
     // @ts-ignore
-    return date - a > b - date ? b : a;
+    if (date - a > b - date) {
+      return { timestamp: b, i: index };
+    } else {
+      return { timestamp: a, i: index - 1 };
+    }
   }
 }
