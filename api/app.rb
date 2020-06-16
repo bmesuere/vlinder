@@ -13,6 +13,8 @@
 #            ██   ██ ██      ██    (;O/ \/ \O;)
 #                   
 
+require 'byebug'
+
 #
 # Configuration
 #
@@ -140,7 +142,7 @@ def query_all_stations!
   $all_query.execute(lookback)
             .group_by{ |row| row['StationID'] }
             .values
-            .map{ |datapoints| process_measurements(datapoints) }
+            .map{ |datapoints| process_measurements(datapoints).first }
 end
 
 def query_station!(id, start = nil, stop = nil)
@@ -201,7 +203,7 @@ get '/measurements' do
 
   if (Time.now - UPDATE_INTERVAL) > $latest_update
     $measurements_result = query_all_stations!
-    $latest_update = Time.now
+    $latest_update = $measurements_result.first[:time]
   end
 
   last_modified $latest_update
