@@ -52,6 +52,7 @@ export class D3StationsMap {
     // prepare data
     this.measurementsMap = new Map(this.measurements.map(m => [m.id, m]));
     this.belgium.objects.municipalities.geometries = this.belgium.objects.municipalities.geometries.filter(d => d.properties.reg_nis !== '03000');
+    this.belgium.objects.provinces.geometries = this.belgium.objects.provinces.geometries.filter(d => d.properties.reg_nis !== '03000');
   }
 
   async init (stations: Station[], measurements: Measurement[]) {
@@ -98,6 +99,17 @@ export class D3StationsMap {
       .attr('d', path)
       .append('title')
       .text(d => d?.properties?.name_nl);
+
+    // draw provinces
+    svg.append('g')
+      .selectAll('.province')
+      .data(topojson.feature(this.belgium, this.belgium.objects.provinces).features)
+      .join('path')
+      .attr('class', 'province')
+      .attr('fill', 'none')
+      .attr('stroke', '#bbbbbb')
+      .attr('stroke-linejoin', 'round')
+      .attr('d', path);
 
     // draw stations
     this.stationDots = svg.append('g')
