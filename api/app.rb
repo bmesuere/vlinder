@@ -26,11 +26,17 @@ configure do
 end
 
 configure :development do
+  $url = 'http://localhost:9292/'
+
   # Automatically reload when files change
   register Sinatra::Reloader
   after_reload do
     puts '=== Sinatra reloaded ==='
   end
+end
+
+configure :production do
+  $url = 'https://mooncake.ugent.be/api/'
 end
 
 #
@@ -44,14 +50,16 @@ def connect_db
 end
 
 def read_stations
+  stations_file = File.new($stations_csv_file)
   stations = {}
-  CSV.foreach($stations_csv_file, headers: true) do |row|
+  CSV.foreach(stations_file, headers: true) do |row|
     stations[row['ID']] = {
       id: row['ID'],
       name: row['VLINDER'],
       coords: { lat: row['lat'].to_f, lon: row['lon'].to_f },
       city: row['stad'],
       given_name: row['benaming'],
+      measurements: $url + 'measurements/' + row['ID'],
       landUse: [20, 50, 100, 250, 500].map { |distance|
         {
           distance: distance,
@@ -62,14 +70,14 @@ def read_stations
       }
     }
   end
-  stations
+  [stations, stations_file.mtime]
 end
 
 #
 # Setup
 #
 
-$stations = read_stations
+$stations, $stations_last_modified = read_stations
 $db = connect_db
 
 #
@@ -85,8 +93,8 @@ error do
 end
 
 get '/' do
-  json stations: request.url + 'stations',
-       measurements: request.url + 'measurements'
+  json stations: $url + 'stations',
+       measurements: $url + 'measurements'
 end
 
 get '/stations' do
