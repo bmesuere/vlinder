@@ -17,8 +17,6 @@
 # Configuration
 #
 
-require 'byebug'
-
 DB_CONFIG_FILE = 'login.json'
 STATIONS_CSV_FILE = 'data.csv'
 UPDATE_INTERVAL = 300
@@ -83,50 +81,78 @@ def read_stations
 end
 
 ATTRIBUTES = %w(temp humidity pressure WindSpeed WindDirection WindGust RainIntensity RainVolume).freeze
-def status_for(measurements)
+def status_for(old, new)
   changed = ATTRIBUTES.any? do |attribute|
-    measurements[0][attribute] != measurements[1][attribute]
+    old[attribute] != new[attribute]
   end
   if changed then 'Ok' else 'Offline' end
 end
 
-def rain_deltas(measurements)
-  data = measurements.reverse_each
-  previous = data.next
-  data.map do |current|
-    diff = current['RainVolume'].to_f - previous['RainVolume'].to_f
-    if diff.negative? # midnight passed
-      delta = current['RainVolume'].to_f
-    else
-      delta = diff
-    end
-    previous = current
-    delta
+def rain_delta(old, new)
+  diff = new['RainVolume'].to_f - old['RainVolume'].to_f
+  if diff.negative? # midnight passed
+    new['RainVolume'].to_f
+  else
+    diff
   end
 end
 
 def process_measurements(measurements)
-  latest = measurements.first
-  {
-    id: latest['StationID'],
-    status: status_for(measurements),
-    rainVolume: rain_deltas(measurements).first,
-    time: latest['datetime'],
-    temp: latest['temperature'].to_f,
-    humidity: latest['humidity'].to_f,
-    pressure: latest['pressure'].to_f / 100,
-    windSpeed: latest['WindSpeed'].to_f,
-    rainIntensity: latest['RainIntensity'].to_f,
-    windGust: latest['WindGust'].to_f,
-  }
+  data = measurements.reverse_each
+  previous = data.first
+  data.drop(1).map do |current|
+    status = status_for(previous, current)
+    rainVolume = rain_delta(previous, current)
+    previous = current
+    {
+      id: current['StationID'],
+      station: $url + 'stations/' + current['StationID'],
+      measurements: $url + 'measurements/' + current['StationID'],
+      status: status,
+      rainVolume: rainVolume,
+      time: current['datetime'],
+      temp: current['temperature'].to_f,
+      humidity: current['humidity'].to_f,
+      pressure: current['pressure'].to_f / 100,
+      windSpeed: current['WindSpeed'].to_f,
+      rainIntensity: current['RainIntensity'].to_f,
+      windGust: current['WindGust'].to_f,
+    }
+  end
 end
 
 def query_all_stations!
-  $all_query ||= $db.prepare('SELECT * FROM Vlinder WHERE datetime > ? ORDER BY datetime DESC')
+  $all_query ||= $db.prepare(
+    %q(
+    SELECT *
+    FROM Vlinder
+    WHERE datetime > ?
+    ORDER BY datetime DESC
+    )
+  )
   lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
   $all_query.execute(lookback)
             .group_by{ |row| row['StationID'] }
-            .map{ |_id, datapoints| process_measurements(datapoints) }
+            .values
+            .map{ |datapoints| process_measurements(datapoints) }
+end
+
+def query_station!(id, start = nil, stop = nil)
+  $station_query ||= $db.prepare(
+    %q(
+    SELECT *
+    FROM Vlinder
+    WHERE StationID = ?
+      AND datetime > ?
+      AND ? > datetime
+    ORDER BY datetime DESC
+    )
+  )
+  start ||= Time.now - 24 * 60 * 60
+  stop ||= Time.now
+
+  result = $station_query.execute(id, start, stop)
+  process_measurements(result)
 end
 
 #
@@ -178,5 +204,5 @@ end
 
 get '/measurements/:id' do
   pass if not $station_info.has_key? params['id']
-  json measurements_for(params['id'])
+  json query_station!(params['id'], params['start'], params['end'])
 end
