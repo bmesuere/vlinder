@@ -82,6 +82,10 @@ def read_stations
   [stations, stations_file.mtime]
 end
 
+def updated_since?(last_modified)
+  Time.now - UPDATE_INTERVAL > last_modified
+end
+
 def httpdate_or_nil(input)
   Time.parse(input || '')
 rescue ArgumentError
@@ -193,15 +197,16 @@ get '/stations' do
 end
 
 get '/stations/:id' do
-  pass if not $station_info.has_key? params['id']
+  id = params['id']
+  pass if not $station_info.has_key? id
   last_modified $station_info_last_modified
-  json $station_info[params['id']]
+  json $station_info[id]
 end
 
 get '/measurements' do
   $latest_update ||= (Time.now - UPDATE_INTERVAL - 1)
 
-  if (Time.now - UPDATE_INTERVAL) > $latest_update
+  if updated_since? $latest_update
     $measurements_result = query_all_stations!
     $latest_update = $measurements_result.first[:time]
   end
@@ -211,13 +216,30 @@ get '/measurements' do
 end
 
 get '/measurements/:id' do
-  pass if not $station_info.has_key? params['id']
+  $station_24h ||= {}
+  id = params['id']
+  pass if not $station_info.has_key? id
   start = httpdate_or_nil params['start']
   stop = httpdate_or_nil params['end']
 
-  if stop
-    last_modified stop
-  end
+  if start.nil? && stop.nil?
+    # This will be called most of the time: fetch the last 24h of a station.
 
-  json query_station!(params['id'], start, stop)
+    result = $station_24h[id]
+    if result.nil? || updated_since?(result[:last_modified])
+      data = query_station!(id)
+      result = {
+        last_modified: data.last[:time],
+        data: data
+      }
+      $station_24h[id] = result
+    end
+    last_modified result[:last_modified]
+    json result[:data]
+
+  else
+
+    last_modified stop if stop
+    json query_station!(id, start, stop)
+  end
 end
