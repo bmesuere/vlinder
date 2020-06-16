@@ -44,6 +44,10 @@ configure :production do
   $url = 'https://mooncake.ugent.be/api/'
 end
 
+before do
+  cache_control :public, :must_revalidate
+end
+
 #
 # Helpers
 #
@@ -117,21 +121,12 @@ def process_measurements(measurements)
   }
 end
 
-def query_all_stations
+def query_all_stations!
   $all_query ||= $db.prepare('SELECT * FROM Vlinder WHERE datetime > ? ORDER BY datetime DESC')
   lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
   $all_query.execute(lookback)
             .group_by{ |row| row['StationID'] }
             .map{ |_id, datapoints| process_measurements(datapoints) }
-end
-
-def current_measurements
-  $latest_update_all ||= (Time.now - $update_interval - 1)
-  if (Time.now - $update_interval) > $latest_update_all
-    $all_data = query_all_stations
-    $latest_update_all = Time.now
-  end
-  $all_data
 end
 
 #
@@ -159,16 +154,26 @@ get '/' do
 end
 
 get '/stations' do
+  last_modified $station_info_last_modified
   json $station_info
 end
 
 get '/stations/:id' do
   pass if not $station_info.has_key? params['id']
+  last_modified $station_info_last_modified
   json $station_info[params['id']]
 end
 
 get '/measurements' do
-  json current_measurements
+  $latest_update ||= (Time.now - UPDATE_INTERVAL - 1)
+
+  if (Time.now - UPDATE_INTERVAL) > $latest_update
+    $measurements_result = query_all_stations!
+    $latest_update = Time.now
+  end
+
+  last_modified $latest_update
+  json $measurements_result
 end
 
 get '/measurements/:id' do
