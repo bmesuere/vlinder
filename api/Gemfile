@@ -13,3 +13,9 @@ gem "json", "~> 2.3"
 gem "sinatra-contrib", "~> 2.0"
 
 gem "sinatra-cors", "~> 1.1"
+
+gem "mysql2", "~> 0.5.3"
+
+gem "csv", "~> 3.1"
+
+gem "byebug", "~> 11.1", :group => :development

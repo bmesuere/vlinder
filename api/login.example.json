@@ -1,6 +1,6 @@
 {
     "host":"Don't",
-    "user":"store",
+    "username":"store",
     "password":"passwords on",
-    "db":"github repos"
+    "database":"github repos"
 }
