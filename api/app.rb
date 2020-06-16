@@ -80,6 +80,12 @@ def read_stations
   [stations, stations_file.mtime]
 end
 
+def httpdate_or_nil(input)
+  Time.parse(input || '')
+rescue ArgumentError
+  nil
+end
+
 ATTRIBUTES = %w(temp humidity pressure WindSpeed WindDirection WindGust RainIntensity RainVolume).freeze
 def status_for(old, new)
   changed = ATTRIBUTES.any? do |attribute|
@@ -204,5 +210,12 @@ end
 
 get '/measurements/:id' do
   pass if not $station_info.has_key? params['id']
-  json query_station!(params['id'], params['start'], params['end'])
+  start = httpdate_or_nil params['start']
+  stop = httpdate_or_nil params['end']
+
+  if stop
+    last_modified stop
+  end
+
+  json query_station!(params['id'], start, stop)
 end
