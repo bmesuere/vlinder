@@ -14,24 +14,24 @@
     <v-content>
       <v-container>
         <v-row>
-          <v-col sm="12" md="10" offset-md="1">
+          <v-col cols="12" md="10" offset-md="1">
             <StationsMap :dataLoaded="initialDataLoaded" />
           </v-col>
         </v-row>
         <v-row>
-          <v-col sm="6" md="4" lg="3" v-for="s in selectedStations" :key="s.id" >
+          <v-col cols="12" sm="6" md="4" lg="3" v-for="s in selectedStations" :key="s.id" >
             <StationCard :station="s" />
           </v-col>
         </v-row>
         <v-toolbar-title class="mt-3">Afgelopen 24u</v-toolbar-title>
         <v-row>
-          <v-col sm="12" md="6" lg="4" >
+          <v-col cols="12" md="6" lg="4" >
             <GraphCard :weatherProperty="weatherProperties.temp"/>
           </v-col>
-          <v-col sm="12" md="6" lg="4" >
+          <v-col cols="12" md="6" lg="4" >
             <GraphCard :weatherProperty="weatherProperties.rainVolume"/>
           </v-col>
-          <v-col sm="12" md="6" lg="4" >
+          <v-col cols="12" md="6" lg="4" >
             <GraphCard :weatherProperty="weatherProperties.windSpeed"/>
           </v-col>
         </v-row>
