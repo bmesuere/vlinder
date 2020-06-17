@@ -48,6 +48,20 @@
         </v-row>
       </v-container>
     </v-content>
+    <v-footer padless>
+      <v-card class="flex blue-grey darken-4" flat tile >
+        <v-card-title class="white--text body-2 px-12">
+          &copy; {{ new Date().getFullYear() }} &ndash; Universiteit Gent
+          <v-spacer></v-spacer>
+          <v-btn class="mx-4" dark icon href="https://github.com/bmesuere/vlinder" target="_blank">
+            <v-icon size="24px">mdi-github</v-icon>
+          </v-btn>
+          <v-btn class="mx-4" dark icon href="https://twitter.com/VLINDER_project" target="_blank">
+            <v-icon size="24px">mdi-twitter</v-icon>
+          </v-btn>
+        </v-card-title>
+      </v-card>
+    </v-footer>
   </v-app>
 </template>
 
