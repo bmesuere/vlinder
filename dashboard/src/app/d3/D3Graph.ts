@@ -122,7 +122,7 @@ export class D3Graph {
   }
 
   updateTooltip () {
-    if (!this.measurements) { return; }
+    if (!this.measurements || this.measurements.series.length === 0) { return; }
     const { timestamp, i } = this.tooltipPosition;
     if (i === -1) {
       this.timeLabel.style('opacity', 0);
@@ -166,7 +166,7 @@ export class D3Graph {
 
   private update () {
     if (!this.svg) return;
-    if (this.measurements.timestamps.length === 0) return;
+    if (!this.measurements) return;
 
     // update scales
     this.x.domain(d3.extent(this.measurements.timestamps, d => Date.parse(d)) as [number, number]);
