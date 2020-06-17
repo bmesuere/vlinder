@@ -25,7 +25,7 @@
         </v-row>
         <v-toolbar-title class="mt-3">Afgelopen 24u</v-toolbar-title>
         <v-banner sticky app>
-          <v-chip small label dark v-for="s in selectedStations" :key="s.id" class="ml-2 mr-2" :color="legendColors[s.id]">
+          <v-chip small label close dark v-for="s in selectedStations" :key="s.id" class="ml-2 mr-2" :color="legendColors[s.id]" v-on:click:close="removeFromList(s.id)">
             {{ s.given_name }}
           </v-chip>
         </v-banner>
@@ -88,6 +88,10 @@ export default class App extends Vue {
         this.$store.dispatch(fetch);
       });
     }, 60000);
+  }
+
+  removeFromList (id: string) {
+    this.$store.dispatch('deselectStationById', id);
   }
 
   get weatherProperties () {
