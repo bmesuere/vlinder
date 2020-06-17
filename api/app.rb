@@ -23,14 +23,16 @@ DB_CONFIG_FILE = 'login.json'
 STATIONS_CSV_FILE = 'data.csv'
 UPDATE_INTERVAL = 300
 LOOKBACK_UPDATES = 2
+DATETIME_FMT = "%a, %d %b %Y %I:%M:%S %Z"
 
 # vlinder database uses UTC, and we want to respond with UTC,
 # so setting our timezone to UTC makes our life easier
 ENV['TZ'] = 'UTC'
 
 configure do
-  set :allow_origin, "*"
-  set :allow_headers, "content-type,if-modified-since"
+  register Sinatra::Cors
+  set :allow_origin, '*'
+  set :allow_headers, 'content-type,if-modified-since'
 end
 
 configure :development do
@@ -55,8 +57,15 @@ end
 def connect_db
   config = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
   config[:connect_timeout] = 2 # crash if we can't connect within 2 seconds
+  config[:reconnect] = true
   Mysql2::Client.new(config)
 end
+
+LAND_USAGE_TYPES = {
+  'water' => 'water',
+  'verhard' => 'paved',
+  'groen' => 'green'
+}.freeze
 
 def read_stations
   stations_file = File.new(STATIONS_CSV_FILE)
@@ -65,15 +74,16 @@ def read_stations
     stations[row['ID']] = {
       id: row['ID'],
       name: row['VLINDER'],
-      coords: { lat: row['lat'].to_f, lon: row['lon'].to_f },
+      coords: { latitude: row['lat'].to_f, longitude: row['lon'].to_f },
       city: row['stad'],
       given_name: row['benaming'],
       measurements: $url + 'measurements/' + row['ID'],
       landUse: [20, 50, 100, 250, 500].map { |distance|
         {
           distance: distance,
-          usage: ['water', 'verhard', 'groen'].map { |type|
-            { type: type, value: row["#{type}#{distance}"].to_f }
+          usage:
+            LAND_USAGE_TYPES.map { |type_nl, type_en|
+            { type: type_en, value: row["#{type_nl}#{distance}"].to_f }
           }
         }
       }
@@ -112,25 +122,29 @@ end
 def process_measurements(measurements)
   data = measurements.reverse_each
   previous = data.first
-  data.drop(1).map do |current|
-    status = status_for(previous, current)
-    rainVolume = rain_delta(previous, current)
-    previous = current
-    {
-      id: current['StationID'],
-      station: $url + 'stations/' + current['StationID'],
-      measurements: $url + 'measurements/' + current['StationID'],
-      status: status,
-      rainVolume: rainVolume,
-      time: current['datetime'],
-      temp: current['temperature'].to_f,
-      humidity: current['humidity'].to_f,
-      pressure: current['pressure'].to_f / 100,
-      windSpeed: current['WindSpeed'].to_f,
-      rainIntensity: current['RainIntensity'].to_f,
-      windGust: current['WindGust'].to_f,
-    }
-  end
+  {
+    data: data.drop(1).map do |current|
+      status = status_for(previous, current)
+      rainVolume = rain_delta(previous, current)
+      previous = current
+      {
+        humidity: current['humidity'].to_f,
+        id: current['StationID'],
+        measurements: $url + 'measurements/' + current['StationID'],
+        pressure: current['pressure'].to_f / 100,
+        rainIntensity: current['RainIntensity'].to_f,
+        rainVolume: rainVolume,
+        station: $url + 'stations/' + current['StationID'],
+        status: status,
+        temp: current['temperature'].to_f,
+        time: current['datetime'].strftime(DATETIME_FMT),
+        windDirection: current['WindDirection'].to_f,
+        windGust: current['WindGust'].to_f,
+        windSpeed: current['WindSpeed'].to_f,
+      }
+    end,
+    last_modified: previous['datetime']
+  }
 end
 
 def query_all_stations!
@@ -143,10 +157,14 @@ def query_all_stations!
     )
   )
   lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
-  $all_query.execute(lookback)
-            .group_by{ |row| row['StationID'] }
-            .values
-            .map{ |datapoints| process_measurements(datapoints).first }
+  result = $all_query.execute(lookback)
+                     .group_by{ |row| row['StationID'] }
+                     .values
+                     .map{ |datapoints| process_measurements(datapoints) }
+  {
+    data: result.map{ |station| station[:data].first },
+    last_modified: result.map{ |station| station[:last_modified] }.max,
+  }
 end
 
 def query_station!(id, start = nil, stop = nil)
@@ -156,7 +174,7 @@ def query_station!(id, start = nil, stop = nil)
     FROM Vlinder
     WHERE StationID = ?
       AND datetime > ?
-      AND ? > datetime
+      AND datetime < ?
     ORDER BY datetime DESC
     )
   )
@@ -191,9 +209,9 @@ get '/' do
        measurements: $url + 'measurements'
 end
 
-get '/stations' do
+get '/stations/?' do
   last_modified $station_info_last_modified
-  json $station_info
+  json $station_info.values
 end
 
 get '/stations/:id' do
@@ -203,12 +221,11 @@ get '/stations/:id' do
   json $station_info[id]
 end
 
-get '/measurements' do
+get '/measurements/?' do
   $latest_update ||= (Time.now - UPDATE_INTERVAL - 1)
 
   if updated_since? $latest_update
-    $measurements_result = query_all_stations!
-    $latest_update = $measurements_result.first[:time]
+    $measurements_result, $latest_update = query_all_stations!
   end
 
   last_modified $latest_update
@@ -227,11 +244,7 @@ get '/measurements/:id' do
 
     result = $station_24h[id]
     if result.nil? || updated_since?(result[:last_modified])
-      data = query_station!(id)
-      result = {
-        last_modified: data.last[:time],
-        data: data
-      }
+      result = query_station!(id)
       $station_24h[id] = result
     end
     last_modified result[:last_modified]
