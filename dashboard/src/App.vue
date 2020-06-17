@@ -25,7 +25,7 @@
         </v-row>
         <v-toolbar-title class="mt-3">Afgelopen 24u</v-toolbar-title>
         <v-banner sticky app>
-          <v-chip small label dark v-for="s in selectedStations" :key="s.id" class="ma-2" :color="legendColors[s.id]">
+          <v-chip small label dark v-for="s in selectedStations" :key="s.id" class="ml-2 mr-2" :color="legendColors[s.id]">
             {{ s.given_name }}
           </v-chip>
         </v-banner>
