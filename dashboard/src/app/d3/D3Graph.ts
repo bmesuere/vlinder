@@ -7,6 +7,7 @@ export class D3Graph {
   private readonly selector: string;
   private readonly selectedStations: Station[];
   private readonly property: WeatherProperty;
+  private tooltipPosition: { timestamp: number; i: number };
 
   // data
   private measurements!: MeasurementSeries;
@@ -30,11 +31,14 @@ export class D3Graph {
   private mouseDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
   private mouseLabels!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGTextElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
   private mouseBGLabels!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGTextElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
+  private mouseLine!: d3.Selection<SVGLineElement, unknown, HTMLElement, any>;
+  private timeLabel!: d3.Selection<SVGTextElement, unknown, HTMLElement, any>;
 
-  constructor (selector: string, property: WeatherProperty, selectedStations: Station[]) {
+  constructor (selector: string, property: WeatherProperty, selectedStations: Station[], tooltipPosition: { timestamp: number; i: number }) {
     this.selector = selector;
     this.property = property;
     this.selectedStations = selectedStations;
+    this.tooltipPosition = tooltipPosition;
   }
 
   init () {
@@ -74,7 +78,7 @@ export class D3Graph {
       .call(d3.axisLeft(this.y));
 
     this.mouseG = this.svg.append('g').attr('class', 'mouse-over');
-    const mouseLine = this.mouseG.append('line')
+    this.mouseLine = this.mouseG.append('line')
       .attr('class', 'mouseover-line')
       .attr('y1', this.y.range()[0])
       .attr('y2', this.y.range()[1] - 20)
@@ -82,7 +86,7 @@ export class D3Graph {
       .style('stroke-width', '1px')
       .style('opacity', '0');
 
-    const timeLabel = this.mouseG.append('text')
+    this.timeLabel = this.mouseG.append('text')
       .attr('class', 'mouseover-time')
       .attr('y', -5 + this.y.range()[1])
       .attr('text-anchor', 'end')
@@ -94,11 +98,53 @@ export class D3Graph {
     this.svg.on('touchmove mousemove', () => {
       if (!this.measurements) { return; }
       const { timestamp, i } = this.bisect(d3.mouse(this.svg.node() as SVGSVGElement)[0]);
-      mouseLine
+      this.tooltipPosition.timestamp = timestamp;
+      this.tooltipPosition.i = i;
+    });
+    this.svg.on('touchend mouseleave', () => {
+      this.tooltipPosition.timestamp = -1;
+      this.tooltipPosition.i = -1;
+    });
+  }
+
+  updateData (measurements: MeasurementSeries) {
+    this.measurements = measurements;
+    this.update();
+  }
+
+  getLegendColors () {
+    const result = {};
+    this.measurements.series.forEach(s => {
+      // @ts-ignore
+      result[s.stationId] = this.color(s.stationId);
+    });
+    return result;
+  }
+
+  updateTooltip () {
+    if (!this.measurements) { return; }
+    const { timestamp, i } = this.tooltipPosition;
+    if (i === -1) {
+      this.timeLabel.style('opacity', 0);
+      this.mouseLine.style('opacity', 0);
+      this.mouseDots
+        .attr('r', 3)
+        .attr('cx', () => this.x(Date.parse(this.measurements.timestamps[this.measurements.timestamps.length - 1])))
+        .attr('cy', d => this.y(d.values[d.values.length - 1]));
+      this.mouseBGLabels
+        .attr('x', this.labelxPos())
+        .attr('y', d => this.labelyPos(d))
+        .text(d => d.values[d.values.length - 1]);
+      this.mouseLabels
+        .attr('x', this.labelxPos())
+        .attr('y', d => this.labelyPos(d))
+        .text(d => d.values[d.values.length - 1]);
+    } else {
+      this.mouseLine
         .style('opacity', 1)
         .attr('x1', this.x(timestamp))
         .attr('x2', this.x(timestamp));
-      timeLabel
+      this.timeLabel
         // @ts-ignore
         .text(multiFormat(timestamp))
         .attr('x', -5 + this.x(timestamp))
@@ -115,29 +161,7 @@ export class D3Graph {
         .attr('x', this.labelxPos(timestamp))
         .attr('y', d => this.labelyPos(d, i))
         .text(d => d.values[i]);
-    });
-    this.svg.on('touchend mouseleave', () => {
-      if (!this.measurements) { return; }
-      timeLabel.style('opacity', 0);
-      mouseLine.style('opacity', 0);
-      this.mouseDots
-        .attr('r', 3)
-        .attr('cx', () => this.x(Date.parse(this.measurements.timestamps[this.measurements.timestamps.length - 1])))
-        .attr('cy', d => this.y(d.values[d.values.length - 1]));
-      this.mouseBGLabels
-        .attr('x', this.labelxPos())
-        .attr('y', d => this.labelyPos(d))
-        .text(d => d.values[d.values.length - 1]);
-      this.mouseLabels
-        .attr('x', this.labelxPos())
-        .attr('y', d => this.labelyPos(d))
-        .text(d => d.values[d.values.length - 1]);
-    });
-  }
-
-  updateData (measurements: MeasurementSeries) {
-    this.measurements = measurements;
-    this.update();
+    }
   }
 
   private update () {
@@ -195,15 +219,6 @@ export class D3Graph {
       .text(d => d.values[d.values.length - 1])
       .style('font-size', 'small')
       .style('fill', d => this.color(d.stationId));
-  }
-
-  getLegendColors () {
-    const result = {};
-    this.measurements.series.forEach(s => {
-      // @ts-ignore
-      result[s.stationId] = this.color(s.stationId);
-    });
-    return result;
   }
 
   private labelxPos (timestamp?: number) {

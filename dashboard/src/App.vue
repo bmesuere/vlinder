@@ -31,13 +31,13 @@
         </v-banner>
         <v-row>
           <v-col cols="12" md="6" lg="4" >
-            <GraphCard :weatherProperty="weatherProperties.temp" updateLegendColors />
+            <GraphCard :weatherProperty="weatherProperties.temp" :tooltipPosition="tooltipPosition" updateLegendColors />
           </v-col>
           <v-col cols="12" md="6" lg="4" >
-            <GraphCard :weatherProperty="weatherProperties.rainVolume"/>
+            <GraphCard :weatherProperty="weatherProperties.rainVolume" :tooltipPosition="tooltipPosition"/>
           </v-col>
           <v-col cols="12" md="6" lg="4" >
-            <GraphCard :weatherProperty="weatherProperties.windSpeed"/>
+            <GraphCard :weatherProperty="weatherProperties.windSpeed" :tooltipPosition="tooltipPosition"/>
           </v-col>
         </v-row>
       </v-container>
@@ -62,6 +62,7 @@ import { Station, Measurement } from './app/types';
 export default class App extends Vue {
   private resolveDataLoaded!: Function;
   initialDataLoaded = new Promise((resolve) => { this.resolveDataLoaded = resolve; });
+  tooltipPosition = { timestamp: -1, i: -1 };
 
   created () {
     // fetch data a first time

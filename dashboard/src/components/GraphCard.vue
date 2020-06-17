@@ -21,11 +21,12 @@ export default class GraphCard extends Vue {
   @Prop() readonly weatherProperty!: WeatherProperty;
   @Prop() readonly graphId!: string;
   @Prop({ type: Boolean }) readonly updateLegendColors!: boolean;
+  @Prop() tooltipPosition!: { timestamp: number; i: number }
 
   graph: D3Graph | undefined;
 
   mounted () {
-    this.graph = new D3Graph(`#${this.consolidatedGraphId}`, this.weatherProperty, this.selectedStations);
+    this.graph = new D3Graph(`#${this.consolidatedGraphId}`, this.weatherProperty, this.selectedStations, this.tooltipPosition);
     this.graph.init();
   }
 
@@ -45,6 +46,10 @@ export default class GraphCard extends Vue {
     return this.graphId || 'weather_graph_' + this.weatherProperty.property;
   }
 
+  get tooltipI () {
+    return this.tooltipPosition.i;
+  }
+
   // when measurements are updated, we have to manually update the D3 map
   @Watch('measurements')
   measurementsChanged () {
@@ -53,6 +58,13 @@ export default class GraphCard extends Vue {
       if (this.updateLegendColors) {
         this.$store.dispatch('setLegendColors', this.graph.getLegendColors());
       }
+    }
+  }
+
+  @Watch('tooltipI')
+  tooltipMoved () {
+    if (this.graph) {
+      this.graph.updateTooltip();
     }
   }
 }
