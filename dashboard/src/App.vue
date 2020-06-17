@@ -14,7 +14,7 @@
     <v-content>
       <v-container>
         <v-row>
-          <v-col cols="12" md="10" offset-md="1">
+          <v-col cols="12">
             <StationsMap :dataLoaded="initialDataLoaded" />
           </v-col>
         </v-row>
@@ -23,7 +23,7 @@
             <StationCard :station="s" />
           </v-col>
         </v-row>
-        <v-toolbar-title class="mt-3">Afgelopen 24u</v-toolbar-title>
+        <v-toolbar-title class="mt-3 headline">Afgelopen 24u</v-toolbar-title>
         <v-banner sticky app>
           <v-chip small label close dark v-for="s in selectedStations" :key="s.id" class="ml-2 mr-2" :color="legendColors[s.id]" v-on:click:close="removeFromList(s.id)">
             {{ s.given_name }}

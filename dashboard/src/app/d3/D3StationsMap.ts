@@ -26,7 +26,7 @@ export class D3StationsMap {
   // settings
   private readonly margin = { top: 5, right: 10, bottom: 50, left: 10 };
   private readonly width = 900;
-  private readonly height = 420;
+  private readonly height = 300;
 
   // D3 internals
   private stationDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, Station, SVGGElement, unknown>;
