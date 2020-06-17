@@ -15,6 +15,14 @@ const weatherProperties = {
     title: 'Neerslag sinds middernacht',
     unit: 'l/m²'
   },
+  pressure: {
+    property: 'pressure',
+    name: 'Luchtdruk',
+    legend: 'Luchtdruk (hPa)',
+    icon: 'mdi-gauge',
+    title: 'Luchtdruk op dit moment',
+    unit: 'hPa'
+  },
   windSpeed: {
     property: 'windSpeed',
     name: 'Windsnelheid',
@@ -22,6 +30,14 @@ const weatherProperties = {
     icon: 'mdi-weather-windy',
     title: 'Windsnelheid op dit moment',
     unit: 'km/u'
+  },
+  humidity: {
+    property: 'humidity',
+    name: 'Luchtvochtigheid',
+    legend: 'Luchtvochtigheid (%)',
+    icon: 'mdi-water-percent',
+    title: 'Luchtvochtigheid op dit moment',
+    unit: '%'
   }
 };
 

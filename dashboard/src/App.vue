@@ -37,7 +37,13 @@
             <GraphCard :weatherProperty="weatherProperties.rainVolume" :tooltipPosition="tooltipPosition"/>
           </v-col>
           <v-col cols="12" md="6" lg="4" >
+            <GraphCard :weatherProperty="weatherProperties.pressure" :tooltipPosition="tooltipPosition"/>
+          </v-col>
+          <v-col cols="12" md="6" lg="4" >
             <GraphCard :weatherProperty="weatherProperties.windSpeed" :tooltipPosition="tooltipPosition"/>
+          </v-col>
+          <v-col cols="12" md="6" lg="4" >
+            <GraphCard :weatherProperty="weatherProperties.humidity" :tooltipPosition="tooltipPosition"/>
           </v-col>
         </v-row>
       </v-container>
