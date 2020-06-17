@@ -79,7 +79,7 @@ export class D3StationsMap {
     const tooltip = d3.select('body').append('div')
       .attr('class', 'tooltip')
       .style('position', 'absolute')
-      .style('visibility', 'visible')
+      .style('display', 'none')
       .style('background-color', 'white')
       .style('padding', '6px')
       .style('border', '1px solid #dddddd')
@@ -143,9 +143,9 @@ export class D3StationsMap {
   }
 
   private tooltip (div, station: Station | null, x?: number, y?: number) {
-    if (!station) return div.style('visibility', 'hidden');
+    if (!station) return div.style('display', 'none');
 
-    div.style('visibility', 'visible')
+    div.style('display', 'block')
       .style('top', (y + 5) + 'px')
       .style('left', (x + 15) + 'px')
       .html('');
