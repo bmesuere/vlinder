@@ -4,13 +4,13 @@
       <v-toolbar-title>{{ weatherProperties[selectedProperty].title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn-toggle v-model="selectedProperty" mandatory>
-        <v-tooltip bottom v-for="p in weatherProperties" :key="p.property">
+        <v-tooltip bottom v-for="p in allowedProperties" :key="p">
           <template v-slot:activator="{ on }">
-            <v-btn :value="p.property" v-on="on">
-              <v-icon>{{ p.icon }}</v-icon>
+            <v-btn :value="p" v-on="on">
+              <v-icon>{{ weatherProperties[p].icon }}</v-icon>
             </v-btn>
           </template>
-          <span>{{ p.name }}</span>
+          <span>{{ weatherProperties[p].name }}</span>
         </v-tooltip>
       </v-btn-toggle>
     </v-toolbar>
@@ -36,9 +36,10 @@ export default class StationsMap extends Vue {
   @Prop({ default: 'stationsMap' }) readonly mapId!: string;
   @Prop() readonly dataLoaded!: Promise<[Station[], Measurement[]]>;
 
-  weatherProperties = wp;
   map: D3StationsMap | undefined;
   selectedProperty = 'temp';
+  weatherProperties = wp;
+  allowedProperties = ['temp', 'rainVolume', 'windSpeed'];
 
   async mounted () {
     this.map = new D3StationsMap(`#${this.mapId}`, this.selectedProperty, this.selectedStations, this.toggleStation);
