@@ -24,9 +24,14 @@
           </v-col>
         </v-row>
         <v-toolbar-title class="mt-3">Afgelopen 24u</v-toolbar-title>
+        <v-banner sticky app>
+          <v-chip small label dark v-for="s in selectedStations" :key="s.id" class="ma-2" :color="legendColors[s.id]">
+            {{ s.given_name }}
+          </v-chip>
+        </v-banner>
         <v-row>
           <v-col cols="12" md="6" lg="4" >
-            <GraphCard :weatherProperty="weatherProperties.temp"/>
+            <GraphCard :weatherProperty="weatherProperties.temp" updateLegendColors />
           </v-col>
           <v-col cols="12" md="6" lg="4" >
             <GraphCard :weatherProperty="weatherProperties.rainVolume"/>
@@ -86,6 +91,10 @@ export default class App extends Vue {
 
   get weatherProperties () {
     return weatherProperties;
+  }
+
+  get legendColors () {
+    return this.$store.state.legendColors;
   }
 
   get selectedStations (): Station[] {

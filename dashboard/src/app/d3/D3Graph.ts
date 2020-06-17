@@ -12,7 +12,7 @@ export class D3Graph {
   private measurements!: MeasurementSeries;
 
   // settings
-  private readonly margin = { top: 15, right: 30, bottom: 30, left: 40 };
+  private readonly margin = { top: 15, right: 35, bottom: 30, left: 40 };
   private readonly width = 400;
   private readonly height = 250;
 
@@ -195,6 +195,15 @@ export class D3Graph {
       .text(d => d.values[d.values.length - 1])
       .style('font-size', 'small')
       .style('fill', d => this.color(d.stationId));
+  }
+
+  getLegendColors () {
+    const result = {};
+    this.measurements.series.forEach(s => {
+      // @ts-ignore
+      result[s.stationId] = this.color(s.stationId);
+    });
+    return result;
   }
 
   private labelxPos (timestamp?: number) {

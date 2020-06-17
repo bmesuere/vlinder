@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-btn fab absolute right x-small elevation="3" class="mr-n2 mt-1" v-on:click="removeFromList">
+    <v-btn fab absolute right x-small elevation="3" class="mr-n3 mt-1" v-on:click="removeFromList">
       <v-icon>mdi-close</v-icon>
     </v-btn>
 

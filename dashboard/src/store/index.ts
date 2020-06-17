@@ -16,6 +16,7 @@ export default new Vuex.Store({
     selectedStations: Array<Station>(),
     liveMeasurements: Array<Measurement>(),
     loadingHistoricMeasurements: true,
+    legendColors: Object(),
     historicMeasurements: Array<Array<Measurement>>()
   },
   mutations: {
@@ -30,6 +31,9 @@ export default new Vuex.Store({
     },
     setLoadingHistoricMeasurements (state, loading: boolean) {
       state.loadingHistoricMeasurements = loading;
+    },
+    setLegendColors (state, legendColors: {}) {
+      state.legendColors = legendColors;
     },
     stationsLoaded (state) {
       state.stationsLoaded = true;
@@ -95,6 +99,9 @@ export default new Vuex.Store({
           commit('addSelectedStation', station);
         }
       }
+    },
+    setLegendColors ({ commit }, legendColors: {}) {
+      commit('setLegendColors', legendColors);
     }
   },
   getters: {

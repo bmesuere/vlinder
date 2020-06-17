@@ -20,6 +20,7 @@ import { Station, Measurement, WeatherProperty } from '../app/types';
 export default class GraphCard extends Vue {
   @Prop() readonly weatherProperty!: WeatherProperty;
   @Prop() readonly graphId!: string;
+  @Prop({ type: Boolean }) readonly updateLegendColors!: boolean;
 
   graph: D3Graph | undefined;
 
@@ -49,6 +50,9 @@ export default class GraphCard extends Vue {
   measurementsChanged () {
     if (this.graph) {
       this.graph.updateData(this.$store.getters.historicData(this.weatherProperty.property));
+      if (this.updateLegendColors) {
+        this.$store.dispatch('setLegendColors', this.graph.getLegendColors());
+      }
     }
   }
 }
