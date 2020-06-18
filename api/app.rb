@@ -176,7 +176,7 @@ def read_stations
       }
     }
   end
-  [stations, stations_file.mtime]
+  [stations, stations_file.mtime.round]
 end
 
 def updated_since?(last_modified)
