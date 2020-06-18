@@ -73,9 +73,9 @@ $db = ROM.container(:sql, opts) do |conf|
       lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
       results = where{ datetime > lookback }.order{ datetime.asc }.to_a
       {
-        last_modified: results.first[:datetime],
+        last_modified: results.last[:datetime],
         data: results.group_by{ |data| data[:StationID] }
-                     .map{ |id, data| process(data).first }
+                     .map{ |id, data| process(data).last }
       }
     end
 
@@ -89,7 +89,7 @@ $db = ROM.container(:sql, opts) do |conf|
         .to_a
 
       {
-        last_modified: results.first[:datetime],
+        last_modified: results.last[:datetime],
         data: process(results)
       }
     end
@@ -142,9 +142,6 @@ $db = ROM.container(:sql, opts) do |conf|
   conf.register_relation(Vlinder)
 end
 
-$vlinder = $db.relations[:vlinder]
-$cache = Hash.new { |hash, key| hash[key] = {} }
-
 #
 # Helpers
 #
@@ -179,7 +176,7 @@ def read_stations
       }
     }
   end
-  [stations, stations_file.mtime]
+  [stations, stations_file.mtime.round]
 end
 
 def updated_since?(last_modified)
@@ -194,10 +191,12 @@ rescue ArgumentError
 end
 
 #
-# Setup
+# Setup globals
 #
 
 $station_info, $station_info_last_modified = read_stations
+$vlinder = $db.relations[:vlinder]
+$cache = Hash.new { |hash, key| hash[key] = {} }
 
 #
 # Routes
