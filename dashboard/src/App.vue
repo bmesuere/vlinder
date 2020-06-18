@@ -24,7 +24,7 @@
           </v-col>
         </v-row>
         <v-toolbar-title class="mt-3 headline">Afgelopen 24u</v-toolbar-title>
-        <v-banner sticky app>
+        <v-banner sticky app class="chip-banner">
           <v-chip small label close dark v-for="s in selectedStations" :key="s.id" class="ma-1" :color="legendColors[s.id]" v-on:click:close="removeFromList(s.id)">
             {{ s.given_name }}
           </v-chip>
@@ -134,3 +134,9 @@ export default class App extends Vue {
   }
 }
 </script>
+
+<style>
+  .chip-banner .v-banner__wrapper {
+    padding: 0 !important;
+  }
+</style>
