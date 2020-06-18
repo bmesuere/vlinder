@@ -115,9 +115,10 @@ $db = ROM.container(:sql, opts) do |conf|
 
     def process(measurements)
       previous = measurements.first
+      rainVolume = 0
       measurements.drop(1).map do |current|
         status = status_for(previous, current)
-        rainVolume = rain_delta(previous, current)
+        rainVolume += rain_delta(previous, current)
         previous = current
         {
           humidity: current[:humidity].to_f,
