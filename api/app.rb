@@ -23,7 +23,7 @@ DB_CONFIG_FILE = 'login.json'
 STATIONS_CSV_FILE = 'data.csv'
 UPDATE_INTERVAL = 300
 LOOKBACK_UPDATES = 2
-DATETIME_FMT = "%a, %d %b %Y %I:%M:%S %Z"
+DATETIME_FMT = "%a, %d %b %Y %H:%M:%S %Z"
 
 # vlinder database uses UTC, and we want to respond with UTC,
 # so setting our timezone to UTC makes our life easier
@@ -40,6 +40,10 @@ configure :development do
 
   # Automatically reload when files change
   register Sinatra::Reloader
+  after_reload do
+    $cache.clear
+    puts '== Reloaded code & cleared caches =='
+  end
 end
 
 configure :production do
@@ -61,34 +65,38 @@ opts[:max_connections] = 1
 
 $db = ROM.container(:sql, opts) do |conf|
   class Vlinder < ROM::Relation[:sql]
-    schema :Vlinder, infer: true, as: :vlinder
+    schema :Vlinder, infer: true, as: :vlinder do
+      attribute :StationID, Types::String
+    end
 
     def all_stations
       lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
-      results = where{ datetime > lookback }.order{ datetime.desc }.to_a
+      results = where{ datetime > lookback }.order{ datetime.asc }.to_a
       {
-        last_modified: results.max(:id),
-        data: results.group_by(:StationID).map{ |id, data| process(data).first }
+        last_modified: results.first[:datetime],
+        data: results.group_by{ |data| data[:StationID] }
+                     .map{ |id, data| process(data).first }
       }
     end
 
-    def station(vlinder_id, start=nil, stop=nil)
+    def station(id, start=nil, stop=nil)
       start ||= Time.now - 24 * 60 * 60
       stop ||= Time.now
 
-      results = where{ (id == vlinder_id) & (datetime > start) & (datetime < stop) }
-        .order{ datetime.desc }
+      results = where(StationID: id)
+        .where{ (datetime > start) & (datetime < stop) }
+        .order{ datetime.asc }
         .to_a
 
       {
-        last_modified: results.max(:datetime),
+        last_modified: results.first[:datetime],
         data: process(results)
       }
     end
 
     private
 
-    ATTRIBUTES = %w(temp humidity pressure WindSpeed WindDirection WindGust RainIntensity).freeze
+    ATTRIBUTES = %i(temp humidity pressure WindSpeed WindDirection WindGust).freeze
     def status_for(old, new)
       changed = ATTRIBUTES.any? do |attribute|
         old[attribute] != new[attribute]
@@ -97,35 +105,34 @@ $db = ROM.container(:sql, opts) do |conf|
     end
 
     def rain_delta(old, new)
-      diff = new['RainVolume'].to_f - old['RainVolume'].to_f
+      diff = new[:RainVolume].to_f - old[:RainVolume].to_f
       if diff.negative? # midnight passed
-        new['RainVolume'].to_f
+        new[:RainVolume].to_f
       else
         diff
       end
     end
 
     def process(measurements)
-      data = measurements.reverse_each
-      previous = data.first
-      data.drop(1).map do |current|
+      previous = measurements.first
+      measurements.drop(1).map do |current|
         status = status_for(previous, current)
         rainVolume = rain_delta(previous, current)
         previous = current
         {
-          humidity: current['humidity'].to_f,
-          id: current['StationID'],
-          measurements: $url + 'measurements/' + current['StationID'],
-          pressure: current['pressure'].to_f / 100,
-          rainIntensity: current['RainIntensity'].to_f,
+          humidity: current[:humidity].to_f,
+          id: current[:StationID],
+          measurements: $url + 'measurements/' + current[:StationID],
+          pressure: current[:pressure].to_f / 100,
+          rainIntensity: current[:RainIntensity].to_f,
           rainVolume: rainVolume,
-          station: $url + 'stations/' + current['StationID'],
+          station: $url + 'stations/' + current[:StationID],
           status: status,
-          temp: current['temperature'].to_f,
-          time: current['datetime'].strftime(DATETIME_FMT),
-          windDirection: current['WindDirection'].to_f,
-          windGust: current['WindGust'].to_f,
-          windSpeed: current['WindSpeed'].to_f,
+          temp: current[:temperature].to_f,
+          time: current[:datetime].strftime(DATETIME_FMT),
+          windDirection: current[:WindDirection].to_f,
+          windGust: current[:WindGust].to_f,
+          windSpeed: current[:WindSpeed].to_f,
         }
       end
     end
@@ -134,6 +141,8 @@ $db = ROM.container(:sql, opts) do |conf|
   conf.register_relation(Vlinder)
 end
 
+$vlinder = $db.relations[:vlinder]
+$cache = Hash.new { |hash, key| hash[key] = {} }
 
 #
 # Helpers
@@ -149,12 +158,14 @@ def read_stations
   stations_file = File.new(STATIONS_CSV_FILE)
   stations = {}
   CSV.foreach(stations_file, headers: true) do |row|
+    given_name, sponsor = row['benaming'].match(/(.*) \((.*)\)/).captures
     stations[row['ID']] = {
       id: row['ID'],
       name: row['VLINDER'],
-      coords: { latitude: row['lat'].to_f, longitude: row['lon'].to_f },
+      coordinates: { latitude: row['lat'].to_f, longitude: row['lon'].to_f },
       city: row['stad'],
-      given_name: row['benaming'],
+      sponsor: sponsor,
+      given_name: given_name,
       measurements: $url + 'measurements/' + row['ID'],
       landUse: [20, 50, 100, 250, 500].map { |distance|
         {
@@ -171,6 +182,7 @@ def read_stations
 end
 
 def updated_since?(last_modified)
+  return true if last_modified.nil?
   Time.now - UPDATE_INTERVAL > last_modified
 end
 
@@ -217,18 +229,16 @@ get '/stations/:id' do
 end
 
 get '/measurements/?' do
-  $latest_update ||= (Time.now - UPDATE_INTERVAL - 1)
 
-  if updated_since? $latest_update
-    $measurements_result, $latest_update = $db.relations[:vlinder].all_stations
+  if updated_since? $cache[:measurements][:last_modified]
+    $cache[:measurements] = $vlinder.all_stations
   end
 
-  last_modified $latest_update
-  json $measurements_result
+  last_modified $cache[:measurements][:last_modified]
+  json $cache[:measurements][:data]
 end
 
 get '/measurements/:id' do
-  $station_24h ||= {}
   id = params['id']
   pass if not $station_info.has_key? id
   start = httpdate_or_nil params['start']
@@ -237,10 +247,10 @@ get '/measurements/:id' do
   if start.nil? && stop.nil?
     # This will be called most of the time: fetch the last 24h of a station.
 
-    result = $station_24h[id]
+    result = $cache[:stations][id]
     if result.nil? || updated_since?(result[:last_modified])
-      result = $db.relations[:vlinder].all_stations
-      $station_24h[id] = result
+      result = $vlinder.station(id)
+      $cache[:stations][id] = result
     end
     last_modified result[:last_modified]
     json result[:data]
@@ -248,6 +258,6 @@ get '/measurements/:id' do
   else
 
     last_modified stop if stop
-    json query_station!(id, start, stop)
+    json $vlinder.station(id, start, stop)[:data]
   end
 end
