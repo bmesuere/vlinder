@@ -51,15 +51,93 @@ before do
 end
 
 #
-# Helpers
+# Database Object Mapper
 #
 
-def connect_db
-  config = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
-  config[:connect_timeout] = 2 # crash if we can't connect within 2 seconds
-  config[:reconnect] = true
-  Mysql2::Client.new(config)
+opts = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
+opts[:connect_timeout] = 2
+opts[:adapter] = :mysql2
+opts[:max_connections] = 1
+
+$db = ROM.container(:sql, opts) do |conf|
+  class Vlinder < ROM::Relation[:sql]
+    schema :Vlinder, infer: true, as: :vlinder
+
+    def all_stations
+      lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
+      results = where{ datetime > lookback }.order{ datetime.desc }.to_a
+      {
+        last_modified: results.max(:id),
+        data: results.group_by(:StationID).map{ |id, data| process(data).first }
+      }
+    end
+
+    def station(vlinder_id, start=nil, stop=nil)
+      start ||= Time.now - 24 * 60 * 60
+      stop ||= Time.now
+
+      results = where{ (id == vlinder_id) & (datetime > start) & (datetime < stop) }
+        .order{ datetime.desc }
+        .to_a
+
+      {
+        last_modified: results.max(:datetime),
+        data: process(results)
+      }
+    end
+
+    private
+
+    ATTRIBUTES = %w(temp humidity pressure WindSpeed WindDirection WindGust RainIntensity).freeze
+    def status_for(old, new)
+      changed = ATTRIBUTES.any? do |attribute|
+        old[attribute] != new[attribute]
+      end
+      if changed then 'Ok' else 'Offline' end
+    end
+
+    def rain_delta(old, new)
+      diff = new['RainVolume'].to_f - old['RainVolume'].to_f
+      if diff.negative? # midnight passed
+        new['RainVolume'].to_f
+      else
+        diff
+      end
+    end
+
+    def process(measurements)
+      data = measurements.reverse_each
+      previous = data.first
+      data.drop(1).map do |current|
+        status = status_for(previous, current)
+        rainVolume = rain_delta(previous, current)
+        previous = current
+        {
+          humidity: current['humidity'].to_f,
+          id: current['StationID'],
+          measurements: $url + 'measurements/' + current['StationID'],
+          pressure: current['pressure'].to_f / 100,
+          rainIntensity: current['RainIntensity'].to_f,
+          rainVolume: rainVolume,
+          station: $url + 'stations/' + current['StationID'],
+          status: status,
+          temp: current['temperature'].to_f,
+          time: current['datetime'].strftime(DATETIME_FMT),
+          windDirection: current['WindDirection'].to_f,
+          windGust: current['WindGust'].to_f,
+          windSpeed: current['WindSpeed'].to_f,
+        }
+      end
+    end
+  end
+
+  conf.register_relation(Vlinder)
 end
+
+
+#
+# Helpers
+#
 
 LAND_USAGE_TYPES = {
   'water' => 'water',
@@ -102,95 +180,11 @@ rescue ArgumentError
   nil
 end
 
-ATTRIBUTES = %w(temp humidity pressure WindSpeed WindDirection WindGust RainIntensity RainVolume).freeze
-def status_for(old, new)
-  changed = ATTRIBUTES.any? do |attribute|
-    old[attribute] != new[attribute]
-  end
-  if changed then 'Ok' else 'Offline' end
-end
-
-def rain_delta(old, new)
-  diff = new['RainVolume'].to_f - old['RainVolume'].to_f
-  if diff.negative? # midnight passed
-    new['RainVolume'].to_f
-  else
-    diff
-  end
-end
-
-def process_measurements(measurements)
-  data = measurements.reverse_each
-  previous = data.first
-  {
-    data: data.drop(1).map do |current|
-      status = status_for(previous, current)
-      rainVolume = rain_delta(previous, current)
-      previous = current
-      {
-        humidity: current['humidity'].to_f,
-        id: current['StationID'],
-        measurements: $url + 'measurements/' + current['StationID'],
-        pressure: current['pressure'].to_f / 100,
-        rainIntensity: current['RainIntensity'].to_f,
-        rainVolume: rainVolume,
-        station: $url + 'stations/' + current['StationID'],
-        status: status,
-        temp: current['temperature'].to_f,
-        time: current['datetime'].strftime(DATETIME_FMT),
-        windDirection: current['WindDirection'].to_f,
-        windGust: current['WindGust'].to_f,
-        windSpeed: current['WindSpeed'].to_f,
-      }
-    end,
-    last_modified: previous['datetime']
-  }
-end
-
-def query_all_stations!
-  $all_query ||= $db.prepare(
-    %q(
-    SELECT *
-    FROM Vlinder
-    WHERE datetime > ?
-    ORDER BY datetime DESC
-    )
-  )
-  lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
-  result = $all_query.execute(lookback)
-                     .group_by{ |row| row['StationID'] }
-                     .values
-                     .map{ |datapoints| process_measurements(datapoints) }
-  {
-    data: result.map{ |station| station[:data].first },
-    last_modified: result.map{ |station| station[:last_modified] }.max,
-  }
-end
-
-def query_station!(id, start = nil, stop = nil)
-  $station_query ||= $db.prepare(
-    %q(
-    SELECT *
-    FROM Vlinder
-    WHERE StationID = ?
-      AND datetime > ?
-      AND datetime < ?
-    ORDER BY datetime DESC
-    )
-  )
-  start ||= Time.now - 24 * 60 * 60
-  stop ||= Time.now
-
-  result = $station_query.execute(id, start, stop)
-  process_measurements(result)
-end
-
 #
 # Setup
 #
 
 $station_info, $station_info_last_modified = read_stations
-$db = connect_db
 
 #
 # Routes
@@ -205,6 +199,7 @@ error do
 end
 
 get '/' do
+  byebug
   json stations: $url + 'stations',
        measurements: $url + 'measurements'
 end
@@ -225,7 +220,7 @@ get '/measurements/?' do
   $latest_update ||= (Time.now - UPDATE_INTERVAL - 1)
 
   if updated_since? $latest_update
-    $measurements_result, $latest_update = query_all_stations!
+    $measurements_result, $latest_update = $db.relations[:vlinder].all_stations
   end
 
   last_modified $latest_update
@@ -244,7 +239,7 @@ get '/measurements/:id' do
 
     result = $station_24h[id]
     if result.nil? || updated_since?(result[:last_modified])
-      result = query_station!(id)
+      result = $db.relations[:vlinder].all_stations
       $station_24h[id] = result
     end
     last_modified result[:last_modified]
