@@ -121,19 +121,19 @@ $db = ROM.container(:sql, opts) do |conf|
         rainVolume += rain_delta(previous, current)
         previous = current
         {
-          humidity: current[:humidity].to_f,
+          humidity: current[:humidity].to_f.round(2),
           id: current[:StationID],
           measurements: $url + 'measurements/' + current[:StationID],
-          pressure: current[:pressure].to_f / 100,
-          rainIntensity: current[:RainIntensity].to_f,
-          rainVolume: rainVolume,
+          pressure: (current[:pressure].to_f / 100).round(2),
+          rainIntensity: current[:RainIntensity].to_f.round(2),
+          rainVolume: rainVolume.round(2),
           station: $url + 'stations/' + current[:StationID],
           status: status,
-          temp: current[:temperature].to_f,
+          temp: current[:temperature].to_f.round(2),
           time: current[:datetime].strftime(DATETIME_FMT),
-          windDirection: current[:WindDirection].to_f,
-          windGust: current[:WindGust].to_f,
-          windSpeed: current[:WindSpeed].to_f,
+          windDirection: current[:WindDirection].to_f.round(2),
+          windGust: current[:WindGust].to_f.round(2),
+          windSpeed: current[:WindSpeed].to_f.round(2)
         }
       end
     end
