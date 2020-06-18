@@ -1,7 +1,8 @@
 <template>
   <div class="text-center">
     <v-toolbar flat>
-      <v-toolbar-title class="headline ml-n4">{{ weatherProperties[selectedProperty].title }}</v-toolbar-title>
+      <v-toolbar-title class="headline ml-n4 d-none d-sm-flex">{{ weatherProperties[selectedProperty].title }}</v-toolbar-title>
+      <v-toolbar-title class="headline ml-n4 d-sm-none">{{ weatherProperties[selectedProperty].name }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn-toggle v-model="selectedProperty" mandatory>
         <v-tooltip bottom v-for="p in allowedProperties" :key="p">

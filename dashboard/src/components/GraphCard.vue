@@ -6,7 +6,7 @@
         <v-list-item-subtitle>{{ weatherProperty.unit }}</v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
-    <div :id="consolidatedGraphId">
+    <div :id="consolidatedGraphId" class="mt-n3">
     </div>
   </v-card>
 </template>

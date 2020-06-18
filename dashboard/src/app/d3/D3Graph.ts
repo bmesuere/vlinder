@@ -13,7 +13,7 @@ export class D3Graph {
   private measurements!: MeasurementSeries;
 
   // settings
-  private readonly margin = { top: 15, right: 35, bottom: 30, left: 40 };
+  private readonly margin = { top: 15, right: 35, bottom: 30, left: 45 };
   private readonly width = 400;
   private readonly height = 250;
 

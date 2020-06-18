@@ -25,7 +25,7 @@
         </v-row>
         <v-toolbar-title class="mt-3 headline">Afgelopen 24u</v-toolbar-title>
         <v-banner sticky app>
-          <v-chip small label close dark v-for="s in selectedStations" :key="s.id" class="ml-2 mr-2" :color="legendColors[s.id]" v-on:click:close="removeFromList(s.id)">
+          <v-chip small label close dark v-for="s in selectedStations" :key="s.id" class="ma-1" :color="legendColors[s.id]" v-on:click:close="removeFromList(s.id)">
             {{ s.given_name }}
           </v-chip>
         </v-banner>
@@ -50,7 +50,7 @@
     </v-content>
     <v-footer padless>
       <v-card class="flex blue-grey darken-4" flat tile >
-        <v-card-title class="white--text body-2 px-12">
+        <v-card-title class="white--text body-2 px-8">
           &copy; {{ new Date().getFullYear() }} &ndash; Universiteit Gent
           <v-spacer></v-spacer>
           <v-btn class="mx-4" dark icon href="https://github.com/bmesuere/vlinder" target="_blank">
