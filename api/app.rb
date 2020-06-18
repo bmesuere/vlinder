@@ -158,7 +158,7 @@ LAND_USAGE_TYPES = {
 def read_stations
   stations_file = File.new(STATIONS_CSV_FILE)
   stations = {}
-  CSV.foreach(stations_file, headers: true) do |row|
+  CSV.foreach(stations_file, encoding:'utf-8', headers: true) do |row|
     given_name, sponsor = row['benaming'].match(/(.*) \((.*)\)/).captures
     stations[row['ID']] = {
       id: row['ID'],
