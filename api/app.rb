@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 #  ██    ██ ██      ██ ███    ██ ██████  ███████ ██████ 
 #  ██    ██ ██      ██ ████   ██ ██   ██ ██      ██   ██ 
@@ -11,7 +13,7 @@
 #            ███████ ██████  ██     \__\/\/__/
 #            ██   ██ ██      ██     /O /==\ O\
 #            ██   ██ ██      ██    (;O/ \/ \O;)
-#                   
+#                    
 
 require 'byebug'
 
@@ -23,7 +25,7 @@ DB_CONFIG_FILE = 'login.json'
 STATIONS_CSV_FILE = 'data.csv'
 UPDATE_INTERVAL = 300
 LOOKBACK_UPDATES = 2
-DATETIME_FMT = "%a, %d %b %Y %H:%M:%S %Z"
+DATETIME_FMT = '%a, %d %b %Y %H:%M:%S %Z'
 
 # vlinder database uses UTC, and we want to respond with UTC,
 # so setting our timezone to UTC makes our life easier
@@ -90,7 +92,7 @@ $db = ROM.container(:sql, opts) do |conf|
       }
     end
 
-    def station(id, start=nil, stop=nil)
+    def station(id, start = nil, stop = nil)
       start ||= Time.now - 24 * 60 * 60
       stop ||= Time.now
 
@@ -116,12 +118,12 @@ $db = ROM.container(:sql, opts) do |conf|
 
     private
 
-    ATTRIBUTES = %i(temp humidity pressure WindSpeed WindDirection WindGust).freeze
+    ATTRIBUTES = %i[temp humidity pressure WindSpeed WindDirection WindGust].freeze
     def status_for(old, new)
       changed = ATTRIBUTES.any? do |attribute|
         old[attribute] != new[attribute]
       end
-      if changed then 'Ok' else 'Offline' end
+      changed ? 'Ok' : 'Offline'
     end
 
     def rain_delta(old, new)
@@ -175,7 +177,7 @@ LAND_USAGE_TYPES = {
 def read_stations
   stations_file = File.new(STATIONS_CSV_FILE)
   stations = {}
-  CSV.foreach(stations_file, encoding:'utf-8', headers: true) do |row|
+  CSV.foreach(stations_file, encoding: 'utf-8', headers: true) do |row|
     given_name, sponsor = row['benaming'].match(/(.*) \((.*)\)/).captures
     stations[row['ID']] = {
       id: row['ID'],
@@ -185,15 +187,15 @@ def read_stations
       sponsor: sponsor,
       given_name: given_name,
       measurements: $url + 'measurements/' + row['ID'],
-      landUse: [20, 50, 100, 250, 500].map { |distance|
+      landUse: [20, 50, 100, 250, 500].map do |distance|
         {
           distance: distance,
           usage:
-            LAND_USAGE_TYPES.map { |type_nl, type_en|
-            { type: type_en, value: row["#{type_nl}#{distance}"].to_f }
-          }
+            LAND_USAGE_TYPES.map do |type_nl, type_en|
+              { type: type_en, value: row["#{type_nl}#{distance}"].to_f }
+            end
         }
-      }
+      end
     }
   end
   [stations, stations_file.mtime.round]
@@ -202,6 +204,7 @@ end
 def updated_since?(last_modified)
   return true
   return true if last_modified.nil?
+
   Time.now - UPDATE_INTERVAL > last_modified
 end
 
@@ -243,13 +246,12 @@ end
 
 get '/stations/:id' do
   id = params['id']
-  pass if not $station_info.has_key? id
+  pass unless $station_info.key? id
   last_modified $station_info_last_modified
   json $station_info[id]
 end
 
 get '/measurements/?' do
-
   if updated_since? $cache[:measurements][:last_modified]
     $cache[:measurements] = $vlinder.all_stations
   end
@@ -260,7 +262,7 @@ end
 
 get '/measurements/:id' do
   id = params['id']
-  pass if not $station_info.has_key? id
+  pass unless $station_info.key? id
   start = httpdate_or_nil params['start']
   stop = httpdate_or_nil params['end']
 
