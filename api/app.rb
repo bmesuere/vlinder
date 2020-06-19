@@ -79,7 +79,7 @@ $db = ROM.container(:sql, opts) do |conf|
       rescue
         raise unless ++tries < 5
 
-        warn 'retrying query: ' + tries
+        warn 'retrying query: ' + tries.to_s
         retry
       end
       {
@@ -102,7 +102,7 @@ $db = ROM.container(:sql, opts) do |conf|
       rescue
         raise unless ++tries < 5
 
-        warn 'retrying query: ' + tries
+        warn 'retrying query: ' + tries.to_s
         retry
       end
 
