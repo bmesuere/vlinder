@@ -71,11 +71,21 @@ $db = ROM.container(:sql, opts) do |conf|
 
     def all_stations
       lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
-      results = where{ datetime > lookback }.order{ datetime.asc }.to_a
+      tries = 0
+      begin
+        results = where { datetime > lookback }
+                  .order { datetime.asc }
+                  .to_a
+      rescue
+        raise unless ++tries < 5
+
+        warn 'retrying query: ' + tries
+        retry
+      end
       {
         last_modified: results.last[:datetime],
-        data: results.group_by{ |data| data[:StationID] }
-                     .map{ |id, data| process(data).last }
+        data: results.group_by { |data| data[:StationID] }
+                     .map { |_id, data| process(data).last }
       }
     end
 
@@ -83,10 +93,18 @@ $db = ROM.container(:sql, opts) do |conf|
       start ||= Time.now - 24 * 60 * 60
       stop ||= Time.now
 
-      results = where(StationID: id)
-        .where{ (datetime > start) & (datetime < stop) }
-        .order{ datetime.asc }
-        .to_a
+      tries = 0
+      begin
+        results = where(StationID: id)
+                  .where { (datetime > start) & (datetime < stop) }
+                  .order { datetime.asc }
+                  .to_a
+      rescue
+        raise unless ++tries < 5
+
+        warn 'retrying query: ' + tries
+        retry
+      end
 
       {
         last_modified: results.last[:datetime],
