@@ -24,7 +24,7 @@ require 'byebug'
 DB_CONFIG_FILE = 'login.json'
 STATIONS_CSV_FILE = 'data.csv'
 UPDATE_INTERVAL = 300
-LOOKBACK_UPDATES = 2
+LOOKBACK_UPDATES = 3
 DATETIME_FMT = '%a, %d %b %Y %H:%M:%S %Z'
 
 # vlinder database uses UTC, and we want to respond with UTC,
