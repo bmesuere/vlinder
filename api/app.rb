@@ -24,6 +24,7 @@ require 'byebug'
 DB_CONFIG_FILE = 'login.json'
 STATIONS_CSV_FILE = 'data.csv'
 UPDATE_INTERVAL = 300
+# extra measurements to collect to determine whether a station is offline
 LOOKBACK_UPDATES = 3
 DATETIME_FMT = '%a, %d %b %Y %H:%M:%S %Z'
 
@@ -44,7 +45,7 @@ configure :development do
   register Sinatra::Reloader
   after_reload do
     $cache.clear
-    puts '== Reloaded code & cleared caches =='
+    warn '== Reloaded code & cleared caches =='
   end
 end
 
@@ -71,20 +72,27 @@ $db = ROM.container(:sql, opts) do |conf|
       attribute :StationID, Types::String
     end
 
-    def all_stations
-      lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
+    def retry_until_succeeded(&block)
       tries = 0
       begin
-        results = where { datetime > lookback }
-                  .order { datetime.asc }
-                  .to_a
+        yield
       rescue
         tries += 1
         raise unless tries < 3
-
         warn 'retrying query: ' + tries.to_s
         retry
       end
+    end
+
+    def all_stations
+      lookback = Time.now - UPDATE_INTERVAL * (LOOKBACK_UPDATES + 1)
+
+      results = retry_until_succeeded do
+        where { datetime > lookback }
+          .order { datetime.asc }
+          .to_a
+      end
+
       {
         last_modified: results.last[:datetime],
         data: results.group_by { |data| data[:StationID] }
@@ -96,18 +104,11 @@ $db = ROM.container(:sql, opts) do |conf|
       start ||= Time.now - 24 * 60 * 60
       stop ||= Time.now
 
-      tries = 0
-      begin
-        results = where(StationID: id)
-                  .where { (datetime > start) & (datetime < stop) }
-                  .order { datetime.asc }
-                  .to_a
-      rescue
-        tries += 1
-        raise unless tries < 3
-
-        warn 'retrying query: ' + tries.to_s
-        retry
+      results = retry_until_succeeded do
+        where(StationID: id)
+          .where { (datetime > start) & (datetime < stop) }
+          .order { datetime.asc }
+          .to_a
       end
 
       {
@@ -119,11 +120,10 @@ $db = ROM.container(:sql, opts) do |conf|
     private
 
     ATTRIBUTES = %i[temp humidity pressure WindSpeed WindDirection WindGust].freeze
-    def status_for(old, new)
-      changed = ATTRIBUTES.any? do |attribute|
+    def changed?(old, new)
+      ATTRIBUTES.any? do |attribute|
         old[attribute] != new[attribute]
       end
-      changed ? 'Ok' : 'Offline'
     end
 
     def rain_delta(old, new)
@@ -137,10 +137,17 @@ $db = ROM.container(:sql, opts) do |conf|
 
     def process(measurements)
       previous = measurements.first
-      rainVolume = 0
-      measurements.drop(1).map do |current|
-        status = status_for(previous, current)
-        rainVolume += rain_delta(previous, current)
+      no_changes = -1 # because we start with comparing the same datapoint
+
+      rainvolume = 0
+      measurements.map do |current|
+        if changed?(previous, current)
+          no_changes = 0
+        else
+          no_changes += 1
+        end
+        status = if no_changes > LOOKBACK_UPDATES then "Offline" else "Ok" end
+        rainvolume += rain_delta(previous, current)
         previous = current
         {
           humidity: current[:humidity].to_f.round(2),
@@ -148,7 +155,7 @@ $db = ROM.container(:sql, opts) do |conf|
           measurements: $url + 'measurements/' + current[:StationID],
           pressure: (current[:pressure].to_f / 100).round(2),
           rainIntensity: current[:RainIntensity].to_f.round(2),
-          rainVolume: rainVolume.round(2),
+          rainVolume: rainvolume.round(2),
           station: $url + 'stations/' + current[:StationID],
           status: status,
           temp: current[:temperature].to_f.round(2),
