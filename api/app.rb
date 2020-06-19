@@ -230,7 +230,6 @@ error do
 end
 
 get '/' do
-  byebug
   json stations: $url + 'stations',
        measurements: $url + 'measurements'
 end
