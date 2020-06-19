@@ -59,9 +59,9 @@ end
 #
 
 opts = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
-opts[:connect_timeout] = 2
+opts[:connect_timeout] = 10
 opts[:adapter] = :mysql2
-opts[:max_connections] = 1
+opts[:max_connections] = 2
 
 $db = ROM.container(:sql, opts) do |conf|
   class Vlinder < ROM::Relation[:sql]
@@ -180,6 +180,7 @@ def read_stations
 end
 
 def updated_since?(last_modified)
+  return true
   return true if last_modified.nil?
   Time.now - UPDATE_INTERVAL > last_modified
 end
