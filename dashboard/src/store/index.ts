@@ -16,6 +16,9 @@ export default new Vuex.Store({
     selectedStations: Array<Station>(),
     liveMeasurements: Array<Measurement>(),
     loadingHistoricMeasurements: true,
+    isStationsError: false,
+    isMeasurementsError: false,
+    isHistoricMeasurementsError: false,
     legendColors: Object(),
     historicMeasurements: Array<Array<Measurement>>()
   },
@@ -35,6 +38,15 @@ export default new Vuex.Store({
     setLegendColors (state, legendColors: {}) {
       state.legendColors = legendColors;
     },
+    setStationsError (state, error: boolean) {
+      state.isStationsError = error;
+    },
+    setMeasurementsError (state, error: boolean) {
+      state.isMeasurementsError = error;
+    },
+    setHistoricMeasurementsError (state, error: boolean) {
+      state.isHistoricMeasurementsError = error;
+    },
     stationsLoaded (state) {
       state.stationsLoaded = true;
     },
@@ -50,19 +62,35 @@ export default new Vuex.Store({
   actions: {
     fetchStations ({ commit }): Promise<Station[]> {
       return fetch(API_URL + STATIONS_PATH)
-        .then(r => r.json())
+        .then(r => {
+          if (!r.ok) return Promise.reject(new Error('station fetch failed'));
+          return r.json();
+        })
         .then((s: Station[]) => {
+          commit('setStationsError', false);
           commit('setStations', s);
           commit('stationsLoaded');
           return s;
+        })
+        .catch(r => {
+          commit('setStationsError', true);
+          return Promise.reject(r);
         });
     },
     fetchMeasurements ({ commit }): Promise<Measurement[]> {
       return fetch(API_URL + MEASUREMENTS_PATH)
-        .then(r => r.json())
+        .then(r => {
+          if (!r.ok) return Promise.reject(new Error('measurement fetch failed'));
+          return r.json();
+        })
         .then((m: Measurement[]) => {
+          commit('setMeasurementsError', false);
           commit('setLiveMeasurements', m);
           return m;
+        })
+        .catch(r => {
+          commit('setMeasurementsError', true);
+          return Promise.reject(r);
         });
     },
     fetchHistoricMeasurements ({ commit, state }): Promise<Measurement[][]> {
