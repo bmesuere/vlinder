@@ -14,7 +14,7 @@
     <v-content>
       <v-container>
         <v-alert type="error" outlined v-if="isError">
-          Er ging iets fout bij het laden van de meetgegevens, probeer later opnieuw.
+          Er ging iets fout bij het ophalen van de meetgegevens. Probeer het later opnieuw.
         </v-alert>
         <v-row>
           <v-col cols="12">
@@ -54,7 +54,7 @@
     <v-footer padless>
       <v-card class="flex blue-grey darken-4" flat tile >
         <v-card-title class="white--text body-2 px-8">
-          &copy; {{ new Date().getFullYear() }} &ndash; Universiteit Gent
+          &copy; {{ new Date().getFullYear() }} Universiteit Gent
           <v-spacer></v-spacer>
           <v-btn class="mx-4" dark icon href="https://github.com/bmesuere/vlinder" target="_blank">
             <v-icon size="24px">mdi-github</v-icon>
