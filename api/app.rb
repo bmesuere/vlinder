@@ -177,14 +177,13 @@ def read_stations
   stations_file = File.new(STATIONS_CSV_FILE)
   stations = {}
   CSV.foreach(stations_file, encoding: 'utf-8', headers: true) do |row|
-    given_name, sponsor = row['benaming'].match(/(.*) \((.*)\)/).captures
     stations[row['ID']] = {
       id: row['ID'],
       name: row['VLINDER'],
       coordinates: { latitude: row['lat'].to_f, longitude: row['lon'].to_f },
       city: row['stad'],
-      sponsor: sponsor,
-      given_name: given_name,
+      sponsor: row['sponsor'],
+      given_name: row['benaming'],
       measurements: $url + 'measurements/' + row['ID'],
       landUse: [20, 50, 100, 250, 500].map do |distance|
         {
