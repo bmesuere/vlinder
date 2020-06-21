@@ -42,7 +42,7 @@ export class D3StationsMap {
 
   async prepareData (stations: Station[], measurements: Measurement[]) {
     // fetch data
-    const belgium = fetch('https://raw.githubusercontent.com/bmesuere/belgium-topojson/master/belgium.json')
+    const belgium = fetch('./belgium.topo.json')
       .then(r => r.json());
 
     this.belgium = await belgium as TopoJSON.Topology;
@@ -51,8 +51,6 @@ export class D3StationsMap {
 
     // prepare data
     this.measurementsMap = new Map(this.measurements.map(m => [m.id, m]));
-    this.belgium.objects.municipalities.geometries = this.belgium.objects.municipalities.geometries.filter(d => d.properties.reg_nis !== '03000');
-    this.belgium.objects.provinces.geometries = this.belgium.objects.provinces.geometries.filter(d => d.properties.reg_nis !== '03000');
   }
 
   async init (stations: Station[], measurements: Measurement[]) {
