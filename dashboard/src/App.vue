@@ -13,6 +13,9 @@
 
     <v-content>
       <v-container>
+        <v-alert type="error" outlined v-if="isError">
+          Er ging iets fout bij het laden van de meetgegevens, probeer later opnieuw.
+        </v-alert>
         <v-row>
           <v-col cols="12">
             <StationsMap :dataLoaded="initialDataLoaded" />
@@ -124,6 +127,10 @@ export default class App extends Vue {
 
   get selectedStations (): Station[] {
     return this.$store.state.selectedStations;
+  }
+
+  get isError (): boolean {
+    return this.$store.state.isStationsError || this.$store.state.isMeasurementsError;
   }
 
   // when the selected stations are changed, update the historic measurements

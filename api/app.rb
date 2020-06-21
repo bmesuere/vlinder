@@ -220,7 +220,7 @@ def reconnect_database
   opts = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
   opts[:connect_timeout] = 10
   opts[:adapter] = :mysql2
-  opts[:max_connections] = 2
+  opts[:max_connections] = 1
 
   conf = ROM::Configuration.new(:sql, opts)
   conf.register_relation(Vlinder)
