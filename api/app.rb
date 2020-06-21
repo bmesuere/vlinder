@@ -24,8 +24,10 @@ require 'byebug'
 DB_CONFIG_FILE = 'login.json'
 STATIONS_CSV_FILE = 'data.csv'
 UPDATE_INTERVAL = 300
+# extra measurements to collect to determine whether a station is offline
 LOOKBACK_UPDATES = 3
 DATETIME_FMT = '%a, %d %b %Y %H:%M:%S %Z'
+DB_MAX_RETRIES = 3
 
 # vlinder database uses UTC, and we want to respond with UTC,
 # so setting our timezone to UTC makes our life easier
@@ -44,7 +46,7 @@ configure :development do
   register Sinatra::Reloader
   after_reload do
     $cache.clear
-    puts '== Reloaded code & cleared caches =='
+    warn '== Reloaded code & cleared caches =='
   end
 end
 
@@ -60,108 +62,105 @@ end
 # Database Object Mapper
 #
 
-opts = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
-opts[:connect_timeout] = 10
-opts[:adapter] = :mysql2
-opts[:max_connections] = 1
+class Vlinder < ROM::Relation[:sql]
+  schema :Vlinder, infer: true, as: :vlinder do
+    attribute :StationID, Types::String
+  end
 
-$db = ROM.container(:sql, opts) do |conf|
-  class Vlinder < ROM::Relation[:sql]
-    schema :Vlinder, infer: true, as: :vlinder do
-      attribute :StationID, Types::String
-    end
-
-    def all_stations
-      lookback = Time.now - UPDATE_INTERVAL * LOOKBACK_UPDATES
-      tries = 0
-      begin
-        results = where { datetime > lookback }
-                  .order { datetime.asc }
-                  .to_a
-      rescue
-        tries += 1
-        raise unless tries < 3
-
-        warn 'retrying query: ' + tries.to_s
-        retry
-      end
-      {
-        last_modified: results.last[:datetime],
-        data: results.group_by { |data| data[:StationID] }
-                     .map { |_id, data| process(data).last }
-      }
-    end
-
-    def station(id, start = nil, stop = nil)
-      start ||= Time.now - 24 * 60 * 60
-      stop ||= Time.now
-
-      tries = 0
-      begin
-        results = where(StationID: id)
-                  .where { (datetime > start) & (datetime < stop) }
-                  .order { datetime.asc }
-                  .to_a
-      rescue
-        tries += 1
-        raise unless tries < 3
-
-        warn 'retrying query: ' + tries.to_s
-        retry
-      end
-
-      {
-        last_modified: results.last[:datetime],
-        data: process(results)
-      }
-    end
-
-    private
-
-    ATTRIBUTES = %i[temp humidity pressure WindSpeed WindDirection WindGust].freeze
-    def status_for(old, new)
-      changed = ATTRIBUTES.any? do |attribute|
-        old[attribute] != new[attribute]
-      end
-      changed ? 'Ok' : 'Offline'
-    end
-
-    def rain_delta(old, new)
-      diff = new[:RainVolume].to_f - old[:RainVolume].to_f
-      if diff.negative? # midnight passed
-        new[:RainVolume].to_f
-      else
-        diff
-      end
-    end
-
-    def process(measurements)
-      previous = measurements.first
-      rainVolume = 0
-      measurements.drop(1).map do |current|
-        status = status_for(previous, current)
-        rainVolume += rain_delta(previous, current)
-        previous = current
-        {
-          humidity: current[:humidity].to_f.round(2),
-          id: current[:StationID],
-          measurements: $url + 'measurements/' + current[:StationID],
-          pressure: (current[:pressure].to_f / 100).round(2),
-          rainIntensity: current[:RainIntensity].to_f.round(2),
-          rainVolume: rainVolume.round(2),
-          station: $url + 'stations/' + current[:StationID],
-          status: status,
-          temp: current[:temperature].to_f.round(2),
-          time: current[:datetime].strftime(DATETIME_FMT),
-          windDirection: current[:WindDirection].to_f.round(2),
-          windGust: current[:WindGust].to_f.round(2),
-          windSpeed: current[:WindSpeed].to_f.round(2)
-        }
-      end
+  def retry_until_succeeded(&block)
+    tries = 0
+    begin
+      yield
+    rescue
+      tries += 1
+      raise unless tries < DB_MAX_RETRIES
+      warn 'retrying query: ' + tries.to_s
+      retry
     end
   end
 
-  conf.register_relation(Vlinder)
+  def all_stations
+    lookback = Time.now - UPDATE_INTERVAL * (LOOKBACK_UPDATES + 1)
+
+    results = retry_until_succeeded do
+      where { datetime > lookback }
+        .order { datetime.asc }
+        .to_a
+    end
+
+    {
+      last_modified: results.last[:datetime],
+      data: results.group_by { |data| data[:StationID] }
+                   .map { |_id, data| process(data).last }
+    }
+  end
+
+  def station(id, start = nil, stop = nil)
+    start ||= Time.now - 24 * 60 * 60
+    stop ||= Time.now
+
+    results = retry_until_succeeded do
+      where(StationID: id)
+        .where { (datetime > start) & (datetime < stop) }
+        .order { datetime.asc }
+        .to_a
+    end
+
+    {
+      last_modified: results.last[:datetime],
+      data: process(results)
+    }
+  end
+
+  private
+
+  ATTRIBUTES = %i[temp humidity pressure WindSpeed WindDirection WindGust].freeze
+  def changed?(old, new)
+    ATTRIBUTES.any? do |attribute|
+      old[attribute] != new[attribute]
+    end
+  end
+
+  def rain_delta(old, new)
+    diff = new[:RainVolume].to_f - old[:RainVolume].to_f
+    if diff.negative? # midnight passed
+      new[:RainVolume].to_f
+    else
+      diff
+    end
+  end
+
+  def process(measurements)
+    previous = measurements.first
+    no_changes = -1 # because we start with comparing the same datapoint
+
+    rainvolume = 0
+    measurements.map do |current|
+      if changed?(previous, current)
+        no_changes = 0
+      else
+        no_changes += 1
+      end
+      status = if no_changes > LOOKBACK_UPDATES then "Offline" else "Ok" end
+      rainvolume += rain_delta(previous, current)
+      previous = current
+      {
+        humidity: current[:humidity].to_f.round(2),
+        id: current[:StationID],
+        measurements: $url + 'measurements/' + current[:StationID],
+        pressure: (current[:pressure].to_f / 100).round(2),
+        rainIntensity: current[:RainIntensity].to_f.round(2),
+        rainVolume: rainvolume.round(2),
+        station: $url + 'stations/' + current[:StationID],
+        status: status,
+        temp: current[:temperature].to_f.round(2),
+        time: current[:datetime].strftime(DATETIME_FMT),
+        windDirection: current[:WindDirection].to_f.round(2),
+        windGust: current[:WindGust].to_f.round(2),
+        windSpeed: current[:WindSpeed].to_f.round(2)
+      }
+    end
+  end
 end
 
 #
@@ -214,12 +213,27 @@ rescue ArgumentError
   nil
 end
 
+def reconnect_database
+  # disconnect if an existing connection is present
+  $rom_instance.disconnect if $rom_instance
+
+  opts = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
+  opts[:connect_timeout] = 10
+  opts[:adapter] = :mysql2
+  opts[:max_connections] = 1
+
+  conf = ROM::Configuration.new(:sql, opts)
+  conf.register_relation(Vlinder)
+  $rom_instance = ROM.container(conf)
+  return $rom_instance.relations[:vlinder]
+end
+
 #
 # Setup globals
 #
 
 $station_info, $station_info_last_modified = read_stations
-$vlinder = $db.relations[:vlinder]
+$vlinder = reconnect_database
 $cache = Hash.new { |hash, key| hash[key] = {} }
 
 #
