@@ -148,7 +148,7 @@ export class D3StationsMap {
       .style('left', (x + 15) + 'px')
       .html('');
 
-    let tooltipHtml = `<b>${station.given_name}</b> - ${station.city}`;
+    let tooltipHtml = `<b>${station.city} &middot ${station.given_name}</b><br/> ${station.sponsor}`;
     if (this.measurementsMap.get(station.id)?.status === "Ok") {
       tooltipHtml += ['temp', 'rainVolume', 'windSpeed'].map(prop => `<br>${weatherProperties[prop].name}: <b>${this.measurementsMap.get(station.id)[prop]} ${weatherProperties[prop].unit}</b>`).join('');
     } else {

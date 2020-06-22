@@ -13,14 +13,17 @@
     <v-list-item three-line>
       <v-list-item-content>
         <div class="text-overline font-weight-regular mb-2" style="line-height: 1rem; font-size: 0.625rem !important;">{{ station.name }}</div>
-        <v-list-item-title class="mb-1">{{ station.given_name }}</v-list-item-title>
-        <v-list-item-subtitle>{{ station.city }}</v-list-item-subtitle>
+        <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
+        <v-list-item-subtitle>
+          <v-icon small title="sponsor">mdi-heart-outline</v-icon>
+          {{ station.sponsor }}
+        </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
 
     <v-list dense subheader>
       <v-list-item v-for="p in weatherProperties" :key="p.property">
-        <v-list-item-subtitle><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ p.name }}</v-list-item-subtitle>
+        <v-list-item-subtitle :title="p.name"><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ p.name }}</v-list-item-subtitle>
         <v-list-item-title class="text-right">{{ measurements[p.property] }} {{ p.unit }}</v-list-item-title>
       </v-list-item>
     </v-list>
