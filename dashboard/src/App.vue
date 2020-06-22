@@ -11,7 +11,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content>
+    <v-main>
       <v-container>
         <v-alert type="error" outlined v-if="isError">
           Er ging iets fout bij het ophalen van de meetgegevens. Probeer het later opnieuw.
@@ -26,7 +26,7 @@
             <StationCard :station="s" />
           </v-col>
         </v-row>
-        <v-toolbar-title class="mt-3 headline">Afgelopen 24u</v-toolbar-title>
+        <v-toolbar-title class="mt-3 text-h5">Afgelopen 24u</v-toolbar-title>
         <v-banner sticky app class="chip-banner">
           <v-chip small label close dark v-for="s in selectedStations" :key="s.id" class="ma-1" :color="legendColors[s.id]" v-on:click:close="removeFromList(s.id)">
             {{ s.given_name }}
@@ -50,10 +50,10 @@
           </v-col>
         </v-row>
       </v-container>
-    </v-content>
+    </v-main>
     <v-footer padless>
       <v-card class="flex blue-grey darken-4" flat tile >
-        <v-card-title class="white--text body-2 px-8">
+        <v-card-title class="white--text text-body-2 px-8">
           &copy; {{ new Date().getFullYear() }} Universiteit Gent
           <v-spacer></v-spacer>
           <v-btn class="mx-4" dark icon href="https://github.com/bmesuere/vlinder" target="_blank">
