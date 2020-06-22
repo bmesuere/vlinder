@@ -12,7 +12,7 @@
 
     <v-list-item three-line>
       <v-list-item-content>
-        <div class="overline mb-2">{{ station.name }}</div>
+        <div class="text-overline font-weight-regular mb-2" style="line-height: 1rem; font-size: 0.625rem !important;">{{ station.name }}</div>
         <v-list-item-title class="mb-1">{{ station.given_name }}</v-list-item-title>
         <v-list-item-subtitle>{{ station.city }}</v-list-item-subtitle>
       </v-list-item-content>
