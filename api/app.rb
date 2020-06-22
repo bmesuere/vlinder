@@ -200,7 +200,6 @@ def read_stations
 end
 
 def updated_since?(last_modified)
-  return true
   return true if last_modified.nil?
 
   Time.now - UPDATE_INTERVAL > last_modified
