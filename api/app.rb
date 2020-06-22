@@ -71,10 +71,11 @@ class Vlinder < ROM::Relation[:sql]
     tries = 0
     begin
       yield
-    rescue
+    rescue StandardError => e
       tries += 1
       raise unless tries < DB_MAX_RETRIES
-      warn 'retrying query: ' + tries.to_s
+
+      warn "#{Time.now}: #{e.inspect} - retrying query: #{tries}"
       retry
     end
   end
