@@ -54,7 +54,7 @@
     <v-footer padless>
       <v-card class="flex blue-grey darken-4" flat tile >
         <v-card-title class="white--text text-body-2 px-8">
-          &copy; {{ new Date().getFullYear() }} Universiteit Gent
+          &copy; {{ new Date().getFullYear() }} Universiteit Gent &middot; v{{ version }}
           <v-spacer></v-spacer>
           <v-btn class="mx-4" dark icon href="https://github.com/bmesuere/vlinder" target="_blank">
             <v-icon size="24px">mdi-github</v-icon>
@@ -84,6 +84,7 @@ import { Station, Measurement } from './app/types';
 })
 export default class App extends Vue {
   private resolveDataLoaded!: Function;
+  version = '1.0'
   initialDataLoaded = new Promise((resolve) => { this.resolveDataLoaded = resolve; });
   tooltipPosition = { timestamp: -1, i: -1 };
 

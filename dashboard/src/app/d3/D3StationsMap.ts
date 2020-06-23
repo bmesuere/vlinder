@@ -90,13 +90,24 @@ export class D3StationsMap {
       .selectAll('.muni')
       .data(topojson.feature(this.belgium, this.belgium.objects.municipalities).features)
       .join('path')
-      .attr('class', 'muni')
+      .attr('class', 'muni d-none d-sm-inline')
       .attr('fill', '#e5e5e5')
       .attr('stroke', 'white')
       .attr('stroke-linejoin', 'round')
       .attr('d', path)
       .append('title')
       .text(d => d?.properties?.name_nl);
+    
+    // draw provinces
+    svg.append('g')
+      .selectAll('.province-bg')
+      .data(topojson.feature(this.belgium, this.belgium.objects.provinces).features)
+      .join('path')
+      .attr('class', 'province-bg d-sm-none')
+      .attr('fill', '#e5e5e5')
+      .attr('stroke', 'none')
+      .attr('stroke-linejoin', 'round')
+      .attr('d', path);
 
     // draw provinces
     svg.append('g')
