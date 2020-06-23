@@ -140,7 +140,7 @@ class Vlinder < ROM::Relation[:sql]
       else
         no_changes += 1
       end
-      status = if no_changes > LOOKBACK_UPDATES then "Offline" else "Ok" end
+      status = if no_changes >= LOOKBACK_UPDATES then "Offline" else "Ok" end
       rainvolume += rain_delta(previous, current)
       previous = current
       {
