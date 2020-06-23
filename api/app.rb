@@ -33,6 +33,10 @@ DB_MAX_RETRIES = 3
 # so setting our timezone to UTC makes our life easier
 ENV['TZ'] = 'UTC'
 
+configure do
+  set :protection, except: [:json_csrf]
+end
+
 configure :development do
   $url = 'http://localhost:9292/'
 
