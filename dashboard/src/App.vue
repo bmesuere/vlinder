@@ -119,6 +119,8 @@ export default class App extends Vue {
   }
 
   removeFromList (id: string) {
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    this.$gtag.event('station_deselect', { event_category: 'stations', value: id });
     this.$store.dispatch('deselectStationById', id);
   }
 

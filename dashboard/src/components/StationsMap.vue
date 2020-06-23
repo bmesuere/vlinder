@@ -50,6 +50,8 @@ export default class StationsMap extends Vue {
 
   // adds or removes a station to the list of selected stations
   toggleStation (stationId: string) {
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    this.$gtag.event('station_toggle', { event_category: 'stations', value: stationId });
     this.$store.dispatch('toggleStationById', stationId);
   }
 
@@ -76,6 +78,8 @@ export default class StationsMap extends Vue {
   // when a different property is selected, we have to manually update the D3 map
   @Watch('selectedProperty')
   selectedPropertyChanged () {
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    this.$gtag.event('property_change', { event_category: 'properties', value: this.selectedProperty });
     if (this.map) {
       this.map.updateProperty(this.selectedProperty);
     }
