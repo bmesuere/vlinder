@@ -24,7 +24,7 @@
     <v-list dense subheader>
       <v-list-item v-for="p in weatherProperties" :key="p.property">
         <v-list-item-subtitle :title="p.name"><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ p.name }}</v-list-item-subtitle>
-        <v-list-item-title class="text-right">{{ measurements[p.property] }} {{ p.unit }}</v-list-item-title>
+        <v-list-item-title class="text-right">{{ measurements['status'] == "Offline" ? "-" : measurements[p.property] }} {{ p.unit }}</v-list-item-title>
       </v-list-item>
     </v-list>
 
