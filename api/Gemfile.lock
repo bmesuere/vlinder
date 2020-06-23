@@ -72,7 +72,6 @@ GEM
       rack-protection (= 2.0.8.1)
       sinatra (= 2.0.8.1)
       tilt (~> 2.0)
-    sinatra-cors (1.1.0)
     tilt (2.0.10)
     transproc (1.1.1)
 
@@ -87,7 +86,6 @@ DEPENDENCIES
   rom-sql (~> 3.2)
   sinatra (~> 2.0)
   sinatra-contrib (~> 2.0)
-  sinatra-cors (~> 1.1)
 
 BUNDLED WITH
    2.1.4

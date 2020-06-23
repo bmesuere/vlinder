@@ -33,12 +33,6 @@ DB_MAX_RETRIES = 3
 # so setting our timezone to UTC makes our life easier
 ENV['TZ'] = 'UTC'
 
-configure do
-  register Sinatra::Cors
-  set :allow_origin, '*'
-  set :allow_headers, 'content-type,if-modified-since'
-end
-
 configure :development do
   $url = 'http://localhost:9292/'
 
