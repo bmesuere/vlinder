@@ -56,6 +56,9 @@
         <v-card-title class="white--text text-body-2 px-8">
           &copy; {{ new Date().getFullYear() }} Universiteit Gent &middot; v{{ version }}
           <v-spacer></v-spacer>
+          <v-btn class="mx-4" dark icon href="https://app.swaggerhub.com/apis-docs/bmesuere/VLINDER/" target="_blank">
+            <v-icon size="24px">mdi-api</v-icon>
+          </v-btn>
           <v-btn class="mx-4" dark icon href="https://github.com/bmesuere/vlinder" target="_blank">
             <v-icon size="24px">mdi-github</v-icon>
           </v-btn>
