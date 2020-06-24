@@ -1,10 +1,10 @@
 # VLINDER dashboard
 
-This repository contains the API and dashboard for the [VLINDER project](http://www.vlinder.ugent.be/).
+This repository contains the API and dashboard for the [VLINDER project](http://vlinder.ugent.be/en).
 
 ## Quicklinks
-- [Project website](http://www.vlinder.ugent.be/en)
-- [Public version of this dashboard](http://vlinder.ugent.be/dashboard): the latest release is deployed here
+- [Project website](http://vlinder.ugent.be/en): also available [in Dutch](http://vlinder.ugent.be).
+- [Public version of this dashboard](http://vlinder.ugent.be/dashboard): the latest release is deployed here.
 - [API documentation](https://app.swaggerhub.com/apis-docs/bmesuere/VLINDER): although the code in this repository is licensed under the MIT License, the data itself is not. Please contact vlinder@ugent.be if you want to actively use the API.
 - [Development version of this dashboard](https://bmesuere.github.io/vlinder/): the latest commit is deployed here automatically. This might break.
 
