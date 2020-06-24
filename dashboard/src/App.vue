@@ -96,9 +96,16 @@ export default class App extends Vue {
     // fetch data a first time
     const stationsPromise = this.$store.dispatch('fetchStations');
     stationsPromise.then(() => {
-      this.$store.dispatch('selectStationById', 'zZ6ZeSg11dJ5zp5GrNwNck9A');
-      this.$store.dispatch('selectStationById', 'Do5lLMfezIdmUCzzsE0IwIbE');
-      this.$store.dispatch('selectStationById', 'XeIIA97QzN5xxk6AvdzAPquY');
+      const stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
+      if (stationsFromStorage.length > 0) {
+        stationsFromStorage.forEach(s => {
+          this.$store.dispatch('selectStationById', s);
+        });
+      } else {
+        this.$store.dispatch('selectStationById', 'zZ6ZeSg11dJ5zp5GrNwNck9A');
+        this.$store.dispatch('selectStationById', 'Do5lLMfezIdmUCzzsE0IwIbE');
+        this.$store.dispatch('selectStationById', 'XeIIA97QzN5xxk6AvdzAPquY');
+      }
     });
     const measurementsPromise: Promise<Measurement[]> = this.$store.dispatch('fetchMeasurements');
 
@@ -145,6 +152,7 @@ export default class App extends Vue {
   @Watch('selectedStations')
   selectedPropertyChanged () {
     this.$store.dispatch('fetchHistoricMeasurements');
+    window.localStorage.setItem('selectedStations', JSON.stringify(this.selectedStations.map(s => s.id)));
   }
 }
 </script>
