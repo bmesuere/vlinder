@@ -12,6 +12,7 @@ export class D3StationsMap {
   private readonly selector: string;
   private selectedProperty: WeatherPropertyName = 'temp';
   private readonly selectedStations: Station[];
+  private readonly tooltipInfo: { station: Station, shown: boolean, x: number, y: number };
   private readonly toggleCallback: Function;
 
   private loading = true;
@@ -33,10 +34,11 @@ export class D3StationsMap {
   private colorScale!: d3.ScaleSequential<string>;
   private legend!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
 
-  constructor (selector: string, selectedProperty = 'temp', selectedStations: Station[], toggleStationCallback: Function) {
+  constructor (selector: string, selectedProperty = 'temp', selectedStations: Station[], tooltipInfo, toggleStationCallback: Function) {
     this.selector = selector;
     this.setProperty(selectedProperty);
     this.selectedStations = selectedStations;
+    this.tooltipInfo = tooltipInfo;
     this.toggleCallback = toggleStationCallback;
   }
 
@@ -73,17 +75,6 @@ export class D3StationsMap {
       .html("")
       .append('svg')
       .attr('viewBox', `0, 0, ${this.width}, ${this.height}`);
-
-    const tooltip = d3.select('body').append('div')
-      .attr('class', 'tooltip')
-      .style('position', 'absolute')
-      .style('display', 'none')
-      .style('background-color', 'white')
-      .style('padding', '6px')
-      .style('border', '1px solid #dddddd')
-      .style('border-radius', '3px')
-      .style('pointer-events', 'none')
-      .style('font', '12px Roboto');
 
     // draw muni's
     svg.append('g')
@@ -134,13 +125,13 @@ export class D3StationsMap {
         d3.select('#station-' + datum.id)
           .attr('fill-opacity', 1)
           .attr('r', 5);
-        this.tooltip(tooltip, datum, d3.event.pageX, d3.event.pageY);
+        this.tooltip(datum, d3.event.pageX, d3.event.pageY);
       })
       .on('mouseleave', datum => {
         d3.select('#station-' + datum.id)
           .attr('r', d => this.stationRadius(d as Station))
           .attr('fill-opacity', d => this.stationFillOpacity(d as Station));
-        this.tooltip(tooltip, null);
+        this.tooltip(null);
       })
       .on('click', datum => { this.toggleCallback(datum.id); });
 
@@ -151,23 +142,15 @@ export class D3StationsMap {
     this.update();
   }
 
-  private tooltip (div, station: Station | null, x?: number, y?: number) {
-    if (!station) return div.style('display', 'none');
-
-    div.style('display', 'block')
-      .style('top', (y + 5) + 'px')
-      .style('left', (x + 15) + 'px')
-      .html('');
-
-    let tooltipHtml = `<b>${station.city} &middot ${station.given_name}</b><br/> ${station.sponsor}`;
-    if (this.measurementsMap.get(station.id)?.status === "Ok") {
-      tooltipHtml += ['temp', 'rainVolume', 'windSpeed'].map(prop => `<br>${weatherProperties[prop].name}: <b>${this.measurementsMap.get(station.id)[prop]} ${weatherProperties[prop].unit}</b>`).join('');
+  private tooltip (station: Station | null, x?: number, y?: number) {
+    if (station) {
+      this.tooltipInfo.station = station;
+      this.tooltipInfo.x = x;
+      this.tooltipInfo.y = y;
+      this.tooltipInfo.shown = true;
     } else {
-      tooltipHtml += "<br>station offline";
+      this.tooltipInfo.shown = false;
     }
-    
-
-    div.html(tooltipHtml);
   }
 
   private setProperty (property: string) {

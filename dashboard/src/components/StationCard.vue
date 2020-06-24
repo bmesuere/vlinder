@@ -38,7 +38,7 @@ import { weatherProperties as wp } from '../app/weatherProperties';
 
 @Component
 export default class StationCard extends Vue {
-  @Prop() station!: Station
+  @Prop() station!: Station;
 
   weatherProperties = wp;
 
