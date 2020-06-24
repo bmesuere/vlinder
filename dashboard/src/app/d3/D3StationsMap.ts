@@ -160,6 +160,8 @@ export class D3StationsMap {
     }
 
     this.tooltipInfo.station = station;
+    this.tooltipInfo.x = x;
+    this.tooltipInfo.y = y;
     this.tooltipInfo.shown = true;
 
     div.style('display', 'block')
