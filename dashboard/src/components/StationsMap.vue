@@ -24,20 +24,20 @@
     />
     </div>
     <div v-if="tooltipInfo.shown" class="text-left" :style="{width: '250px', position: 'absolute', left: (tooltipInfo.x + 15) + 'px', top: (tooltipInfo.y - 45) + 'px'}">
-      <StationCard :station="tooltipInfo.station" />
+      <TooltipCard :station="tooltipInfo.station" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import StationCard from './StationCard.vue';
+import TooltipCard from './TooltipCard.vue';
 
 import { weatherProperties as wp } from '../app/weatherProperties';
 import { D3StationsMap } from '../app/d3/D3StationsMap';
 import { Station, Measurement } from '../app/types';
 
-@Component({ components: { StationCard } })
+@Component({ components: { TooltipCard } })
 export default class StationsMap extends Vue {
   @Prop({ default: 'stationsMap' }) readonly mapId!: string;
   @Prop() readonly dataLoaded!: Promise<[Station[], Measurement[]]>;
