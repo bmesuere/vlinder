@@ -12,6 +12,7 @@ export class D3StationsMap {
   private readonly selector: string;
   private selectedProperty: WeatherPropertyName = 'temp';
   private readonly selectedStations: Station[];
+  private readonly tooltipInfo: { station: Station, shown: boolean, x: number, y: number };
   private readonly toggleCallback: Function;
 
   private loading = true;
@@ -33,10 +34,11 @@ export class D3StationsMap {
   private colorScale!: d3.ScaleSequential<string>;
   private legend!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
 
-  constructor (selector: string, selectedProperty = 'temp', selectedStations: Station[], toggleStationCallback: Function) {
+  constructor (selector: string, selectedProperty = 'temp', selectedStations: Station[], tooltipInfo, toggleStationCallback: Function) {
     this.selector = selector;
     this.setProperty(selectedProperty);
     this.selectedStations = selectedStations;
+    this.tooltipInfo = tooltipInfo;
     this.toggleCallback = toggleStationCallback;
   }
 
@@ -152,7 +154,13 @@ export class D3StationsMap {
   }
 
   private tooltip (div, station: Station | null, x?: number, y?: number) {
-    if (!station) return div.style('display', 'none');
+    if (!station) {
+      this.tooltipInfo.shown = false;
+      return div.style('display', 'none');
+    }
+
+    this.tooltipInfo.station = station;
+    this.tooltipInfo.shown = true;
 
     div.style('display', 'block')
       .style('top', (y + 5) + 'px')
