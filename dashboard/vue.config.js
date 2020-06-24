@@ -4,7 +4,7 @@ module.exports = {
   ],
   publicPath: process.env.CI
     ? '/vlinder/'
-    : '/',
+    : '/dashboard/',
   pwa: {
     manifestOptions: {
       name: 'VLINDER dashboard',
