@@ -4,6 +4,8 @@
       <v-icon>mdi-close</v-icon>
     </v-btn>
 
+    <LandUseGraph :station="station" />
+
     <v-img
       aspect-ratio="2.3137254902"
       :src="imgUrl"
@@ -45,10 +47,12 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import LandUseGraph from './LandUseGraph.vue';
+
 import { Station, Measurement } from '../app/types';
 import { weatherProperties as wp } from '../app/weatherProperties';
 
-@Component
+@Component({ components: { LandUseGraph } })
 export default class StationCard extends Vue {
   @Prop() station!: Station;
 
