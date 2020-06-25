@@ -189,8 +189,8 @@ def read_stations
           distance: distance,
           usage:
             LAND_USAGE_TYPES.map do |type_nl, type_en|
-              { type: type_en, value: row["#{type_nl}#{distance}"].to_f }
-            end
+              { type_en.to_sym => row["#{type_nl}#{distance}"].to_f }
+            end.reduce({}, :merge)
         }
       end
     }
