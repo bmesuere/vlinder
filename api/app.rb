@@ -145,7 +145,7 @@ class Vlinder < ROM::Relation[:sql]
         if normalize_rain
           rainvolume + rain_delta(previous, current)
         else
-          current[:RainVolume]
+          current[:RainVolume].to_f
         end
       previous = current
       {
