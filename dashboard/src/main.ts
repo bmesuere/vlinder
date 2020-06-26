@@ -5,6 +5,8 @@ import './registerServiceWorker';
 import vuetify from './plugins/vuetify';
 import store from './store';
 
+import 'whatwg-fetch';
+
 Vue.config.productionTip = false;
 
 Vue.use(VueGtag, {
