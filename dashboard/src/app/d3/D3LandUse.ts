@@ -8,8 +8,8 @@ export class D3LandUse {
 
   // settings
   private readonly margin = { top: 5, right: 5, bottom: 20, left: 5 };
-  private readonly width = 354;
-  private readonly height = 153;
+  private readonly width = 295;
+  private readonly height = 127.5;
 
   private angle!: number[] & d3.ScaleLinear<number, number>;
   private radius!: string[] & d3.ScaleBand<string>;
@@ -31,6 +31,7 @@ export class D3LandUse {
       .keys(['water', 'paved', 'green'])
       // @ts-ignore
       .value((d, key) => d.usage[key])(this.landUse)
+      // @ts-ignore
       .map(d => { d.forEach(v => { v.key = d.key; }); return d; });
 
     const color = d3.scaleOrdinal()
@@ -49,8 +50,10 @@ export class D3LandUse {
       .range([this.margin.left, this.width - this.margin.right])
       .padding(0.1);
 
+    // @ts-ignore
     const rAxis = g => g
       .call(d3.axisBottom(this.radius).tickSizeOuter(0).tickFormat(d => d + ' m'))
+      // @ts-ignore
       .call(g => g.selectAll('.domain').remove());
 
     // @ts-ignore
