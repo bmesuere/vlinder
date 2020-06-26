@@ -90,7 +90,7 @@ class Vlinder < ROM::Relation[:sql]
     {
       last_modified: results.last[:datetime],
       data: results.group_by { |data| data[:StationID] }
-                   .map { |_id, data| process(data).last }
+                   .map { |_id, data| process(data, normalize_rain: false).last }
     }
   end
 
@@ -129,7 +129,7 @@ class Vlinder < ROM::Relation[:sql]
     end
   end
 
-  def process(measurements)
+  def process(measurements, normalize_rain: true)
     previous = measurements.first
     no_changes = -1 # because we start with comparing the same datapoint
 
@@ -141,7 +141,12 @@ class Vlinder < ROM::Relation[:sql]
         no_changes += 1
       end
       status = if no_changes >= LOOKBACK_UPDATES then "Offline" else "Ok" end
-      rainvolume += rain_delta(previous, current)
+      rainvolume = \
+        if normalize_rain
+          rainvolume + rain_delta(previous, current)
+        else
+          current[:RainVolume]
+        end
       previous = current
       {
         humidity: current[:humidity].to_f.round(2),
