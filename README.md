@@ -1,6 +1,8 @@
 # VLINDER dashboard
 
-This repository contains the API and dashboard for the [VLINDER project](http://vlinder.ugent.be/en).
+This repository contains the API and dashboard for [VLINDER](http://vlinder.ugent.be/en), a citizen science project in Flanders. The VLINDER network consists of 60 weather stations located in very diverse landscapes. Each station reports weather data every five minutes, which is then exposed using this API and dashboard.
+
+![image](https://user-images.githubusercontent.com/481872/86219125-0c04b880-bb82-11ea-90e9-af77f382d66f.png)
 
 ## Quicklinks
 - [Project website](http://vlinder.ugent.be/en): also available [in Dutch](http://vlinder.ugent.be).
