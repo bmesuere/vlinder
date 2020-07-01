@@ -88,7 +88,7 @@ import { Station, Measurement } from './app/types';
 })
 export default class App extends Vue {
   private resolveDataLoaded!: Function;
-  version = '1.0'
+  version = '1.0.1'
   initialDataLoaded = new Promise((resolve) => { this.resolveDataLoaded = resolve; });
   tooltipPosition = { timestamp: -1, i: -1 };
 
