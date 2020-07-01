@@ -59,7 +59,7 @@ export class D3StationsMap {
     await this.prepareData(stations, measurements);
 
     this.colorScale = d3.scaleSequential(d3.interpolateViridis)
-      .domain(d3.extent(this.measurements, d => d[this.selectedProperty]) as [number, number]);
+      .domain(d3.extent(this.measurements.filter(d => d.status === "Ok"), d => d[this.selectedProperty]) as [number, number]);
 
     // fit the map for what we want to show
     const projection = d3.geoMercator()
@@ -176,7 +176,7 @@ export class D3StationsMap {
     if (this.loading) return;
 
     this.legend.html('');
-    this.colorScale.domain(d3.extent(this.measurements, d => d[this.selectedProperty]) as [number, number]);
+    this.colorScale.domain(d3.extent(this.measurements.filter(d => d.status === "Ok"), d => d[this.selectedProperty]) as [number, number]);
     this.legend.append(() => legend({ color: this.colorScale, title: weatherProperties[this.selectedProperty].legend, width: 200, tickSize: -10, ticks: 4 }));
     this.stationDots.transition()
       .attr('r', d => this.stationRadius(d))
