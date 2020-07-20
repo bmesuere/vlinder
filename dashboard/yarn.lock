@@ -9011,10 +9011,10 @@ vue-eslint-parser@^7.0.0:
     esquery "^1.0.1"
     lodash "^4.17.15"
 
-vue-gtag@^1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/vue-gtag/-/vue-gtag-1.7.0.tgz#1a375d68c3b8a0338d2ebb1d1312f05803b6bca1"
-  integrity sha512-W3bBlgzrCC1FAmhBxDhhIiaNKVoqO/VDB6ZuYGcEg0Smg88A92FUKvNgpUv1Mkn+d61pUZXBWDFKyQMkyoFU7w==
+vue-gtag@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/vue-gtag/-/vue-gtag-1.8.0.tgz#0707e744bca6bc00681cbf555786b48cd9d46f97"
+  integrity sha512-oM3DojStj3oLSgmgUTgKlj1nuUBK5u7nSzjn5BltbozmA72CjkRkMyZ/OfyVZwkHUS97Rh2LYf6QfwXMQ46ZRw==
 
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"
