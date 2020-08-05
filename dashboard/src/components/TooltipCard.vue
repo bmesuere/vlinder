@@ -6,7 +6,7 @@
         <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
         <v-list-item-subtitle title="sponsor">
           <v-icon small>mdi-heart-outline</v-icon>
-          {{ station.sponsor }}
+          {{ station.school || station.sponsor }}
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>

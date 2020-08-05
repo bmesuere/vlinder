@@ -8,6 +8,8 @@ export interface Station {
   id: string;
   measurements: string;
   name: string;
+  sponsor: string;
+  school: string;
 }
 
 export interface Measurement {
