@@ -187,7 +187,7 @@ def read_stations
       coordinates: { latitude: row['lat'].to_f, longitude: row['lon'].to_f },
       city: row['stad'],
       sponsor: row['sponsor'],
-      school: row['sponsor'],
+      school: row['school'],
       given_name: row['benaming'],
       measurements: $url + 'measurements/' + row['ID'],
       landUse: [20, 50, 100, 250, 500].map do |distance|
