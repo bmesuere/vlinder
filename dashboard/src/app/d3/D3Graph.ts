@@ -95,9 +95,10 @@ export class D3Graph {
 
     this.bisector = d3.bisector((d: string) => Date.parse(d)).left;
 
-    this.svg.on('touchmove mousemove', () => {
+    this.svg.on('touchmove mousemove', (event) => {
       if (!this.measurements) { return; }
-      const { timestamp, i } = this.bisect(d3.mouse(this.svg.node() as SVGSVGElement)[0]);
+      // @ts-ignore
+      const { timestamp, i } = this.bisect(d3.pointer(event, this.svg.node() as SVGSVGElement)[0]);
       this.tooltipPosition.timestamp = timestamp;
       this.tooltipPosition.i = i;
     });
