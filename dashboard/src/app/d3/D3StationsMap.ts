@@ -121,19 +121,19 @@ export class D3StationsMap {
       .attr('cx', d => projection([d.coordinates.longitude, d.coordinates.latitude])[0])
       .attr('cy', d => projection([d.coordinates.longitude, d.coordinates.latitude])[1])
       .style('cursor', 'pointer')
-      .on('mouseenter', datum => {
+      .on('mouseenter', (event, datum) => {
         d3.select('#station-' + datum.id)
           .attr('fill-opacity', 1)
           .attr('r', 5);
-        this.tooltip(datum, d3.event.pageX, d3.event.pageY);
+        this.tooltip(datum, event.pageX, event.pageY);
       })
-      .on('mouseleave', datum => {
+      .on('mouseleave', (event, datum) => {
         d3.select('#station-' + datum.id)
           .attr('r', d => this.stationRadius(d as Station))
           .attr('fill-opacity', d => this.stationFillOpacity(d as Station));
         this.tooltip(null);
       })
-      .on('click', datum => { this.toggleCallback(datum.id); });
+      .on('click', (event, datum) => { this.toggleCallback(datum.id); });
 
     this.legend = svg.append('g')
       .attr('transform', `translate(${this.margin.left}, ${this.height - this.margin.top - 40})`);
