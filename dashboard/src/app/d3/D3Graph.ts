@@ -97,6 +97,7 @@ export class D3Graph {
 
     this.svg.on('touchmove mousemove', (event) => {
       if (!this.measurements) { return; }
+      // @ts-ignore
       const { timestamp, i } = this.bisect(d3.pointer(event, this.svg.node() as SVGSVGElement)[0]);
       this.tooltipPosition.timestamp = timestamp;
       this.tooltipPosition.i = i;
