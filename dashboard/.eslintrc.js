@@ -21,7 +21,8 @@ module.exports = {
     'no-extra-semi': 'off',
     'no-prototype-builtins': 'off',
     semi: ['error', 'always'],
-    '@typescript-eslint/ban-ts-ignore': 'off',
-    '@typescript-eslint/no-explicit-any': 'off'
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/ban-types': 'off'
   },
 };
