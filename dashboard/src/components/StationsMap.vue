@@ -50,15 +50,14 @@ export default class StationsMap extends Vue {
   weatherProperties = wp;
   allowedProperties = ['temp', 'rainVolume', 'windSpeed'];
 
-  async mounted () {
+  async mounted (): Promise<void> {
     this.map = new D3StationsMap(`#${this.mapId}`, this.selectedProperty, this.selectedStations, this.tooltipInfo, this.toggleStation);
     const [s, m] = await this.dataLoaded;
     this.map.init(s, m);
   }
 
   // adds or removes a station to the list of selected stations
-  toggleStation (stationId: string) {
-    // eslint-disable-next-line @typescript-eslint/camelcase
+  toggleStation (stationId: string): void {
     this.$gtag.event('station_toggle', { event_category: 'stations', value: stationId });
     this.$store.dispatch('toggleStationById', stationId);
   }
@@ -77,7 +76,7 @@ export default class StationsMap extends Vue {
 
   // when stations are added or removed, update the D3 map
   @Watch('selectedStations')
-  selectedStationsChanged () {
+  selectedStationsChanged (): void {
     if (this.map) {
       this.map.updateSelectedStations();
     }
@@ -85,8 +84,7 @@ export default class StationsMap extends Vue {
 
   // when a different property is selected, we have to manually update the D3 map
   @Watch('selectedProperty')
-  selectedPropertyChanged () {
-    // eslint-disable-next-line @typescript-eslint/camelcase
+  selectedPropertyChanged (): void {
     this.$gtag.event('property_change', { event_category: 'properties', value: this.selectedProperty });
     if (this.map) {
       this.map.updateProperty(this.selectedProperty);
@@ -95,7 +93,7 @@ export default class StationsMap extends Vue {
 
   // when measurements are updated, we have to manually update the D3 map
   @Watch('measurements')
-  measurementsChanged () {
+  measurementsChanged (): void {
     if (this.map) {
       this.map.updateMeasurements(this.measurements);
     }

@@ -49,13 +49,12 @@ export default class StationCard extends Vue {
 
   weatherProperties = wp;
 
-  removeFromList () {
-    // eslint-disable-next-line @typescript-eslint/camelcase
+  removeFromList ():void {
     this.$gtag.event('station_deselect', { event_category: 'stations', value: this.station.id });
     this.$store.dispatch('deselectStationById', this.station.id);
   }
 
-  get imgUrl () {
+  get imgUrl (): string {
     return `./img/maps/${this.station.name}.png`;
   }
 
