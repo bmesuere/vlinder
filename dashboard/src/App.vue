@@ -92,7 +92,7 @@ export default class App extends Vue {
   initialDataLoaded = new Promise((resolve) => { this.resolveDataLoaded = resolve; });
   tooltipPosition = { timestamp: -1, i: -1 };
 
-  created () {
+  created (): void {
     // fetch data a first time
     const stationsPromise = this.$store.dispatch('fetchStations');
     stationsPromise.then(() => {
@@ -116,7 +116,7 @@ export default class App extends Vue {
     this.scheduleFetch('fetchHistoricMeasurements');
   }
 
-  scheduleFetch (fetch: string) {
+  scheduleFetch (fetch: string): void {
     setTimeout(() => {
       requestAnimationFrame(() => {
         this.scheduleFetch(fetch);
@@ -125,17 +125,17 @@ export default class App extends Vue {
     }, 60000);
   }
 
-  removeFromList (id: string) {
-    // eslint-disable-next-line @typescript-eslint/camelcase
+  removeFromList (id: string): void {
     this.$gtag.event('station_deselect', { event_category: 'stations', value: id });
     this.$store.dispatch('deselectStationById', id);
   }
 
+  // eslint-disable-next-line
   get weatherProperties () {
     return weatherProperties;
   }
 
-  get legendColors () {
+  get legendColors (): String[] {
     return this.$store.state.legendColors;
   }
 
@@ -150,7 +150,7 @@ export default class App extends Vue {
   // when the selected stations are changed, update the historic measurements
   // might eventually move to another component
   @Watch('selectedStations')
-  selectedPropertyChanged () {
+  selectedPropertyChanged (): void {
     this.$store.dispatch('fetchHistoricMeasurements');
     window.localStorage.setItem('selectedStations', JSON.stringify(this.selectedStations.map(s => s.id)));
   }
