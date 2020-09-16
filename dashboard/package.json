@@ -19,7 +19,7 @@
     "vue-router": "^3.4.3",
     "vuetify": "^2.3.10",
     "vuex": "^3.5.1",
-    "whatwg-fetch": "^3.4.0"
+    "whatwg-fetch": "^3.4.1"
   },
   "devDependencies": {
     "@types/d3": "^5.7.2",
