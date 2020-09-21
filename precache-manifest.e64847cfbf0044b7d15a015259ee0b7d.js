@@ -4,11 +4,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/belgium.topo.json"
   },
   {
-    "revision": "784eaab0fd8cdacf17cb",
+    "revision": "4dda7bb1cd23ad864322",
     "url": "/vlinder/css/app.d44967a0.css"
   },
   {
-    "revision": "93483f22316b86c746a2",
+    "revision": "b82be9fcb439932a04f7",
     "url": "/vlinder/css/chunk-vendors.afceca44.css"
   },
   {
@@ -252,16 +252,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/maps/vlinder60.png"
   },
   {
-    "revision": "dd8f282996496f4948e530804c447630",
+    "revision": "93f6a46451b699eea0f6f02060d852e7",
     "url": "/vlinder/index.html"
   },
   {
-    "revision": "784eaab0fd8cdacf17cb",
-    "url": "/vlinder/js/app.10763b47.js"
+    "revision": "4dda7bb1cd23ad864322",
+    "url": "/vlinder/js/app.224a1458.js"
   },
   {
-    "revision": "93483f22316b86c746a2",
-    "url": "/vlinder/js/chunk-vendors.6c85f820.js"
+    "revision": "b82be9fcb439932a04f7",
+    "url": "/vlinder/js/chunk-vendors.1309bb03.js"
   },
   {
     "revision": "5dc27aed738712b8ad41e8110bb8dce9",
