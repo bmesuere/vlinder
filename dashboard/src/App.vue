@@ -21,9 +21,7 @@
             <StationsMap :dataLoaded="initialDataLoaded" />
           </v-col>
         </v-row>
-        <v-row>
-          <StationSelector />
-        </v-row>
+        <StationSelector />
         <v-row>
           <v-col cols="12" sm="6" md="4" lg="3" v-for="s in selectedStations" :key="s.id" >
             <StationCard :station="s" />
