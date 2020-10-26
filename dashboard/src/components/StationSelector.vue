@@ -9,12 +9,15 @@
     </v-text-field>
     <v-card-text>
       <v-treeview
+        v-on:update:active="selectStation"
         :items="stations"
         :search="search"
         :filter="filter"
+        :active="activeStations"
         activatable
         hoverable
         multiple-active
+        open-on-click
       >
         <template v-slot:label="{ item }">
           {{ item.city + " &middot; " + item.given_name }}
@@ -30,17 +33,29 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import { Vue, Component, Watch } from 'vue-property-decorator';
 
 import { Station } from '../app/types';
 
 @Component
 export default class StationSelector extends Vue {
   search = '';
+  activeStations: string[] = [];
 
-  filter (station: Station, query: string) {
+  filter (station: Station, query: string): boolean {
     const searchKey = station.city + station.given_name + station.name + station.sponsor + station.school;
     return searchKey.toLowerCase().includes(query.toLowerCase());
+  }
+
+  selectStation (stations: string[]): void {
+    const addedStations = stations.filter(s => !this.activeStations.includes(s));
+    const removeStations = this.activeStations.filter(s => !stations.includes(s));
+    addedStations.forEach(station => {
+      this.$store.dispatch('selectStationById', station);
+    });
+    removeStations.forEach(station => {
+      this.$store.dispatch('deselectStationById', station);
+    });
   }
 
   get stations (): Station[] {
@@ -49,6 +64,11 @@ export default class StationSelector extends Vue {
 
   get selectedStations (): Station[] {
     return this.$store.state.selectedStations;
+  }
+
+  @Watch('selectedStations')
+  selectedStationsChanged (): void {
+    this.activeStations = this.selectedStations.map(d => d.id);
   }
 }
 </script>
