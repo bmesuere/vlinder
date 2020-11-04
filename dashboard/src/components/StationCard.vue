@@ -11,18 +11,23 @@
     />
 
     <v-list-item three-line>
-      <v-list-item-content>
+      <v-list-item-content class="pb-1">
         <div class="text-overline font-weight-regular mb-2" style="line-height: 1rem; font-size: 0.625rem !important;">{{ station.name }}</div>
         <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
         <v-list-item-subtitle>
-          <span v-if="station.sponsor !== ''" title="sponsor">
-            <v-icon small>mdi-heart-outline</v-icon>
-            {{ station.sponsor }}
-            &middot;
-          </span>
-          <span title="school">
+          <span title="Betrokken school">
             <v-icon small>mdi-school-outline</v-icon>
             {{ station.school }}
+          </span>
+          <br>
+          <span title="sponsor" style="display: inline-block" class="mt-1">
+            <v-icon small>mdi-heart-outline</v-icon>
+            <span v-if="station.sponsor !== ''" >
+              {{ station.sponsor }}
+            </span>
+            <a v-else hfref="mailto:vlinder@ugent.be">
+              Dit station sponsoren?
+            </a>
           </span>
         </v-list-item-subtitle>
       </v-list-item-content>
