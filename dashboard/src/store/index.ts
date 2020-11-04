@@ -118,6 +118,12 @@ export default new Vuex.Store({
         commit('removeSelectedStation', station);
       }
     },
+    selectStationByName ({ commit, state }, stationName: string) {
+      const station = state.stations.find(s => s.name === stationName);
+      if (station) {
+        commit('addSelectedStation', station);
+      }
+    },
     toggleStationById ({ commit, state }, stationId: string) {
       const station = state.stations.find(s => s.id === stationId);
       if (station) {

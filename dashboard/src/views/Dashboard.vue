@@ -74,7 +74,7 @@ export default class Dashboard extends Vue {
       const stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
       if (this.urlStations.length > 0) {
         this.urlStations.forEach(s => {
-          this.$store.dispatch('selectStationById', s);
+          this.$store.dispatch('selectStationByName', s);
         });
       } else if (stationsFromStorage.length > 0) {
         stationsFromStorage.forEach(s => {
@@ -134,7 +134,7 @@ export default class Dashboard extends Vue {
 
     // set the query parameter
     const query = Object.assign({}, this.$route.query);
-    query.stations = this.selectedStations.map(s => s.id);
+    query.stations = this.selectedStations.map(s => s.name);
     await this.$router.replace({ query });
 
     // set the history in local storage
