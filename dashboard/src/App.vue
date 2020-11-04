@@ -77,7 +77,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import GraphCard from './components/GraphCard.vue';
 import StationCard from './components/StationCard.vue';
@@ -93,6 +93,8 @@ import { Station, Measurement } from './app/types';
   }
 })
 export default class App extends Vue {
+  @Prop() urlStations!: string;
+
   private resolveDataLoaded!: Function;
   version = '1.0.2'
   initialDataLoaded = new Promise((resolve) => { this.resolveDataLoaded = resolve; });
@@ -156,8 +158,15 @@ export default class App extends Vue {
   // when the selected stations are changed, update the historic measurements
   // might eventually move to another component
   @Watch('selectedStations')
-  selectedPropertyChanged (): void {
+  async selectedPropertyChanged (): Promise<void> {
     this.$store.dispatch('fetchHistoricMeasurements');
+
+    // set the query parameter
+    const query = Object.assign({}, this.$route.query);
+    query.stations = this.selectedStations.map(s => s.id).join(',');
+    await this.$router.push({ query });
+
+    // set the history in local storage
     window.localStorage.setItem('selectedStations', JSON.stringify(this.selectedStations.map(s => s.id)));
   }
 }
