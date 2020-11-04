@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
-import App from '../App.vue';
+import Dashboard from '../views/Dashboard.vue';
 
 Vue.use(VueRouter);
 
@@ -8,9 +8,9 @@ const routes: Array<RouteConfig> = [
   {
     path: '/',
     name: 'Home',
-    component: App,
-    // props: route => ({ urlStations: route.query.stations })
-    props: { urlStations: 'test' }
+    component: Dashboard,
+    props: route => ({ urlStations: route.query.stations ? [route.query.stations].flat() : [] })
+    // props: { urlStations: 'test' }
   }
   // {
   //  path: '/about',
@@ -27,5 +27,23 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 });
+
+function patchRouterMethod (router: VueRouter, methodName: string) {
+  // @ts-ignore
+  router['old' + methodName] = router[methodName];
+  // @ts-ignore
+  router[methodName] = async function (location) {
+    // @ts-ignore
+    return router['old' + methodName](location).catch((error) => {
+      if (error.name === 'NavigationDuplicated') {
+        return this.currentRoute;
+      }
+      throw error;
+    });
+  };
+}
+
+patchRouterMethod(router, 'push');
+patchRouterMethod(router, 'replace');
 
 export default router;
