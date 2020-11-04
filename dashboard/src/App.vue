@@ -21,7 +21,11 @@
             <StationsMap :dataLoaded="initialDataLoaded" />
           </v-col>
         </v-row>
-        <StationSelector />
+        <v-toolbar class="mt-n4" flat>
+          <v-toolbar-title class="text-h5 ml-n4">Geselecteerde stations</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <StationSelector />
+        </v-toolbar>
         <v-row>
           <v-col cols="12" sm="6" md="4" lg="3" v-for="s in selectedStations" :key="s.id" >
             <StationCard :station="s" />
