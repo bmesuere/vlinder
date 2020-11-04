@@ -21,6 +21,11 @@
             <StationsMap :dataLoaded="initialDataLoaded" />
           </v-col>
         </v-row>
+        <v-toolbar class="mt-n4" flat>
+          <v-toolbar-title class="text-h5 ml-n4">Geselecteerde stations</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <StationSelector />
+        </v-toolbar>
         <v-row>
           <v-col cols="12" sm="6" md="4" lg="3" v-for="s in selectedStations" :key="s.id" >
             <StationCard :station="s" />
@@ -74,16 +79,17 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 
-import StationsMap from './components/StationsMap.vue';
-import StationCard from './components/StationCard.vue';
 import GraphCard from './components/GraphCard.vue';
+import StationCard from './components/StationCard.vue';
+import StationSelector from './components/StationSelector.vue';
+import StationsMap from './components/StationsMap.vue';
 
 import { weatherProperties } from './app/weatherProperties';
 import { Station, Measurement } from './app/types';
 
 @Component({
   components: {
-    StationsMap, StationCard, GraphCard
+    GraphCard, StationCard, StationSelector, StationsMap
   }
 })
 export default class App extends Vue {
