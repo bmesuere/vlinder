@@ -4,11 +4,10 @@
       <v-icon>mdi-close</v-icon>
     </v-btn>
     <v-carousel
-      :show-arrows="false"
-      delimiter-icon="mdi-circle-medium"
+      hide-delimiters
       height="auto"
-      light
-      hide-delimiter-background
+      dark
+      show-arrows-on-hover
     >
       <v-carousel-item>
         <LandUseGraph :station="station" />
@@ -82,3 +81,9 @@ export default class StationCard extends Vue {
   }
 }
 </script>
+
+<style>
+  .v-window__prev, .v-window__next {
+    top: calc(100% - 50px);
+  }
+</style>

@@ -24,6 +24,7 @@ export class D3LandUse {
       .html('')
       .append('svg')
       .attr('viewBox', `0, 0, ${this.width}, ${this.height}`)
+      .attr('style', 'color: black')
       .append('g')
       .attr('transform', `translate(0, ${this.height - this.margin.bottom})`);
 
@@ -42,7 +43,7 @@ export class D3LandUse {
     this.angle = d3.scaleLinear()
       // @ts-ignore
       .domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
-      .range([3 / 8 * Math.PI, 4 / 8 * Math.PI]);
+      .range([3.05 / 8 * Math.PI, 4 / 8 * Math.PI]);
 
     this.radius = d3.scaleBand()
       // @ts-ignore
