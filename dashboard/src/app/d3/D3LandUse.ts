@@ -90,11 +90,13 @@ export class D3LandUse {
         .attr('width', 10)
         .attr('height', 10)
         .attr('y', (i + 2) * 14 - 9)
+      // @ts-ignore
         .attr('fill', this[type + 'Color']);
       legend.append('text')
         .attr('font-size', 11)
         .attr('x', 15)
         .attr('y', (i + 2) * 14)
+      // @ts-ignore
         .text(this[type + 'Name']);
     });
   }
