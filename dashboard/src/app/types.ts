@@ -10,6 +10,16 @@ export interface Station {
   name: string;
   sponsor: string;
   school: string;
+  landUse: LandUse[];
+}
+
+export interface LandUse {
+  distance: number;
+  usage: {
+    water: number;
+    paved: number;
+    green: number;
+  };
 }
 
 export interface Measurement {

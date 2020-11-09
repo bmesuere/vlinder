@@ -44,3 +44,9 @@ export default class App extends Vue {
   version = '1.0.2'
 }
 </script>
+
+<style>
+  svg {
+    display: block;
+  }
+</style>
