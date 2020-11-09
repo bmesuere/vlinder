@@ -11,6 +11,14 @@ export class D3LandUse {
   private readonly width = 295;
   private readonly height = 127.5;
 
+  private readonly waterColor = '#9ab5cd';
+  private readonly pavedColor = '#efc7c8';
+  private readonly greenColor = '#b4c49c';
+
+  private readonly waterName = 'Water';
+  private readonly pavedName = 'Verhard';
+  private readonly greenName = 'Groen';
+
   private angle!: number[] & d3.ScaleLinear<number, number>;
   private radius!: string[] & d3.ScaleBand<string>;
 
@@ -37,7 +45,7 @@ export class D3LandUse {
 
     const color = d3.scaleOrdinal()
       .domain(series.map(d => d.key))
-      .range(['#9ab5cd', '#efc7c8', '#b4c49c'])
+      .range([this.waterColor, this.pavedColor, this.greenColor])
       .unknown('#ccc');
 
     this.angle = d3.scaleLinear()
@@ -69,10 +77,26 @@ export class D3LandUse {
       .attr('d', d => this.arc(d))
       .append('title')
       // @ts-ignore
-      .text(d => `${d.data.distance} ${d.key} ${d.data.usage[d.key]}`);
+      .text(d => `${d3.format('.0%')(d.data.usage[d.key])} ${this[d.key + 'Name'].toLowerCase()} in een straal van ${d.data.distance}m rond het station`);
 
     svg.append('g')
       .call(rAxis);
+
+    const legend = svg.append('g')
+      .attr('transform', `translate(10, ${-1 * (this.height - this.margin.bottom) + 10})`);
+    legend.append('text').attr('y', 12).text('Landgebruik');
+    ['water', 'paved', 'green'].forEach((type, i) => {
+      legend.append('rect')
+        .attr('width', 10)
+        .attr('height', 10)
+        .attr('y', (i + 2) * 14 - 9)
+        .attr('fill', this[type + 'Color']);
+      legend.append('text')
+        .attr('font-size', 11)
+        .attr('x', 15)
+        .attr('y', (i + 2) * 14)
+        .text(this[type + 'Name']);
+    });
   }
 
   // @ts-ignore

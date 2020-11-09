@@ -31,7 +31,7 @@
             {{ station.school }}
           </span>
           <br>
-          <span title="sponsor" style="display: inline-block" class="mt-1">
+          <span title="Sponsor" style="display: inline-block" class="mt-1">
             <v-icon small>mdi-heart-outline</v-icon>
             <span v-if="station.sponsor !== ''" >
               {{ station.sponsor }}
