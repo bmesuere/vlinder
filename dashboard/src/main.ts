@@ -12,7 +12,7 @@ Vue.config.productionTip = false;
 
 Vue.use(VueGtag, {
   config: { id: 'UA-170459792-1' }
-});
+}, router);
 
 new Vue({
   vuetify,
