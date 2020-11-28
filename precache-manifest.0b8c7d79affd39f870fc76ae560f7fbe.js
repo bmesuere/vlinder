@@ -368,6 +368,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/sponsors/vlinder34.png"
   },
   {
+    "revision": "cca2f80abba894a8036f40957bdb9e74",
+    "url": "/vlinder/img/sponsors/vlinder35.png"
+  },
+  {
     "revision": "b5a3601f22cbff1cd9abb8717d23492f",
     "url": "/vlinder/img/sponsors/vlinder37.png"
   },
