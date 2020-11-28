@@ -41,7 +41,7 @@ import { Vue, Component } from 'vue-property-decorator';
   components: { }
 })
 export default class App extends Vue {
-  version = '1.0.2'
+  version = '1.1.0'
 }
 </script>
 
