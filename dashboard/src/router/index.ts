@@ -7,6 +7,7 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
   {
     path: '/',
+    alias: ['/index.html'],
     name: 'Home',
     component: Dashboard,
     props: route => ({ urlStations: route.query.stations ? [route.query.stations].flat() : [] })
