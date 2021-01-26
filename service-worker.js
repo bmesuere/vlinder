@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/vlinder/precache-manifest.f46242948197c96084e4cdb6b5eb2ad5.js"
+  "/vlinder/precache-manifest.dcd4f4546f4d0ef09879adff41751735.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "vlinder-dashboard"});
