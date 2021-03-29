@@ -252,6 +252,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/maps/vlinder60.png"
   },
   {
+    "revision": "728e7afc6c788ad46f76127546ee4572",
+    "url": "/vlinder/img/maps/vlinder70.png"
+  },
+  {
     "revision": "3250a4922707205dfcca36cdd2f04d5b",
     "url": "/vlinder/img/sponsors/vlinder01.png"
   },
@@ -444,6 +448,14 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/sponsors/vlinder51.png"
   },
   {
+    "revision": "e444872bcbb8b8c76f6c412297285320",
+    "url": "/vlinder/img/sponsors/vlinder52.png"
+  },
+  {
+    "revision": "7c6b592f180732f855fe0ce2fe5e702d",
+    "url": "/vlinder/img/sponsors/vlinder53.png"
+  },
+  {
     "revision": "cec5d80f750bb50bf6250db70b82fa98",
     "url": "/vlinder/img/sponsors/vlinder54.png"
   },
@@ -470,6 +482,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "a5b9283564cfbc7fa3836016fb6adc1b",
     "url": "/vlinder/img/sponsors/vlinder60.png"
+  },
+  {
+    "revision": "c8edb890ed57259791dd0a13e312e3d9",
+    "url": "/vlinder/img/sponsors/vlinder70.png"
   },
   {
     "revision": "84fd206f57a639a1c55b30db74f2ebd0",
