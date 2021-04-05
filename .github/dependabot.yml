@@ -9,6 +9,6 @@ updates:
 - package-ecosystem: bundler
   directory: "/api"
   schedule:
-    interval: daily
+    interval: weekly
     time: "04:00"
   open-pull-requests-limit: 10
