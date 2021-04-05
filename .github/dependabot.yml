@@ -1,0 +1,14 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/dashboard"
+  schedule:
+    interval: weekly
+    time: "04:00"
+  open-pull-requests-limit: 10
+- package-ecosystem: bundler
+  directory: "/api"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
