@@ -200,7 +200,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/maps/vlinder47.png"
   },
   {
-    "revision": "db0f7c067a65b74db496c73a18285ca8",
+    "revision": "8996f064678568e17a6589ca1b0d9f9f",
     "url": "/vlinder/img/maps/vlinder48.png"
   },
   {
@@ -256,7 +256,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/maps/vlinder61.png"
   },
   {
-    "revision": "1dcb23c0fd5dd134d808ffa4b9bfe091",
+    "revision": "80dbce19b6060c33890c90e90c477c68",
     "url": "/vlinder/img/maps/vlinder62.png"
   },
   {
