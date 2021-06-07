@@ -14,7 +14,7 @@ gem "sinatra-contrib", "~> 2.1"
 
 gem "mysql2", "~> 0.5.3"
 
-gem "csv", "~> 3.1"
+gem "csv", "~> 3.2"
 
 gem "byebug", "~> 11.1", :group => :development
 
