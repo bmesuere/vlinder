@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/maps/vlinder04.png"
   },
   {
-    "revision": "e081cc336d785c48c3d7407db3473184",
+    "revision": "af57ca5873357cee6dc0904e86c660a8",
     "url": "/vlinder/img/maps/vlinder05.png"
   },
   {
@@ -144,7 +144,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/maps/vlinder33.png"
   },
   {
-    "revision": "b53f0a0b5a449da44c6ce14601aaccec",
+    "revision": "e8b6397fbd169475872a435444ae2955",
     "url": "/vlinder/img/maps/vlinder34.png"
   },
   {
@@ -256,7 +256,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/maps/vlinder61.png"
   },
   {
-    "revision": "80dbce19b6060c33890c90e90c477c68",
+    "revision": "c0881c3c86af1c8613626e07b20de498",
     "url": "/vlinder/img/maps/vlinder62.png"
   },
   {
@@ -280,7 +280,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/maps/vlinder67.png"
   },
   {
-    "revision": "9e65b6efc11d4c42e3b819bf1c32aef6",
+    "revision": "6f953be54e36f9d43cc52299905d065a",
     "url": "/vlinder/img/maps/vlinder68.png"
   },
   {
@@ -290,6 +290,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "728e7afc6c788ad46f76127546ee4572",
     "url": "/vlinder/img/maps/vlinder70.png"
+  },
+  {
+    "revision": "5b6643fbc815501063802876c55b7cce",
+    "url": "/vlinder/img/maps/vlinder71.png"
   },
   {
     "revision": "3250a4922707205dfcca36cdd2f04d5b",
@@ -558,6 +562,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "c8edb890ed57259791dd0a13e312e3d9",
     "url": "/vlinder/img/sponsors/vlinder70.png"
+  },
+  {
+    "revision": "c1ec253318eae5586bc370fe040d57cf",
+    "url": "/vlinder/img/sponsors/vlinder71.png"
   },
   {
     "revision": "10ed882dd21efb71dfa72e753841d868",
