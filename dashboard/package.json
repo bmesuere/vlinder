@@ -22,7 +22,7 @@
     "whatwg-fetch": "^3.6.2"
   },
   "devDependencies": {
-    "@types/d3": "^6.7.1",
+    "@types/d3": "^7.0.0",
     "@types/topojson-client": "^3.1.0",
     "@typescript-eslint/eslint-plugin": "^4.0.0",
     "@typescript-eslint/parser": "^3.10.1",
