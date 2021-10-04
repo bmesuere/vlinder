@@ -152,7 +152,7 @@ class Vlinder < ROM::Relation[:sql]
         humidity: current[:humidity].to_f.round(2),
         id: current[:StationID],
         measurements: $url + 'measurements/' + current[:StationID],
-        pressure: (current[:pressure].to_f / 100).round(2),
+        pressure: (current[:pressure_0].to_f / 100).round(2),
         rainIntensity: current[:RainIntensity].to_f.round(2),
         rainVolume: rainvolume.to_f.round(2),
         station: $url + 'stations/' + current[:StationID],
