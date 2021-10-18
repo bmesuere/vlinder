@@ -29,7 +29,7 @@ GEM
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
     ice_nine (0.11.2)
-    json (2.5.1)
+    json (2.6.0)
     multi_json (1.15.0)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
@@ -86,7 +86,7 @@ PLATFORMS
 DEPENDENCIES
   byebug (~> 11.1)
   csv (~> 3.2)
-  json (~> 2.5)
+  json (~> 2.6)
   mysql2 (~> 0.5.3)
   rom-sql (~> 3.5)
   sinatra (~> 2.1)
