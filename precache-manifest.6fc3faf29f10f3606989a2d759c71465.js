@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/belgium.topo.json"
   },
   {
-    "revision": "9bc70d31e2839edfc613",
+    "revision": "65e5c7cb0256e3dda6b4",
     "url": "/vlinder/css/app.29ae638c.css"
   },
   {
@@ -568,12 +568,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/sponsors/vlinder71.png"
   },
   {
-    "revision": "8a972a17dbdecdf2e23d0bc929ec3169",
+    "revision": "38561005cf7a7a2e58b42619e5ce6a0c",
     "url": "/vlinder/index.html"
   },
   {
-    "revision": "9bc70d31e2839edfc613",
-    "url": "/vlinder/js/app.f5f2cc43.js"
+    "revision": "65e5c7cb0256e3dda6b4",
+    "url": "/vlinder/js/app.2d55eda0.js"
   },
   {
     "revision": "b8e74657d6f9fbfca362",
