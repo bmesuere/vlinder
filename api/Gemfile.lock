@@ -33,7 +33,7 @@ GEM
     multi_json (1.15.0)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
-    mysql2 (0.5.3)
+    mysql2 (0.5.4)
     rack (2.2.3)
     rack-protection (2.2.0)
       rack
@@ -87,7 +87,7 @@ DEPENDENCIES
   byebug (~> 11.1)
   csv (~> 3.2)
   json (~> 2.6)
-  mysql2 (~> 0.5.3)
+  mysql2 (~> 0.5.4)
   rom-sql (~> 3.5)
   sinatra (~> 2.2)
   sinatra-contrib (~> 2.2)
