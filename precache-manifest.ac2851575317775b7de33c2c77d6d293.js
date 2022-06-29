@@ -144,7 +144,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/vlinder/img/maps/vlinder33.png"
   },
   {
-    "revision": "e8b6397fbd169475872a435444ae2955",
+    "revision": "8c260c0c975ecff4ffa175bd26132eda",
     "url": "/vlinder/img/maps/vlinder34.png"
   },
   {
