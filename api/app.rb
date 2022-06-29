@@ -65,7 +65,7 @@ class Vlinder < ROM::Relation[:sql]
     attribute :StationID, Types::String
   end
 
-  def retry_until_succeeded(&block)
+  def retry_until_succeeded
     tries = 0
     begin
       yield
@@ -140,7 +140,7 @@ class Vlinder < ROM::Relation[:sql]
       else
         no_changes += 1
       end
-      status = if no_changes >= LOOKBACK_UPDATES then "Offline" else "Ok" end
+      status = no_changes >= LOOKBACK_UPDATES ? 'Offline' : 'Ok'
       rainvolume = \
         if normalize_rain
           rainvolume + rain_delta(previous, current)
@@ -156,7 +156,7 @@ class Vlinder < ROM::Relation[:sql]
         rainIntensity: current[:RainIntensity].to_f.round(2),
         rainVolume: rainvolume.to_f.round(2),
         station: $url + 'stations/' + current[:StationID],
-        status: status,
+        status:,
         temp: current[:temperature].to_f.round(2),
         time: current[:datetime].strftime(DATETIME_FMT),
         windDirection: current[:WindDirection].to_f.round(2),
@@ -192,7 +192,7 @@ def read_stations
       measurements: $url + 'measurements/' + row['ID'],
       landUse: [20, 50, 100, 250, 500].map do |distance|
         {
-          distance: distance,
+          distance:,
           usage:
             LAND_USAGE_TYPES.map do |type_nl, type_en|
               { type_en.to_sym => row["#{type_nl}#{distance}"].to_f }
@@ -228,7 +228,7 @@ def reconnect_database
   conf = ROM::Configuration.new(:sql, opts)
   conf.register_relation(Vlinder)
   $rom_instance = ROM.container(conf)
-  return $rom_instance.relations[:vlinder]
+  $rom_instance.relations[:vlinder]
 end
 
 #
@@ -269,9 +269,7 @@ get '/stations/:id' do
 end
 
 get '/measurements/?' do
-  if updated_since? $cache[:measurements][:last_modified]
-    $cache[:measurements] = $vlinder.all_stations
-  end
+  $cache[:measurements] = $vlinder.all_stations if updated_since? $cache[:measurements][:last_modified]
 
   last_modified $cache[:measurements][:last_modified]
   json $cache[:measurements][:data]
