@@ -92,8 +92,7 @@ export default class StationCard extends Vue {
 
   get activeProperties (): WeatherProperty[] {
     // filter the properties where the measurement is null
-    return Object.entries(wp)
-      .map(([, value]) => value)
+    return Object.values(wp)
       // @ts-ignore
       .filter((p: WeatherProperty) => this.measurements[p.property as any] !== null);
   }

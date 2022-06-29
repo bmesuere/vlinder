@@ -20,7 +20,7 @@
 
     <v-list subheader class="px-2">
       <v-row dense>
-      <v-col cols="6" class="pa-0" v-for="p in weatherProperties" :key="p.property">
+      <v-col cols="6" class="pa-0" v-for="p in activeProperties" :key="p.property">
         <v-list-item dense class="px-2" style="min-height: 36px;">
             <v-list-item-subtitle :title="p.name"><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ measurements['status'] == "Offline" ? "-" : measurements[p.property] }} {{ p.unit }}</v-list-item-subtitle>
         </v-list-item>
@@ -33,17 +33,22 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { Station, Measurement } from '../app/types';
+import { Station, Measurement, WeatherProperty } from '../app/types';
 import { weatherProperties as wp } from '../app/weatherProperties';
 
 @Component
 export default class TooltipCard extends Vue {
   @Prop() station!: Station;
 
-  weatherProperties = wp;
-
   get measurements (): Measurement | {} {
     return (this.$store.state.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
+  }
+
+  get activeProperties (): WeatherProperty[] {
+    // filter the properties where the measurement is null
+    return Object.values(wp)
+      // @ts-ignore
+      .filter((p: WeatherProperty) => this.measurements[p.property as any] !== null);
   }
 }
 </script>
