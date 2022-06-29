@@ -61,7 +61,7 @@ end
 #
 
 class Vlinder < ROM::Relation[:sql]
-  schema :Vlinder, infer: true, as: :vlinder do
+  schema :Vlinder_Combined_Dashboard, infer: true, as: :vlinder do
     attribute :StationID, Types::String
   end
 
@@ -161,7 +161,8 @@ class Vlinder < ROM::Relation[:sql]
         time: current[:datetime].strftime(DATETIME_FMT),
         windDirection: current[:WindDirection].to_f.round(2),
         windGust: current[:WindGust].to_f.round(2),
-        windSpeed: current[:WindSpeed].to_f.round(2)
+        windSpeed: current[:WindSpeed].to_f.round(2),
+        wbgt: current[:wet_bulb_globe_temp] ? current[:wet_bulb_globe_temp].to_f.round(2) : nil
       }
     end
   end

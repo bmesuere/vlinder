@@ -19,3 +19,5 @@ gem "csv", "~> 3.2"
 gem "byebug", "~> 11.1", :group => :development
 
 gem "rom-sql", "~> 3.5"
+
+gem "puma", "~> 5.6", :group => :development
