@@ -52,7 +52,7 @@ export default class GraphCard extends Vue {
 
   get hasData (): boolean {
     if (this.weatherProperty.property === 'wbgt') {
-      //return this.selectedStations.some(s => s.hasWbgt);
+      // return this.selectedStations.some(s => s.hasWbgt);
       return this.selectedStations.some(s => s.name === 'vlinder02');
     }
     return true;
