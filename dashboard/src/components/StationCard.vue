@@ -53,7 +53,7 @@
     </v-list-item>
 
     <v-list dense subheader>
-      <v-list-item v-for="p in weatherProperties" :key="p.property">
+      <v-list-item v-for="p in activeProperties" :key="p.property">
         <v-list-item-subtitle :title="p.name"><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ p.name }}</v-list-item-subtitle>
         <v-list-item-title class="text-right">{{ measurements['status'] == "Offline" ? "-" : measurements[p.property] }} {{ p.unit }}</v-list-item-title>
       </v-list-item>
@@ -66,14 +66,12 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import LandUseGraph from './LandUseGraph.vue';
 
-import { Station, Measurement } from '../app/types';
+import { Station, Measurement, WeatherProperty } from '../app/types';
 import { weatherProperties as wp } from '../app/weatherProperties';
 
 @Component({ components: { LandUseGraph } })
 export default class StationCard extends Vue {
   @Prop() station!: Station;
-
-  weatherProperties = wp;
 
   removeFromList ():void {
     this.$gtag.event('station_deselect', { event_category: 'stations', value: this.station.id });
@@ -90,6 +88,13 @@ export default class StationCard extends Vue {
 
   get measurements (): Measurement | {} {
     return (this.$store.state.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
+  }
+
+  get activeProperties (): WeatherProperty[] {
+    // filter the properties where the measurement is null
+    return Object.values(wp)
+      // @ts-ignore
+      .filter((p: WeatherProperty) => this.measurements[p.property as any] !== null);
   }
 }
 </script>

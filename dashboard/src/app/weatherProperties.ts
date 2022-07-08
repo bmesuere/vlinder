@@ -38,6 +38,14 @@ const weatherProperties = {
     icon: 'mdi-water-percent',
     title: 'Luchtvochtigheid op dit moment',
     unit: '%'
+  },
+  wbgt: {
+    property: 'wbgt',
+    name: 'Gevoelstemperatuur (WBGT)',
+    legend: 'Gevoelstemperatuur (°C)',
+    icon: 'mdi-thermometer-lines',
+    title: 'Gevoelstemperatuur (WBGT) op dit moment',
+    unit: '°C'
   }
 };
 

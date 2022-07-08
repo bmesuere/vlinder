@@ -40,6 +40,9 @@
       <v-col cols="12" md="6" lg="4" >
         <GraphCard :weatherProperty="weatherProperties.humidity" :tooltipPosition="tooltipPosition"/>
       </v-col>
+      <v-col cols="12" md="6" lg="4" >
+        <GraphCard :weatherProperty="weatherProperties.wbgt" :tooltipPosition="tooltipPosition"/>
+      </v-col>
     </v-row>
   </v-container>
 </template>
