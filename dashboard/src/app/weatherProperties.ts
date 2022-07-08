@@ -41,10 +41,10 @@ const weatherProperties = {
   },
   wbgt: {
     property: 'wbgt',
-    name: 'Gevoelstemperatuur',
+    name: 'Gevoelstemperatuur (WBGT)',
     legend: 'Gevoelstemperatuur (°C)',
     icon: 'mdi-thermometer-lines',
-    title: 'Gevoelstemperatuur op dit moment',
+    title: 'Gevoelstemperatuur (WBGT) op dit moment',
     unit: '°C'
   }
 };
