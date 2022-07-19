@@ -115,7 +115,8 @@ class Vlinder < ROM::Relation[:sql]
 
   ATTRIBUTES = %i[temperature humidity pressure_0 WindSpeed WindDirection WindGust].freeze
   def changed?(old, new)
-    puts new[:datetime]
+    return false if new[:pressure_0].nil?
+
     ATTRIBUTES.any? do |attribute|
       old[attribute] != new[attribute]
     end
