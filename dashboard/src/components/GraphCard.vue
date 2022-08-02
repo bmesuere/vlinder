@@ -25,6 +25,8 @@ export default class GraphCard extends Vue {
 
   graph: D3Graph | undefined;
 
+  wbgtStations = ['vlinder02', 'vlinder73', 'vlinder74', 'vlinder75', 'vlinder76'];
+
   mounted () {
     this.graph = new D3Graph(`#${this.consolidatedGraphId}`, this.weatherProperty, this.selectedStations, this.tooltipPosition);
     this.graph.init();
@@ -53,7 +55,7 @@ export default class GraphCard extends Vue {
   get hasData (): boolean {
     if (this.weatherProperty.property === 'wbgt') {
       // return this.selectedStations.some(s => s.hasWbgt);
-      return this.selectedStations.some(s => s.name === 'vlinder02');
+      return this.selectedStations.some(s => this.wbgtStations.includes(s.name));
     }
     return true;
   }
