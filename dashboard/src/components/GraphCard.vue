@@ -13,10 +13,18 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import { mapStores } from 'pinia';
+
+import { useVlinderStore } from '@/stores';
+
 import { D3Graph } from '../app/d3/D3Graph';
 import { Station, Measurement, WeatherProperty } from '../app/types';
 
-@Component
+@Component({
+  computed: {
+    ...mapStores(useVlinderStore)
+  }
+})
 export default class GraphCard extends Vue {
   @Prop() readonly weatherProperty!: WeatherProperty;
   @Prop() readonly graphId!: string;
@@ -26,6 +34,7 @@ export default class GraphCard extends Vue {
   graph: D3Graph | undefined;
 
   wbgtStations = ['vlinder02', 'vlinder73', 'vlinder74', 'vlinder75', 'vlinder76'];
+  vlinderStore: any;
 
   mounted () {
     this.graph = new D3Graph(`#${this.consolidatedGraphId}`, this.weatherProperty, this.selectedStations, this.tooltipPosition);
@@ -33,15 +42,15 @@ export default class GraphCard extends Vue {
   }
 
   get measurements (): Measurement[][] {
-    return this.$store.state.historicMeasurements;
+    return this.vlinderStore.historicMeasurements;
   }
 
   get selectedStations (): Station[] {
-    return this.$store.state.selectedStations;
+    return this.vlinderStore.selectedStations;
   }
 
   get loading (): boolean {
-    return this.$store.state.loadingHistoricMeasurements;
+    return this.vlinderStore.loadingHistoricMeasurements;
   }
 
   get consolidatedGraphId (): string {
@@ -64,9 +73,9 @@ export default class GraphCard extends Vue {
   @Watch('measurements')
   measurementsChanged () {
     if (this.graph) {
-      this.graph.updateData(this.$store.getters.historicData(this.weatherProperty.property));
+      this.graph.updateData(this.vlinderStore.historicData(this.weatherProperty.property));
       if (this.updateLegendColors) {
-        this.$store.dispatch('setLegendColors', this.graph.getLegendColors());
+        this.vlinderStore.setLegendColors(this.graph.getLegendColors());
       }
     }
   }

@@ -33,13 +33,22 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import { mapStores } from 'pinia';
+
+import { useVlinderStore } from '@/stores';
+
 import TooltipCard from './TooltipCard.vue';
 
 import { weatherProperties as wp } from '../app/weatherProperties';
 import { D3StationsMap } from '../app/d3/D3StationsMap';
 import { Station, Measurement } from '../app/types';
 
-@Component({ components: { TooltipCard } })
+@Component({
+  components: { TooltipCard },
+  computed: {
+    ...mapStores(useVlinderStore)
+  }
+})
 export default class StationsMap extends Vue {
   @Prop({ default: 'stationsMap' }) readonly mapId!: string;
   @Prop() readonly dataLoaded!: Promise<[Station[], Measurement[]]>;
@@ -49,6 +58,7 @@ export default class StationsMap extends Vue {
   selectedProperty = 'temp';
   weatherProperties = wp;
   allowedProperties = ['temp', 'rainVolume', 'windSpeed'];
+  vlinderStore: any;
 
   async mounted (): Promise<void> {
     this.map = new D3StationsMap(`#${this.mapId}`, this.selectedProperty, this.selectedStations, this.tooltipInfo, this.toggleStation);
@@ -59,19 +69,19 @@ export default class StationsMap extends Vue {
   // adds or removes a station to the list of selected stations
   toggleStation (stationId: string): void {
     this.$gtag.event('station_toggle', { event_category: 'stations', value: stationId });
-    this.$store.dispatch('toggleStationById', stationId);
+    this.vlinderStore.toggleStationById(stationId);
   }
 
   get selectedStations (): Station[] {
-    return this.$store.state.selectedStations;
+    return this.vlinderStore.selectedStations;
   }
 
   get stations (): Station[] {
-    return this.$store.state.stations;
+    return this.vlinderStore.stations;
   }
 
   get measurements (): Measurement[] {
-    return this.$store.state.liveMeasurements;
+    return this.vlinderStore.liveMeasurements;
   }
 
   // when stations are added or removed, update the D3 map

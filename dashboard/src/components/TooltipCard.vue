@@ -33,15 +33,24 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { mapStores } from 'pinia';
+
+import { useVlinderStore } from '@/stores';
+
 import { Station, Measurement, WeatherProperty } from '../app/types';
 import { weatherProperties as wp } from '../app/weatherProperties';
 
-@Component
+@Component({
+  computed: {
+    ...mapStores(useVlinderStore)
+  }
+})
 export default class TooltipCard extends Vue {
   @Prop() station!: Station;
+  vlinderStore: any;
 
   get measurements (): Measurement | {} {
-    return (this.$store.state.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
+    return (this.vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
   }
 
   get activeProperties (): WeatherProperty[] {
