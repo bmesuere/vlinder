@@ -7,7 +7,6 @@ import vuetify from './plugins/vuetify';
 import 'whatwg-fetch';
 
 import router from './router';
-import store from './store';
 
 Vue.config.productionTip = false;
 
@@ -21,7 +20,6 @@ Vue.use(VueGtag, {
 new Vue({
   vuetify,
   pinia,
-  store,
   router,
   render: h => h(App)
 }).$mount('#app');
