@@ -101,15 +101,15 @@ export default class Dashboard extends Vue {
     Promise.all([stationsPromise, measurementsPromise])
       .then((d) => { this.resolveDataLoaded(d); });
 
-    this.scheduleFetch(this.vlinderStore.fetchMeasurement);
+    this.scheduleFetch(this.vlinderStore.fetchMeasurements);
     this.scheduleFetch(this.vlinderStore.fetchHistoricMeasurements);
   }
 
-  scheduleFetch (fetch: Function): void {
+  scheduleFetch (f: Function): void {
     setTimeout(() => {
       requestAnimationFrame(() => {
-        this.scheduleFetch(fetch);
-        fetch();
+        this.scheduleFetch(f);
+        f();
       });
     }, 60000);
   }
