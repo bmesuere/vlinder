@@ -64,18 +64,28 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { mapStores } from 'pinia';
+
+import { useVlinderStore } from '@/stores';
+
 import LandUseGraph from './LandUseGraph.vue';
 
 import { Station, Measurement, WeatherProperty } from '../app/types';
 import { weatherProperties as wp } from '../app/weatherProperties';
 
-@Component({ components: { LandUseGraph } })
+@Component({
+  components: { LandUseGraph },
+  computed: {
+    ...mapStores(useVlinderStore)
+  }
+})
 export default class StationCard extends Vue {
   @Prop() station!: Station;
+  vlinderStore: any;
 
   removeFromList ():void {
     this.$gtag.event('station_deselect', { event_category: 'stations', value: this.station.id });
-    this.$store.dispatch('deselectStationById', this.station.id);
+    this.vlinderStore.deselectStationById(this.station.id);
   }
 
   get mapUrl (): string {
@@ -87,7 +97,7 @@ export default class StationCard extends Vue {
   }
 
   get measurements (): Measurement | {} {
-    return (this.$store.state.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
+    return (this.vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
   }
 
   get activeProperties (): WeatherProperty[] {

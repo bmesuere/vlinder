@@ -49,6 +49,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { mapStores } from 'pinia';
+
+import { useVlinderStore } from '@/stores';
 
 import GraphCard from '../components/GraphCard.vue';
 import StationCard from '../components/StationCard.vue';
@@ -61,6 +64,9 @@ import { Station, Measurement } from '../app/types';
 @Component({
   components: {
     GraphCard, StationCard, StationSelector, StationsMap
+  },
+  computed: {
+    ...mapStores(useVlinderStore)
   }
 })
 export default class Dashboard extends Vue {
@@ -69,47 +75,48 @@ export default class Dashboard extends Vue {
   private resolveDataLoaded!: Function;
   initialDataLoaded = new Promise((resolve) => { this.resolveDataLoaded = resolve; });
   tooltipPosition = { timestamp: -1, i: -1 };
+  vlinderStore: any;
 
   created (): void {
     // fetch data a first time
-    const stationsPromise = this.$store.dispatch('fetchStations');
+    const stationsPromise = this.vlinderStore.fetchStations();
     stationsPromise.then(() => {
       const stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
       if (this.urlStations.length > 0) {
         this.urlStations.forEach(s => {
-          this.$store.dispatch('selectStationByName', s);
+          this.vlinderStore.selectStationByName(s);
         });
       } else if (stationsFromStorage.length > 0) {
         stationsFromStorage.forEach(s => {
-          this.$store.dispatch('selectStationById', s);
+          this.vlinderStore.selectStationById(s);
         });
       } else {
-        this.$store.dispatch('selectStationById', 'zZ6ZeSg11dJ5zp5GrNwNck9A');
-        this.$store.dispatch('selectStationById', 'Do5lLMfezIdmUCzzsE0IwIbE');
-        this.$store.dispatch('selectStationById', 'XeIIA97QzN5xxk6AvdzAPquY');
+        this.vlinderStore.selectStationById('zZ6ZeSg11dJ5zp5GrNwNck9A');
+        this.vlinderStore.selectStationById('Do5lLMfezIdmUCzzsE0IwIbE');
+        this.vlinderStore.selectStationById('XeIIA97QzN5xxk6AvdzAPquY');
       }
     });
-    const measurementsPromise: Promise<Measurement[]> = this.$store.dispatch('fetchMeasurements');
+    const measurementsPromise: Promise<Measurement[]> = this.vlinderStore.fetchMeasurements();
 
     Promise.all([stationsPromise, measurementsPromise])
       .then((d) => { this.resolveDataLoaded(d); });
 
-    this.scheduleFetch('fetchMeasurements');
-    this.scheduleFetch('fetchHistoricMeasurements');
+    this.scheduleFetch(this.vlinderStore.fetchMeasurement);
+    this.scheduleFetch(this.vlinderStore.fetchHistoricMeasurements);
   }
 
-  scheduleFetch (fetch: string): void {
+  scheduleFetch (fetch: Function): void {
     setTimeout(() => {
       requestAnimationFrame(() => {
         this.scheduleFetch(fetch);
-        this.$store.dispatch(fetch);
+        fetch();
       });
     }, 60000);
   }
 
   removeFromList (id: string): void {
     this.$gtag.event('station_deselect', { event_category: 'stations', value: id });
-    this.$store.dispatch('deselectStationById', id);
+    this.vlinderStore.deselectStationById(id);
   }
 
   // eslint-disable-next-line
@@ -118,22 +125,22 @@ export default class Dashboard extends Vue {
   }
 
   get legendColors (): String[] {
-    return this.$store.state.legendColors;
+    return this.vlinderStore.legendColors;
   }
 
   get selectedStations (): Station[] {
-    return this.$store.state.selectedStations;
+    return this.vlinderStore.selectedStations;
   }
 
   get isError (): boolean {
-    return this.$store.state.isStationsError || this.$store.state.isMeasurementsError;
+    return this.vlinderStore.isStationsError || this.vlinderStore.isMeasurementsError;
   }
 
   // when the selected stations are changed, update the historic measurements
   // might eventually move to another component
   @Watch('selectedStations')
   async selectedPropertyChanged (): Promise<void> {
-    this.$store.dispatch('fetchHistoricMeasurements');
+    this.vlinderStore.fetchHistoricMeasurements();
 
     // set the query parameter
     const query = Object.assign({}, this.$route.query);

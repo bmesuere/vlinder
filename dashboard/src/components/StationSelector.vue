@@ -65,14 +65,22 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
+import { mapStores } from 'pinia';
+
+import { useVlinderStore } from '@/stores';
 
 import { Station } from '../app/types';
 
-@Component
+@Component({
+  computed: {
+    ...mapStores(useVlinderStore)
+  }
+})
 export default class StationSelector extends Vue {
   dialog = false;
   search = '';
   activeStations: string[] = [];
+  vlinderStore: any;
 
   filter (station: Station, query: string): boolean {
     const searchKey = station.city + station.given_name + station.name + station.sponsor + station.school;
@@ -83,19 +91,19 @@ export default class StationSelector extends Vue {
     const addedStations = stations.filter(s => !this.activeStations.includes(s));
     const removeStations = this.activeStations.filter(s => !stations.includes(s));
     addedStations.forEach(station => {
-      this.$store.dispatch('selectStationById', station);
+      this.vlinderStore.selectStationById(station);
     });
     removeStations.forEach(station => {
-      this.$store.dispatch('deselectStationById', station);
+      this.vlinderStore.deselectStationById(station);
     });
   }
 
   get stations (): Station[] {
-    return this.$store.state.stations;
+    return this.vlinderStore.stations;
   }
 
   get selectedStations (): Station[] {
-    return this.$store.state.selectedStations;
+    return this.vlinderStore.selectedStations;
   }
 
   @Watch('selectedStations')
