@@ -70,7 +70,7 @@ export class D3LandUse {
       .selectAll('g')
       .data(series)
       .join('g')
-      .attr('fill', d => color(d.key))
+      .attr('fill', (d) => (color(d.key) as string))
       .selectAll('path')
       .data(d => d)
       .join('path')
