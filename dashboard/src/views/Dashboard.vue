@@ -78,10 +78,10 @@ export default class Dashboard extends Vue {
   vlinderStore: any;
 
   created (): void {
+    const stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
     // fetch data a first time
     const stationsPromise = this.vlinderStore.fetchStations();
     stationsPromise.then(() => {
-      const stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
       if (this.urlStations.length > 0) {
         this.urlStations.forEach(s => {
           this.vlinderStore.selectStationByName(s);
