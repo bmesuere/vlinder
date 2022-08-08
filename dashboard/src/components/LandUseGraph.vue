@@ -1,3 +1,36 @@
+<script lang="ts">
+import { computed, defineComponent, onMounted, PropType } from 'vue';
+
+import { D3LandUse } from '../app/d3/D3LandUse';
+import { Station } from '../app/types';
+
+export default defineComponent({
+  name: 'LandUseGraph',
+  props: {
+    station: {
+      type: Object as PropType<Station>,
+      required: true
+    }
+  },
+  setup (props, _context) {
+    let graph: D3LandUse | undefined;
+
+    const graphId = computed<string>(() => {
+      return 'land_use_' + props.station.id;
+    });
+
+    onMounted(() => {
+      graph = new D3LandUse(`#${graphId.value}`, props.station.landUse);
+      graph.init();
+    });
+
+    return {
+      graphId
+    };
+  }
+});
+</script>
+
 <template>
   <div :id="graphId">
     <v-img
@@ -7,25 +40,3 @@
     />
   </div>
 </template>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { D3LandUse } from '../app/d3/D3LandUse';
-import { Station } from '../app/types';
-
-@Component
-export default class LandUseGraph extends Vue {
-  @Prop() station!: Station;
-
-  graph: D3LandUse | undefined;
-
-  mounted () {
-    this.graph = new D3LandUse(`#${this.graphId}`, this.station.landUse);
-    this.graph.init();
-  }
-
-  get graphId (): string {
-    return 'land_use_' + this.station.id;
-  }
-}
-</script>
