@@ -1,8 +1,43 @@
+<script lang="ts">
+import { computed, defineComponent, PropType } from 'vue';
+
+import { useVlinderStore } from '@/stores';
+
+import { Station, Measurement, WeatherProperty } from '@/app/types';
+import { weatherProperties as wp } from '@/app/weatherProperties';
+
+export default defineComponent({
+  name: 'TooltipCard',
+  props: {
+    station: {
+      type: Object as PropType<Station>,
+      required: true
+    }
+  },
+  setup (props, _context) {
+    const vlinderStore = useVlinderStore();
+
+    const measurements = computed<Measurement | {}>(() => {
+      return (vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === props.station.id) || {};
+    });
+
+    const activeProperties = computed<WeatherProperty[]>(() => {
+      // filter the properties where the measurement is null
+      return Object.values(wp)
+        .filter((p: WeatherProperty) => measurements.value[p.property as any] !== null);
+    });
+
+    return { activeProperties, measurements };
+  }
+});
+</script>
+
 <template>
   <v-card elevation=10>
     <v-list-item two-line>
       <v-list-item-content class="pb-2">
-        <div class="text-overline font-weight-regular mb-1" style="line-height: 1rem; font-size: 0.625rem !important;">{{ station.name }}</div>
+        <div class="text-overline font-weight-regular mb-1" style="line-height: 1rem; font-size: 0.625rem !important;">
+          {{ station.name }}</div>
         <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
         <v-list-item-subtitle>
           <span v-if="station.sponsor !== ''" title="sponsor">
@@ -20,44 +55,17 @@
 
     <v-list subheader class="px-2">
       <v-row dense>
-      <v-col cols="6" class="pa-0" v-for="p in activeProperties" :key="p.property">
-        <v-list-item dense class="px-2" style="min-height: 36px;">
-            <v-list-item-subtitle :title="p.name"><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ measurements['status'] == "Offline" ? "-" : measurements[p.property] }} {{ p.unit }}</v-list-item-subtitle>
-        </v-list-item>
-      </v-col>
+        <v-col cols="6" class="pa-0" v-for="p in activeProperties" :key="p.property">
+          <v-list-item dense class="px-2" style="min-height: 36px;">
+            <v-list-item-subtitle :title="p.name">
+              <v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ measurements['status'] == "Offline" ? "-" :
+                  measurements[p.property]
+              }} {{ p.unit }}
+            </v-list-item-subtitle>
+          </v-list-item>
+        </v-col>
       </v-row>
     </v-list>
 
   </v-card>
 </template>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { mapStores } from 'pinia';
-
-import { useVlinderStore } from '@/stores';
-
-import { Station, Measurement, WeatherProperty } from '../app/types';
-import { weatherProperties as wp } from '../app/weatherProperties';
-
-@Component({
-  computed: {
-    ...mapStores(useVlinderStore)
-  }
-})
-export default class TooltipCard extends Vue {
-  @Prop() station!: Station;
-  vlinderStore: any;
-
-  get measurements (): Measurement | {} {
-    return (this.vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
-  }
-
-  get activeProperties (): WeatherProperty[] {
-    // filter the properties where the measurement is null
-    return Object.values(wp)
-      // @ts-ignore
-      .filter((p: WeatherProperty) => this.measurements[p.property as any] !== null);
-  }
-}
-</script>
