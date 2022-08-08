@@ -1,8 +1,8 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, PropType } from 'vue';
 
-import { D3LandUse } from '../app/d3/D3LandUse';
-import { Station } from '../app/types';
+import { D3LandUse } from '@/app/d3/D3LandUse';
+import { Station } from '@/app/types';
 
 export default defineComponent({
   name: 'LandUseGraph',

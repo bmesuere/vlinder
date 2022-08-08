@@ -1,3 +1,52 @@
+<script lang="ts">
+import { computed, defineComponent, PropType } from 'vue';
+
+import { useVlinderStore } from '@/stores';
+
+import { event } from 'vue-gtag';
+
+import LandUseGraph from './LandUseGraph.vue';
+
+import { Station, Measurement, WeatherProperty } from '@/app/types';
+import { weatherProperties as wp } from '@/app/weatherProperties';
+
+export default defineComponent({
+  name: 'StationCard',
+  components: { LandUseGraph },
+  props: {
+    station: {
+      type: Object as PropType<Station>,
+      required: true
+    }
+  },
+  setup (props, _context) {
+    const vlinderStore = useVlinderStore();
+
+    const mapUrl = computed<string>(() => `./img/maps/${props.station.name}.png`);
+    const sponsorUrl = computed<string>(() => `./img/sponsors/${props.station.name}.png`);
+    const measurements = computed<Measurement | {}>(() => {
+      return (vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === props.station.id) || {};
+    });
+    const activeProperties = computed<WeatherProperty[]>(() => {
+      // filter the properties where the measurement is null
+      return Object.values(wp)
+        .filter((p: WeatherProperty) => measurements.value[p.property as any] !== null);
+    });
+
+    function removeFromList() {
+      event('station_deselect', { event_category: 'stations', value: props.station.id });
+      vlinderStore.deselectStationById(props.station.id);
+    }
+    return {
+      mapUrl,
+      sponsorUrl,
+      activeProperties,
+      removeFromList
+    };
+  }
+});
+</script>
+
 <template>
   <v-card>
     <v-btn fab absolute right x-small elevation="3" class="mr-n3 mt-1" v-on:click="removeFromList">
@@ -61,53 +110,6 @@
 
   </v-card>
 </template>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { mapStores } from 'pinia';
-
-import { useVlinderStore } from '@/stores';
-
-import LandUseGraph from './LandUseGraph.vue';
-
-import { Station, Measurement, WeatherProperty } from '../app/types';
-import { weatherProperties as wp } from '../app/weatherProperties';
-
-@Component({
-  components: { LandUseGraph },
-  computed: {
-    ...mapStores(useVlinderStore)
-  }
-})
-export default class StationCard extends Vue {
-  @Prop() station!: Station;
-  vlinderStore: any;
-
-  removeFromList ():void {
-    this.$gtag.event('station_deselect', { event_category: 'stations', value: this.station.id });
-    this.vlinderStore.deselectStationById(this.station.id);
-  }
-
-  get mapUrl (): string {
-    return `./img/maps/${this.station.name}.png`;
-  }
-
-  get sponsorUrl (): string {
-    return `./img/sponsors/${this.station.name}.png`;
-  }
-
-  get measurements (): Measurement | {} {
-    return (this.vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
-  }
-
-  get activeProperties (): WeatherProperty[] {
-    // filter the properties where the measurement is null
-    return Object.values(wp)
-      // @ts-ignore
-      .filter((p: WeatherProperty) => this.measurements[p.property as any] !== null);
-  }
-}
-</script>
 
 <style>
   .v-window__prev, .v-window__next {
