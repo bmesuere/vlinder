@@ -40,6 +40,7 @@ export default defineComponent({
     return {
       mapUrl,
       sponsorUrl,
+      measurements,
       activeProperties,
       removeFromList
     };
