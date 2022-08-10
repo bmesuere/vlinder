@@ -34,7 +34,6 @@ export default defineComponent({
     }
 
     watch(selectedStations, () => {
-      console.log('watch triggered');
       activeStations.value = selectedStations.value.map(s => s.id);
     }, { deep: true });
 
