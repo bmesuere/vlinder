@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, onMounted, PropType, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
 import { useVlinderStore } from '@/stores';
 
