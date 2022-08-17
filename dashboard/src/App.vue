@@ -1,3 +1,17 @@
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'App',
+  setup(_props, _context) {
+    const version = '1.3.0';
+    return {
+      version
+    };
+  }
+});
+</script>
+
 <template>
   <v-app>
     <v-app-bar app color="primary" dark dense>
@@ -33,17 +47,6 @@
     </v-footer>
   </v-app>
 </template>
-
-<script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-
-@Component({
-  components: { }
-})
-export default class App extends Vue {
-  version = '1.2.0'
-}
-</script>
 
 <style>
   svg {

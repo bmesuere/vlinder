@@ -1,3 +1,92 @@
+<script lang="ts">
+import { computed, defineComponent, onMounted, PropType, watch } from 'vue';
+
+import { useVlinderStore } from '@/stores';
+
+import { D3Graph } from '@/app/d3/D3Graph';
+import { Station, Measurement, WeatherProperty, WeatherPropertyName } from '@/app/types';
+
+export default defineComponent({
+  name: 'GraphCard',
+  props: {
+    weatherProperty: {
+      type: Object as PropType<WeatherProperty>,
+      required: true
+    },
+    graphId: {
+      type: String
+    },
+    updateLegendColors: {
+      type: Boolean
+    },
+    tooltipPosition: {
+      type: Object as PropType<{ timestamp: number; i: number }>,
+      default: () => ({ i: -1, timestamp: -1 })
+    }
+  },
+  setup (props, _context) {
+    let graph: D3Graph | undefined;
+    const wbgtStations = ['vlinder02', 'vlinder73', 'vlinder74', 'vlinder75', 'vlinder76'];
+
+    const vlinderStore = useVlinderStore();
+
+    const measurements = computed<Measurement[][]>(() => {
+      return vlinderStore.historicMeasurements;
+    });
+
+    const selectedStations = computed<Station[]>(() => {
+      return vlinderStore.selectedStations;
+    });
+
+    const loading = computed<boolean>(() => {
+      return vlinderStore.loadingHistoricMeasurements;
+    });
+
+    const consolidatedGraphId = computed<string>(() => {
+      return props.graphId || 'weather_graph_' + props.weatherProperty.property;
+    });
+
+    const tooltipI = computed<number>(() => {
+      return props.tooltipPosition.i;
+    });
+
+    const hasData = computed<boolean>(() => {
+      if (props.weatherProperty.property === 'wbgt') {
+        return selectedStations.value.some(s => wbgtStations.includes(s.name));
+      }
+      return true;
+    });
+
+    onMounted(() => {
+      graph = new D3Graph(`#${consolidatedGraphId.value}`, props.weatherProperty, selectedStations.value, props.tooltipPosition);
+      graph.init();
+    });
+
+    // when measurements are updated, we have to manually update the D3 map
+    watch(measurements, () => {
+      if (graph) {
+        graph.updateData(vlinderStore.historicData(props.weatherProperty.property as WeatherPropertyName));
+        if (props.updateLegendColors) {
+          vlinderStore.setLegendColors(graph.getLegendColors());
+        }
+      }
+    }, { deep: true });
+
+    watch(tooltipI, () => {
+      if (graph) {
+        graph.updateTooltip();
+      }
+    }, { deep: true });
+
+    return {
+      consolidatedGraphId,
+      hasData,
+      loading
+    };
+  }
+});
+</script>
+
 <template>
   <v-card :loading="loading" v-show="hasData">
     <v-list-item two-line>
@@ -10,81 +99,3 @@
     </div>
   </v-card>
 </template>
-
-<script lang="ts">
-import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { mapStores } from 'pinia';
-
-import { useVlinderStore } from '@/stores';
-
-import { D3Graph } from '../app/d3/D3Graph';
-import { Station, Measurement, WeatherProperty } from '../app/types';
-
-@Component({
-  computed: {
-    ...mapStores(useVlinderStore)
-  }
-})
-export default class GraphCard extends Vue {
-  @Prop() readonly weatherProperty!: WeatherProperty;
-  @Prop() readonly graphId!: string;
-  @Prop({ type: Boolean }) readonly updateLegendColors!: boolean;
-  @Prop() tooltipPosition!: { timestamp: number; i: number }
-
-  graph: D3Graph | undefined;
-
-  wbgtStations = ['vlinder02', 'vlinder73', 'vlinder74', 'vlinder75', 'vlinder76'];
-  vlinderStore: any;
-
-  mounted () {
-    this.graph = new D3Graph(`#${this.consolidatedGraphId}`, this.weatherProperty, this.selectedStations, this.tooltipPosition);
-    this.graph.init();
-  }
-
-  get measurements (): Measurement[][] {
-    return this.vlinderStore.historicMeasurements;
-  }
-
-  get selectedStations (): Station[] {
-    return this.vlinderStore.selectedStations;
-  }
-
-  get loading (): boolean {
-    return this.vlinderStore.loadingHistoricMeasurements;
-  }
-
-  get consolidatedGraphId (): string {
-    return this.graphId || 'weather_graph_' + this.weatherProperty.property;
-  }
-
-  get tooltipI (): number {
-    return this.tooltipPosition.i;
-  }
-
-  get hasData (): boolean {
-    if (this.weatherProperty.property === 'wbgt') {
-      // return this.selectedStations.some(s => s.hasWbgt);
-      return this.selectedStations.some(s => this.wbgtStations.includes(s.name));
-    }
-    return true;
-  }
-
-  // when measurements are updated, we have to manually update the D3 map
-  @Watch('measurements')
-  measurementsChanged () {
-    if (this.graph) {
-      this.graph.updateData(this.vlinderStore.historicData(this.weatherProperty.property));
-      if (this.updateLegendColors) {
-        this.vlinderStore.setLegendColors(this.graph.getLegendColors());
-      }
-    }
-  }
-
-  @Watch('tooltipI')
-  tooltipMoved () {
-    if (this.graph) {
-      this.graph.updateTooltip();
-    }
-  }
-}
-</script>
