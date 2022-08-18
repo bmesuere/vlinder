@@ -59,7 +59,7 @@ export default defineComponent({
       <v-row dense>
         <v-col cols="6" class="pa-0" v-for="p in activeProperties" :key="p.property">
           <v-list-item dense class="px-2" style="min-height: 36px;">
-            <v-list-item-subtitle :title="p.name">
+            <v-list-item-subtitle :title="p.title">
               <v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ measurements['status'] == "Offline" ? "-" :
                   measurements[p.property]
               }} {{ p.unit }}
