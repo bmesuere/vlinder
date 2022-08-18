@@ -71,6 +71,15 @@ export default defineComponent({
           :active="activeStations" activatable hoverable multiple-active open-on-click>
           <template v-slot:label="{ item }">
             {{ item.city + " &middot; " + item.given_name }}
+            <div class="caption mt-n1">
+              <span v-if="item.sponsor !== ''" title="sponsor">
+                {{ item.sponsor }}
+                &middot;
+              </span>
+              <span title="school">
+                {{ item.school }}
+              </span>
+            </div>
           </template>
           <template v-slot:prepend="{ active }">
             <v-icon>
