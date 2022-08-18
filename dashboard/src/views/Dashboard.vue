@@ -142,7 +142,7 @@ export default defineComponent({
         <StationCard :station="s" />
       </v-col>
     </v-row>
-    <v-toolbar-title class="mt-3 text-h5">Afgelopen 24u</v-toolbar-title>
+    <v-toolbar-title class="mt-5 text-h5">Afgelopen 24u</v-toolbar-title>
     <v-banner sticky app class="chip-banner" color="white">
       <v-chip small label close dark v-for="s in selectedStations" :key="s.id" class="ma-1" :color="legendColors[s.id]" v-on:click:close="removeFromList(s.id)">
         {{ s.city }} &middot; {{ s.given_name }}
