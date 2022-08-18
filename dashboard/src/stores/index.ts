@@ -84,7 +84,9 @@ export const useVlinderStore = defineStore('vlinder', {
       const station = this.stations.find(s => s.id === stationId);
       if (station) {
         this.addSelectedStation(station);
+        return true;
       }
+      return false;
     },
     deselectStationById (stationId: string) {
       const station = this.stations.find(s => s.id === stationId);
@@ -96,7 +98,9 @@ export const useVlinderStore = defineStore('vlinder', {
       const station = this.stations.find(s => s.name === stationName);
       if (station) {
         this.addSelectedStation(station);
+        return true;
       }
+      return false;
     },
     toggleStationById (stationId: string) {
       const station = this.stations.find(s => s.id === stationId);

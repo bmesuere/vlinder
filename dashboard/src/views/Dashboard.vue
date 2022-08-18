@@ -61,15 +61,18 @@ export default defineComponent({
     // fetch data a first time
     const stationsPromise = vlinderStore.fetchStations();
     stationsPromise.then(() => {
+      let stationsSelected = false;
       if (props.urlStations.length > 0) {
         props.urlStations.forEach(s => {
-          vlinderStore.selectStationByName(s);
+          stationsSelected ||= vlinderStore.selectStationByName(s);
         });
-      } else if (stationsFromStorage.length > 0) {
+      }
+      if (!stationsSelected && stationsFromStorage.length > 0) {
         stationsFromStorage.forEach(s => {
-          vlinderStore.selectStationById(s);
+          stationsSelected ||= vlinderStore.selectStationById(s);
         });
-      } else {
+      }
+      if (!stationsSelected) {
         vlinderStore.selectStationById('zZ6ZeSg11dJ5zp5GrNwNck9A');
         vlinderStore.selectStationById('Do5lLMfezIdmUCzzsE0IwIbE');
         vlinderStore.selectStationById('XeIIA97QzN5xxk6AvdzAPquY');
