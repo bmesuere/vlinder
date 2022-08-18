@@ -53,7 +53,8 @@ export default defineComponent({
 <template>
   <v-dialog v-model="dialog" scrollable max-width="500" transition="dialog-bottom-transition">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn color="primary" dark v-bind="attrs" v-on="on">
+      <v-btn depressed outlined color="primary" v-bind="attrs" v-on="on">
+        <v-icon left dark>mdi-magnify</v-icon>
         Selecteer stations
       </v-btn>
     </template>
