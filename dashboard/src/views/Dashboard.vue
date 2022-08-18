@@ -64,12 +64,14 @@ export default defineComponent({
       let stationsSelected = false;
       if (props.urlStations.length > 0) {
         props.urlStations.forEach(s => {
-          stationsSelected ||= vlinderStore.selectStationByName(s);
+          const wasAdded = vlinderStore.selectStationByName(s);
+          stationsSelected ||= wasAdded;
         });
       }
       if (!stationsSelected && stationsFromStorage.length > 0) {
         stationsFromStorage.forEach(s => {
-          stationsSelected ||= vlinderStore.selectStationById(s);
+          const wasAdded = vlinderStore.selectStationById(s);
+          stationsSelected ||= wasAdded;
         });
       }
       if (!stationsSelected) {
