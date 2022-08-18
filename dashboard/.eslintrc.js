@@ -12,7 +12,8 @@ module.exports = {
   ],
 
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 2020,
+    parser: '@typescript-eslint/parser'
   },
 
   rules: {
@@ -20,6 +21,7 @@ module.exports = {
     'no-debugger': 'off',
     'no-extra-semi': 'off',
     'no-prototype-builtins': 'off',
+    'space-before-function-paren': 'off',
     semi: ['error', 'always'],
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-explicit-any': 'off',

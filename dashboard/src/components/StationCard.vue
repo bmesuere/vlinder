@@ -1,3 +1,53 @@
+<script lang="ts">
+import { computed, defineComponent, PropType } from 'vue';
+
+import { useVlinderStore } from '@/stores';
+
+import { event } from 'vue-gtag';
+
+import LandUseGraph from './LandUseGraph.vue';
+
+import { Station, Measurement, WeatherProperty } from '@/app/types';
+import { weatherProperties as wp } from '@/app/weatherProperties';
+
+export default defineComponent({
+  name: 'StationCard',
+  components: { LandUseGraph },
+  props: {
+    station: {
+      type: Object as PropType<Station>,
+      required: true
+    }
+  },
+  setup (props, _context) {
+    const vlinderStore = useVlinderStore();
+
+    const mapUrl = computed<string>(() => `./img/maps/${props.station.name}.png`);
+    const sponsorUrl = computed<string>(() => `./img/sponsors/${props.station.name}.png`);
+    const measurements = computed<Measurement | {}>(() => {
+      return (vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === props.station.id) || {};
+    });
+    const activeProperties = computed<WeatherProperty[]>(() => {
+      // filter the properties where the measurement is null
+      return Object.values(wp)
+        .filter((p: WeatherProperty) => measurements.value[p.property as any] !== null);
+    });
+
+    function removeFromList() {
+      event('station_deselect', { event_category: 'stations', value: props.station.id });
+      vlinderStore.deselectStationById(props.station.id);
+    }
+    return {
+      mapUrl,
+      sponsorUrl,
+      measurements,
+      activeProperties,
+      removeFromList
+    };
+  }
+});
+</script>
+
 <template>
   <v-card>
     <v-btn fab absolute right x-small elevation="3" class="mr-n3 mt-1" v-on:click="removeFromList">
@@ -31,7 +81,10 @@
 
     <v-list-item three-line>
       <v-list-item-content class="pb-1">
-        <div class="text-overline font-weight-regular mb-2" style="line-height: 1rem; font-size: 0.625rem !important;">{{ station.name }}</div>
+        <div class="text-overline font-weight-regular mb-2" style="line-height: 1rem; font-size: 0.625rem !important;">
+          {{ station.name }}
+          <span v-if="measurements['status'] == 'Offline'"> &middot; offline</span>
+        </div>
         <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
         <v-list-item-subtitle>
           <span title="Betrokken school">
@@ -54,50 +107,13 @@
 
     <v-list dense subheader>
       <v-list-item v-for="p in activeProperties" :key="p.property">
-        <v-list-item-subtitle :title="p.name"><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ p.name }}</v-list-item-subtitle>
+        <v-list-item-subtitle :title="p.title"><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ p.name }}</v-list-item-subtitle>
         <v-list-item-title class="text-right">{{ measurements['status'] == "Offline" ? "-" : measurements[p.property] }} {{ p.unit }}</v-list-item-title>
       </v-list-item>
     </v-list>
 
   </v-card>
 </template>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import LandUseGraph from './LandUseGraph.vue';
-
-import { Station, Measurement, WeatherProperty } from '../app/types';
-import { weatherProperties as wp } from '../app/weatherProperties';
-
-@Component({ components: { LandUseGraph } })
-export default class StationCard extends Vue {
-  @Prop() station!: Station;
-
-  removeFromList ():void {
-    this.$gtag.event('station_deselect', { event_category: 'stations', value: this.station.id });
-    this.$store.dispatch('deselectStationById', this.station.id);
-  }
-
-  get mapUrl (): string {
-    return `./img/maps/${this.station.name}.png`;
-  }
-
-  get sponsorUrl (): string {
-    return `./img/sponsors/${this.station.name}.png`;
-  }
-
-  get measurements (): Measurement | {} {
-    return (this.$store.state.liveMeasurements as Measurement[]).find(m => m.id === this.station.id) || {};
-  }
-
-  get activeProperties (): WeatherProperty[] {
-    // filter the properties where the measurement is null
-    return Object.values(wp)
-      // @ts-ignore
-      .filter((p: WeatherProperty) => this.measurements[p.property as any] !== null);
-  }
-}
-</script>
 
 <style>
   .v-window__prev, .v-window__next {
