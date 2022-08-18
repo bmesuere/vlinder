@@ -58,7 +58,7 @@ export class D3Graph {
     this.line = d3.line()
       .curve(d3.curveMonotoneX)
       // @ts-ignore
-      .defined(d => !isNaN(d))
+      .defined(d => !(isNaN(d) || d === null))
       .x((d, i) => this.x(Date.parse(this.measurements.timestamps[i])))
       // @ts-ignore
       .y(d => this.y(d));
@@ -169,9 +169,11 @@ export class D3Graph {
     if (!this.svg) return;
     if (!this.measurements) return;
 
+    const filteredSeries = this.measurements.series.filter(s => s.values[0] !== null);
+
     // update scales
     this.x.domain(d3.extent(this.measurements.timestamps, d => Date.parse(d)) as [number, number]);
-    this.y.domain([d3.min(this.measurements.series, d => d3.min(d.values)) as number, d3.max(this.measurements.series, d => d3.max(d.values)) as number]).nice();
+    this.y.domain([d3.min(filteredSeries, d => d3.min(d.values)) as number, d3.max(filteredSeries, d => d3.max(d.values)) as number]).nice();
 
     // redraw axes
     // @ts-ignore
@@ -181,7 +183,7 @@ export class D3Graph {
     // redraw lines
     this.lines.selectAll('path')
       // @ts-ignore
-      .data(this.measurements.series, d => d.stationId)
+      .data(filteredSeries, d => d.stationId)
       .join('path')
       .transition()
       // @ts-ignore
@@ -190,7 +192,7 @@ export class D3Graph {
 
     this.mouseDots = this.mouseG.selectAll('.mouseover-dot')
       // @ts-ignore
-      .data(this.measurements.series, d => d.stationId)
+      .data(filteredSeries, d => d.stationId)
       .join('circle')
       .attr('class', 'mouseover-dot')
       .attr('r', 3)
@@ -200,7 +202,7 @@ export class D3Graph {
 
     this.mouseBGLabels = this.mouseG.selectAll('.mouseover-BGlabels')
       // @ts-ignore
-      .data(this.measurements.series, d => d.stationId)
+      .data(filteredSeries, d => d.stationId)
       .join('text')
       .attr('class', 'mouseover-BGlabels')
       .attr('x', this.labelxPos())
@@ -212,7 +214,7 @@ export class D3Graph {
 
     this.mouseLabels = this.mouseG.selectAll('.mouseover-labels')
       // @ts-ignore
-      .data(this.measurements.series, d => d.stationId)
+      .data(filteredSeries, d => d.stationId)
       .join('text')
       .attr('class', 'mouseover-labels')
       .attr('x', this.labelxPos())
