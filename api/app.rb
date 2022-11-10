@@ -61,7 +61,7 @@ end
 #
 
 class Vlinder < ROM::Relation[:sql]
-  schema :Vlinder_Combined_Dashboard, infer: true, as: :vlinder do
+  schema :Vlinder_Mocca_Combined_Dashboard, infer: true, as: :vlinder do
     attribute :StationID, Types::String
   end
 
@@ -154,7 +154,7 @@ class Vlinder < ROM::Relation[:sql]
         humidity: current[:humidity].to_f.round(2),
         id: current[:StationID],
         measurements: $url + 'measurements/' + current[:StationID],
-        pressure: (current[:pressure_0].to_f / 100).round(2),
+        pressure: current[:pressure_0] ? (current[:pressure_0].to_f / 100).round(2) : nil,
         rainIntensity: current[:RainIntensity].to_f.round(2),
         rainVolume: rainvolume.to_f.round(2),
         station: $url + 'stations/' + current[:StationID],
