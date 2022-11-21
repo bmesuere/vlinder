@@ -25,7 +25,7 @@
     "@types/d3": "^7.4.0",
     "@types/topojson-client": "^3.1.1",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
-    "@typescript-eslint/parser": "^5.42.1",
+    "@typescript-eslint/parser": "^5.43.0",
     "@vue/cli-plugin-babel": "~5.0.8",
     "@vue/cli-plugin-eslint": "~5.0.8",
     "@vue/cli-plugin-pwa": "~5.0.8",
