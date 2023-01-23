@@ -12,7 +12,7 @@ gem "json", "~> 2.6"
 
 gem "sinatra-contrib", "~> 3.0"
 
-gem "mysql2", "~> 0.5.4"
+gem "mysql2", "~> 0.5.5"
 
 gem "csv", "~> 3.2"
 
