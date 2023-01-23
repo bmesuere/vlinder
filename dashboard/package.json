@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.27.2",
-    "d3": "^7.8.1",
+    "d3": "^7.8.2",
     "pinia": "^2.0.29",
     "register-service-worker": "^1.7.2",
     "topojson-client": "^3.1.0",
