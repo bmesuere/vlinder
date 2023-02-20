@@ -8,7 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "core-js": "^3.27.2",
+    "core-js": "^3.28.0",
     "d3": "^7.8.2",
     "pinia": "^2.0.30",
     "register-service-worker": "^1.7.2",
