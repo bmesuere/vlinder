@@ -48,7 +48,8 @@ export class D3StationsMap {
       .then(r => r.json());
 
     this.belgium = await belgium as TopoJSON.Topology;
-    this.stations = stations;
+    // only draw the vlinder stations on the map
+    this.stations = stations.filter(s => s.name.startsWith('vlinder'));
     this.measurements = measurements;
 
     // prepare data
@@ -88,7 +89,7 @@ export class D3StationsMap {
       .attr('d', path)
       .append('title')
       .text(d => d?.properties?.name_nl);
-    
+
     // draw provinces
     svg.append('g')
       .selectAll('.province-bg')
