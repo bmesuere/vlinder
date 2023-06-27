@@ -14,7 +14,7 @@ Vue.use(PiniaVuePlugin);
 const pinia = createPinia();
 
 Vue.use(VueGtag, {
-  config: { id: 'UA-170459792-1' }
+  config: { id: 'G-YY7WRV394E' }
 }, router);
 
 new Vue({
