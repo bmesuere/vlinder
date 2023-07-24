@@ -19,7 +19,7 @@
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.5.4",
     "vuetify": "^2.6.15",
-    "whatwg-fetch": "^3.6.2"
+    "whatwg-fetch": "^3.6.17"
   },
   "devDependencies": {
     "@types/d3": "^7.4.0",
