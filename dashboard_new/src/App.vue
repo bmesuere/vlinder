@@ -12,7 +12,7 @@
     </v-app-bar>
 
     <v-main>
-      <HelloWorld />
+      <router-view></router-view>
     </v-main>
 
     <v-footer class="d-flex flex-row bg-blue-grey-darken-4">
@@ -27,6 +27,11 @@
   </v-app>
 </template>
 
+<style>
+.v-application {
+  overflow: visible !important;
+}
+</style>
+
 <script setup lang="ts">
-  import HelloWorld from '@/components/HelloWorld.vue'
 </script>
