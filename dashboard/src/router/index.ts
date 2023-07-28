@@ -1,41 +1,27 @@
-import Vue from 'vue';
-import VueRouter, { RouteConfig } from 'vue-router';
-import Dashboard from '../views/Dashboard.vue';
+// Composables
+import { createRouter, createWebHistory } from 'vue-router'
 
-Vue.use(VueRouter);
-
-const routes: Array<RouteConfig> = [
+const routes = [
   {
     path: '/',
-    alias: ['/index.html'],
-    name: 'Home',
-    component: Dashboard,
-    props: route => ({ urlStations: route.query.stations ? [route.query.stations].flat() : [] })
-  }
-];
+    component: () => import('@/layouts/default/Default.vue'),
+    children: [
+      {
+        path: '',
+        name: 'Home',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "home" */ '@/views/Dashboard.vue'),
+        props: route => ({ urlStations: route.query.stations ? [route.query.stations].flat() : [] }),
+      },
+    ],
+  },
+]
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
-});
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes,
+})
 
-function patchRouterMethod (router: VueRouter, methodName: string) {
-  // @ts-ignore
-  router['old' + methodName] = router[methodName];
-  // @ts-ignore
-  router[methodName] = async function (location) {
-    // @ts-ignore
-    return router['old' + methodName](location).catch((error) => {
-      if (error.name === 'NavigationDuplicated') {
-        return this.currentRoute;
-      }
-      throw error;
-    });
-  };
-}
-
-patchRouterMethod(router, 'push');
-patchRouterMethod(router, 'replace');
-
-export default router;
+export default router

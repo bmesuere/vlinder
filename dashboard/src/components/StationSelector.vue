@@ -1,59 +1,8 @@
-<script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
-
-import { useVlinderStore } from '@/stores';
-
-import { Station } from '@/app/types';
-
-export default defineComponent({
-  name: 'StationSelector',
-  setup (_props, _context) {
-    const dialog = ref(false);
-    const search = ref('');
-    const activeStations = ref<string[]>([]);
-
-    const vlinderStore = useVlinderStore();
-
-    const stations = computed<Station[]>(() => vlinderStore.stations);
-    const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
-
-    function filter (station: Station, query: string): boolean {
-      const searchKey = station.city + station.given_name + station.name + station.sponsor + station.school;
-      return searchKey.toLowerCase().includes(query.toLowerCase());
-    }
-
-    function selectStation (stations: string[]): void {
-      const addedStations = stations.filter(s => !activeStations.value.includes(s));
-      const removeStations = activeStations.value.filter(s => !stations.includes(s));
-      addedStations.forEach(station => {
-        vlinderStore.selectStationById(station);
-      });
-      removeStations.forEach(station => {
-        vlinderStore.deselectStationById(station);
-      });
-    }
-
-    watch(selectedStations, () => {
-      activeStations.value = selectedStations.value.map(s => s.id);
-    }, { deep: true });
-
-    return {
-      dialog,
-      search,
-      activeStations,
-      stations,
-      selectedStations,
-      filter,
-      selectStation
-    };
-  }
-});
-</script>
 
 <template>
-  <v-dialog v-model="dialog" scrollable max-width="500" transition="dialog-bottom-transition">
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn depressed outlined color="primary" v-bind="attrs" v-on="on">
+  <v-dialog v-model="dialog" scrollable max-width="500" transition="slide-y-reverse-transition">
+    <template v-slot:activator="{ props }">
+      <v-btn variant="outlined" color="primary" v-bind="props">
         <v-icon left dark>mdi-magnify</v-icon>
         Selecteer stations
       </v-btn>
@@ -91,10 +40,48 @@ export default defineComponent({
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="dialog = false">
+        <v-btn color="blue darken-1" @click="dialog = false">
           Sluiten
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
+
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue';
+
+import { useVlinderStore } from '@/store/app';
+
+import { Station } from '@/app/types';
+
+const dialog = ref(false);
+const search = ref('');
+const activeStations = ref<string[]>([]);
+
+const vlinderStore = useVlinderStore();
+
+const stations = computed<Station[]>(() => vlinderStore.stations);
+const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
+
+function filter (station: Station, query: string): boolean {
+  const searchKey = station.city + station.given_name + station.name + station.sponsor + station.school;
+  return searchKey.toLowerCase().includes(query.toLowerCase());
+}
+
+function selectStation (stations: string[]): void {
+  const addedStations = stations.filter(s => !activeStations.value.includes(s));
+  const removeStations = activeStations.value.filter(s => !stations.includes(s));
+  addedStations.forEach(station => {
+    vlinderStore.selectStationById(station);
+  });
+  removeStations.forEach(station => {
+    vlinderStore.deselectStationById(station);
+  });
+}
+
+watch(selectedStations, () => {
+  activeStations.value = selectedStations.value.map(s => s.id);
+}, { deep: true });
+
+</script>

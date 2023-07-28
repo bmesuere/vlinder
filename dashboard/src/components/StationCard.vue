@@ -1,63 +1,12 @@
-<script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
-import { useVlinderStore } from '@/stores';
-
-import { event } from 'vue-gtag';
-
-import LandUseGraph from './LandUseGraph.vue';
-
-import { Station, Measurement, WeatherProperty } from '@/app/types';
-import { weatherProperties as wp } from '@/app/weatherProperties';
-
-export default defineComponent({
-  name: 'StationCard',
-  components: { LandUseGraph },
-  props: {
-    station: {
-      type: Object as PropType<Station>,
-      required: true
-    }
-  },
-  setup (props, _context) {
-    const vlinderStore = useVlinderStore();
-
-    const mapUrl = computed<string>(() => `./img/maps/${props.station.name}.png`);
-    const sponsorUrl = computed<string>(() => `./img/sponsors/${props.station.name}.png`);
-    const measurements = computed<Measurement | {}>(() => {
-      return (vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === props.station.id) || {};
-    });
-    const activeProperties = computed<WeatherProperty[]>(() => {
-      // filter the properties where the measurement is null
-      return Object.values(wp)
-        .filter((p: WeatherProperty) => measurements.value[p.property as any] !== null);
-    });
-
-    function removeFromList() {
-      event('station_deselect', { event_category: 'stations', value: props.station.id });
-      vlinderStore.deselectStationById(props.station.id);
-    }
-    return {
-      mapUrl,
-      sponsorUrl,
-      measurements,
-      activeProperties,
-      removeFromList
-    };
-  }
-});
-</script>
-
 <template>
   <v-card>
-    <v-btn fab absolute right x-small elevation="3" class="mr-n3 mt-1" v-on:click="removeFromList">
-      <v-icon>mdi-close</v-icon>
+    <v-btn position="absolute"  right="0" size="x-small" elevation="3" class="close mr-n3 mt-1" v-on:click="removeFromList" icon="mdi-close">
     </v-btn>
     <v-carousel
       hide-delimiters
       height="auto"
-      dark
-      show-arrows-on-hover
+      show-arrows="hover"
+      theme="dark"
     >
       <v-carousel-item>
         <v-img
@@ -79,36 +28,36 @@ export default defineComponent({
       </v-carousel-item>
     </v-carousel>
 
-    <v-list-item three-line>
-      <v-list-item-content class="pb-1">
-        <div class="text-overline font-weight-regular mb-2" style="line-height: 1rem; font-size: 0.625rem !important;">
-          {{ station.name }}
-          <span v-if="measurements['status'] == 'Offline'"> &middot; offline</span>
-        </div>
-        <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
-        <v-list-item-subtitle>
-          <span title="Betrokken school">
-            <v-icon small>mdi-school-outline</v-icon>
-            {{ station.school }}
+    <v-list-item lines="three" class="pb-0">
+      <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
+        {{ station.name }}
+        <span v-if="measurements['status'] == 'Offline'"> &middot; offline</span>
+      </div>
+      <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
+      <v-list-item-subtitle>
+        <span title="Betrokken school">
+          <v-icon size="small" icon="mdi-school-outline" class="mr-1"></v-icon>
+          <span>{{ station.school }}</span>
+        </span>
+        <br>
+        <span title="Sponsor" style="display: inline-block" class="mt-1">
+          <v-icon size="small" icon="mdi-heart-outline" class="mr-1"></v-icon>
+          <span v-if="station.sponsor !== ''" >
+            {{ station.sponsor }}
           </span>
-          <br>
-          <span title="Sponsor" style="display: inline-block" class="mt-1">
-            <v-icon small>mdi-heart-outline</v-icon>
-            <span v-if="station.sponsor !== ''" >
-              {{ station.sponsor }}
-            </span>
-            <a v-else hfref="mailto:vlinder@ugent.be">
-              Dit station sponsoren?
-            </a>
-          </span>
-        </v-list-item-subtitle>
-      </v-list-item-content>
+          <a v-else href="mailto:vlinder@ugent.be">
+            Dit station sponsoren?
+          </a>
+        </span>
+      </v-list-item-subtitle>
     </v-list-item>
 
-    <v-list dense subheader>
-      <v-list-item v-for="p in activeProperties" :key="p.property">
-        <v-list-item-subtitle :title="p.title"><v-icon class='pr-1'>{{ p.icon }}</v-icon> {{ p.name }}</v-list-item-subtitle>
-        <v-list-item-title class="text-right">{{ measurements['status'] == "Offline" ? "-" : measurements[p.property] }} {{ p.unit }}</v-list-item-title>
+    <v-list density="compact">
+      <v-list-item v-for="p in activeProperties" :key="p.property" class="pb-0 pt-0">
+        <v-list-item-subtitle :title="p.title" class="font-weight-medium" style="font-size: .8125rem"><v-icon size="large" class='mr-1' :icon="p.icon"></v-icon> {{ p.name }}</v-list-item-subtitle>
+        <template v-slot:append>
+          <v-list-item-title class="font-weight-medium" style="font-size: .8125rem">{{ measurements['status'] == "Offline" ? "-" : measurements[p.property] }} {{ p.unit }}</v-list-item-title>
+        </template>
       </v-list-item>
     </v-list>
 
@@ -116,7 +65,60 @@ export default defineComponent({
 </template>
 
 <style>
-  .v-window__prev, .v-window__next {
-    top: calc(100% - 50px);
+  .v-window__controls {
+    align-items: end !important;
+  }
+  .v-window__left, .v-window__right {
+    margin-bottom: 12px;
+    background-color: rgba(0,0,0,.3);
+    color: white;
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .v-btn.close {
+    right: 16px;
+    z-index: 1;
+  }
+  svg {
+    display: block;
   }
 </style>
+
+<script setup lang="ts">
+import { computed, PropType } from 'vue';
+
+import { useVlinderStore } from '@/store/app';
+
+//import { event } from 'vue-gtag';
+
+import LandUseGraph from './LandUseGraph.vue';
+
+import { Station, Measurement, WeatherProperty } from '@/app/types';
+import { weatherProperties as wp } from '@/app/weatherProperties';
+
+const props = defineProps({
+  station: {
+    type: Object as PropType<Station>,
+    required: true
+  }
+});
+
+const vlinderStore = useVlinderStore();
+
+const mapUrl = computed<string>(() => `./img/maps/${props.station.name}.png`);
+const sponsorUrl = computed<string>(() => `./img/sponsors/${props.station.name}.png`);
+const measurements = computed<Measurement | {}>(() => {
+  return (vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === props.station.id) || {};
+});
+const activeProperties = computed<WeatherProperty[]>(() => {
+  // filter the properties where the measurement is null
+  return Object.values(wp)
+    .filter((p: WeatherProperty) => measurements.value[p.property as any] !== null);
+});
+
+function removeFromList() {
+  // TODO
+  //event('station_deselect', { event_category: 'stations', value: props.station.id });
+  vlinderStore.deselectStationById(props.station.id);
+}
+</script>
