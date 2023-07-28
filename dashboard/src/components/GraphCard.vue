@@ -1,10 +1,8 @@
 <template>
   <v-card :loading="loading" v-show="hasData">
     <v-list-item lines="two">
-      <v-list-item-content>
-        <v-list-item-title class="mb-0">{{ weatherProperty.name }}</v-list-item-title>
-        <v-list-item-subtitle>{{ weatherProperty.unit }}</v-list-item-subtitle>
-      </v-list-item-content>
+      <v-list-item-title class="mb-0">{{ weatherProperty.name }}</v-list-item-title>
+      <v-list-item-subtitle>{{ weatherProperty.unit }}</v-list-item-subtitle>
     </v-list-item>
     <div :id="consolidatedGraphId" class="mt-n3">
     </div>

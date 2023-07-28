@@ -1,24 +1,22 @@
 <template>
   <v-card elevation=10>
     <v-list-item lines="two">
-      <v-list-item-content class="pb-0">
-        <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
-          {{ station.name }}
-          <span v-if="measurements['status'] == 'Offline'"> &middot; offline</span>
-        </div>
-        <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
-        <v-list-item-subtitle style="white-space: nowrap; text-overflow: ellipsis; display: block;">
-          <span v-if="station.sponsor !== ''" title="sponsor">
-            <v-icon size="small" icon="mdi-heart-outline"></v-icon>
-            {{ station.sponsor }}
-            &middot;
-          </span>
-          <span title="school">
-            <v-icon size="small" icon="mdi-school-outline"></v-icon>
-            {{ station.school }}
-          </span>
-        </v-list-item-subtitle>
-      </v-list-item-content>
+      <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
+        {{ station.name }}
+        <span v-if="measurements['status'] == 'Offline'"> &middot; offline</span>
+      </div>
+      <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
+      <v-list-item-subtitle style="white-space: nowrap; text-overflow: ellipsis; display: block;">
+        <span v-if="station.sponsor !== ''" title="sponsor">
+          <v-icon size="small" icon="mdi-heart-outline"></v-icon>
+          {{ station.sponsor }}
+          &middot;
+        </span>
+        <span title="school">
+          <v-icon size="small" icon="mdi-school-outline"></v-icon>
+          {{ station.school }}
+        </span>
+      </v-list-item-subtitle>
     </v-list-item>
 
     <v-list density="compact" class="mb-3">
