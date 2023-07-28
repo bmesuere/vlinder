@@ -34,7 +34,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 
 import { useVlinderStore } from '@/store/app';
 
-//import { event } from 'vue-gtag';
+import { useGtag } from 'vue-gtag-next';
 
 import TooltipCard from './TooltipCard.vue';
 
@@ -73,7 +73,8 @@ onMounted(async () => {
 
 // adds or removes a station to the list of selected stations
 function toggleStation (stationId: string): void {
-  //event('station_toggle', { event_category: 'stations', value: stationId });
+  const { event } = useGtag();
+  event('station_toggle', { event_category: 'stations', value: stationId });
   vlinderStore.toggleStationById(stationId);
 }
 
@@ -86,7 +87,8 @@ watch(selectedStations, () => {
 
 // when a different property is selected, we have to manually update the D3 map
 watch(selectedProperty, () => {
-  //event('property_change', { event_category: 'properties', value: selectedProperty.value });
+  const { event } = useGtag();
+  event('property_change', { event_category: 'properties', value: selectedProperty.value });
   if (map) {
     map.updateProperty(selectedProperty.value);
   }

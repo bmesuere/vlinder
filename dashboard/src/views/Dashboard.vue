@@ -64,6 +64,7 @@ import StationSelector from '@/components/StationSelector.vue';
 import StationCard from '@/components/StationCard.vue';
 import StationsMap from '@/components/StationsMap.vue';
 
+import { useGtag } from 'vue-gtag-next';
 
 import { weatherProperties as wp } from '../app/weatherProperties';
 
@@ -154,8 +155,8 @@ function scheduleFetch(f: Function): void {
   }, 60000);
 }
 function removeFromList (id: string): void {
-  //TODO
-  //event('station_deselect', { event_category: 'stations', value: id });
+  const { event } = useGtag()
+  event('station_deselect', { event_category: 'stations', value: id });
   vlinderStore.deselectStationById(id);
 }
 </script>

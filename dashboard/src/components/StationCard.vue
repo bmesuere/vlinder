@@ -89,7 +89,7 @@ import { computed, PropType } from 'vue';
 
 import { useVlinderStore } from '@/store/app';
 
-//import { event } from 'vue-gtag';
+import { useGtag } from 'vue-gtag-next';
 
 import LandUseGraph from './LandUseGraph.vue';
 
@@ -117,8 +117,8 @@ const activeProperties = computed<WeatherProperty[]>(() => {
 });
 
 function removeFromList() {
-  // TODO
-  //event('station_deselect', { event_category: 'stations', value: props.station.id });
+  const { event } = useGtag()
+  event('station_deselect', { event_category: 'stations', value: props.station.id });
   vlinderStore.deselectStationById(props.station.id);
 }
 </script>
