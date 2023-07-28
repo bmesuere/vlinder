@@ -4,7 +4,7 @@
       <v-toolbar-title class="text-h5 ml-0 d-none d-sm-flex">{{ weatherProperties[selectedProperty as keyof typeof weatherProperties].title }}</v-toolbar-title>
       <v-toolbar-title class="text-h5 ml-0 d-sm-none d-flex">{{ weatherProperties[selectedProperty as keyof typeof weatherProperties].name }}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn-toggle v-model="selectedProperty" variant="outlined" divided mandatory="force" rounded="xl" density="compact">
+      <v-btn-toggle v-model="selectedProperty" variant="outlined" divided mandatory="force" rounded="xl">
         <v-btn v-for="p in allowedProperties" :key="p" :value="p">
           <v-icon size="large">{{ weatherProperties[p as keyof typeof weatherProperties].icon }}</v-icon>
           <v-tooltip activator="parent" location="bottom">

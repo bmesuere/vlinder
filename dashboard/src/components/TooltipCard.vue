@@ -1,5 +1,5 @@
 <template>
-  <v-card elevation=10>
+  <v-card rounded="lg" elevation=10>
     <v-list-item lines="two">
       <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
         {{ station.name }}

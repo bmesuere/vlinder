@@ -2,15 +2,15 @@
 <template>
   <v-dialog v-model="dialog" scrollable max-width="500" transition="slide-y-reverse-transition">
     <template v-slot:activator="{ props }">
-      <v-btn variant="outlined" color="primary" v-bind="props">
+      <v-btn variant="tonal" rounded="xl" color="primary" size="large" v-bind="props">
         <v-icon left dark>mdi-magnify</v-icon>
         Selecteer stations
       </v-btn>
     </template>
 
-    <v-card class="mx-auto" max-width="500">
+    <v-card rounded="lg" class="mx-auto" max-width="500" min-width="500">
       <v-card-title>
-        <v-text-field v-model="search" label="Typ om te filteren" prepend-inner-icon="mdi-magnify" hide-details
+        <v-text-field v-model="search" label="Typ om te filteren" prepend-inner-icon="mdi-magnify" variant="underlined" color="primary" hide-details
           autofocus clearable>
         </v-text-field>
 
@@ -44,7 +44,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" @click="dialog = false">
+        <v-btn color="blue darken-1" @click="dialog = false" rounded="xl">
           Sluiten
         </v-btn>
       </v-card-actions>

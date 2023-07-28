@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card rounded="lg">
     <v-btn position="absolute"  right="0" size="x-small" elevation="3" class="close mr-n3 mt-1" v-on:click="removeFromList" icon="mdi-close">
     </v-btn>
     <v-carousel
