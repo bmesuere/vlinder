@@ -7,6 +7,7 @@
         Selecteer stations
       </v-btn>
     </template>
+
     <v-card class="mx-auto" max-width="500">
       <v-card-title>
         <v-text-field v-model="search" label="Typ om te filteren" prepend-inner-icon="mdi-magnify" hide-details
@@ -16,26 +17,29 @@
       </v-card-title>
 
       <v-card-text style="height: 300px;">
-        <v-treeview v-on:update:active="selectStation" :items="stations" :search="search" :filter="filter"
-          :active="activeStations" activatable hoverable multiple-active open-on-click>
-          <template v-slot:label="{ item }">
-            {{ item.city + " &middot; " + item.given_name }}
-            <div class="caption mt-n1">
-              <span v-if="item.sponsor !== ''" title="sponsor">
-                {{ item.sponsor }}
+        <v-list lines="two" select-strategy="classic" active-color="primary" v-model:selected="activeStations" v-on:update:selected="selectStation">
+
+          <v-list-item v-for="station in filteredStations" :value="station.id">
+            <template v-slot:prepend="{ isActive }">
+              <v-list-item-action start>
+                <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+              </v-list-item-action>
+            </template>
+            <v-list-item-title>
+              {{ station.city + " &middot; " + station.given_name }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              <span v-if="station.sponsor !== ''" title="sponsor">
+                {{ station.sponsor }}
                 &middot;
               </span>
               <span title="school">
-                {{ item.school }}
+                {{ station.school }}
               </span>
-            </div>
-          </template>
-          <template v-slot:prepend="{ active }">
-            <v-icon>
-              {{ active ? 'mdi-checkbox-outline' : 'mdi-checkbox-blank-outline' }}
-            </v-icon>
-          </template>
-        </v-treeview>
+            </v-list-item-subtitle>
+          </v-list-item>
+
+        </v-list>
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
@@ -64,14 +68,20 @@ const vlinderStore = useVlinderStore();
 const stations = computed<Station[]>(() => vlinderStore.stations);
 const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
 
+const filteredStations = computed<Station[]>(() => {
+  return stations.value.filter(s => filter(s, search.value));
+});
+
 function filter (station: Station, query: string): boolean {
   const searchKey = station.city + station.given_name + station.name + station.sponsor + station.school;
-  return searchKey.toLowerCase().includes(query.toLowerCase());
+  return searchKey.toLowerCase().includes((query|| "").toLowerCase());
 }
 
-function selectStation (stations: string[]): void {
-  const addedStations = stations.filter(s => !activeStations.value.includes(s));
-  const removeStations = activeStations.value.filter(s => !stations.includes(s));
+function selectStation (): void {
+  const selectedIds = selectedStations.value.map(s => s.id);
+  const activeIds = activeStations._rawValue;
+  const removeStations = selectedIds.filter(s => !activeIds.includes(s));
+  const addedStations = activeIds.filter(s => !selectedIds.includes(s));
   addedStations.forEach(station => {
     vlinderStore.selectStationById(station);
   });
