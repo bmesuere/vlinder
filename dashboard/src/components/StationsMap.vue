@@ -1,14 +1,14 @@
 <template>
   <div class="text-center">
     <v-toolbar variant="flat" color="white">
-      <v-toolbar-title class="text-h5 ml-0 d-none d-sm-flex">{{ weatherProperties[selectedProperty].title }}</v-toolbar-title>
-      <v-toolbar-title class="text-h5 ml-0 d-sm-none d-flex">{{ weatherProperties[selectedProperty].name }}</v-toolbar-title>
+      <v-toolbar-title class="text-h5 ml-0 d-none d-sm-flex">{{ weatherProperties[selectedProperty as keyof typeof weatherProperties].title }}</v-toolbar-title>
+      <v-toolbar-title class="text-h5 ml-0 d-sm-none d-flex">{{ weatherProperties[selectedProperty as keyof typeof weatherProperties].name }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn-toggle v-model="selectedProperty" variant="outlined" divided mandatory="force" rounded="xl" density="compact">
         <v-btn v-for="p in allowedProperties" :key="p" :value="p">
-          <v-icon size="large">{{ weatherProperties[p].icon }}</v-icon>
+          <v-icon size="large">{{ weatherProperties[p as keyof typeof weatherProperties].icon }}</v-icon>
           <v-tooltip activator="parent" location="bottom">
-            {{ weatherProperties[p].name }}
+            {{ weatherProperties[p as keyof typeof weatherProperties].name }}
           </v-tooltip>
         </v-btn>
       </v-btn-toggle>
@@ -23,7 +23,7 @@
     </div>
     <v-fade-transition>
       <div v-if="tooltipInfo.shown" class="text-left" :style="{width: '260px', 'z-index': '10', position: 'absolute', left: (tooltipInfo.x + 15) + 'px', top: (tooltipInfo.y - 45) + 'px'}">
-        <TooltipCard :station="tooltipInfo.station" />
+        <TooltipCard :station="(tooltipInfo.station as Station)" />
       </div>
     </v-fade-transition>
   </div>
@@ -57,7 +57,7 @@ let map: D3StationsMap | undefined;
 const weatherProperties = wp;
 const allowedProperties = ['temp', 'rainVolume', 'windSpeed'];
 
-const tooltipInfo = ref({ shown: false, station: null, x: 0, y: 0 });
+const tooltipInfo = ref({ shown: false, station: {} as Station, x: 0, y: 0 });
 const selectedProperty = ref('temp');
 
 const vlinderStore = useVlinderStore();

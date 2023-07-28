@@ -6,7 +6,7 @@
 
     <v-row>
       <v-col cols="12">
-        <StationsMap :dataLoaded="initialDataLoaded" />
+        <StationsMap :dataLoaded="initialDataLoaded as any" />
       </v-col>
     </v-row>
 
@@ -81,7 +81,7 @@ const vlinderStore = useVlinderStore();
 const router = useRouter();
 const route = useRoute();
 
-let resolveDataLoaded;
+let resolveDataLoaded : Function;
 const initialDataLoaded = ref(new Promise((resolve) => { resolveDataLoaded = resolve; }));
 const tooltipPosition = ref({ timestamp: -1, i: -1 });
 

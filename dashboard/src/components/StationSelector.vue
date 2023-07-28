@@ -79,7 +79,7 @@ function filter (station: Station, query: string): boolean {
 
 function selectStation (): void {
   const selectedIds = selectedStations.value.map(s => s.id);
-  const activeIds = activeStations._rawValue;
+  const activeIds = activeStations.value as string[];
   const removeStations = selectedIds.filter(s => !activeIds.includes(s));
   const addedStations = activeIds.filter(s => !selectedIds.includes(s));
   addedStations.forEach(station => {

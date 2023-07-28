@@ -31,7 +31,7 @@
     <v-list-item lines="three" class="pb-0">
       <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
         {{ station.name }}
-        <span v-if="measurements['status'] == 'Offline'"> &middot; offline</span>
+        <span v-if="(measurements as Measurement)['status'] == 'Offline'"> &middot; offline</span>
       </div>
       <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
       <v-list-item-subtitle>
@@ -56,7 +56,13 @@
       <v-list-item v-for="p in activeProperties" :key="p.property" class="pb-0 pt-0">
         <v-list-item-subtitle :title="p.title" class="font-weight-medium" style="font-size: .8125rem"><v-icon size="large" class='mr-1' :icon="p.icon"></v-icon> {{ p.name }}</v-list-item-subtitle>
         <template v-slot:append>
-          <v-list-item-title class="font-weight-medium" style="font-size: .8125rem">{{ measurements['status'] == "Offline" ? "-" : measurements[p.property] }} {{ p.unit }}</v-list-item-title>
+          <v-list-item-title class="font-weight-medium" style="font-size: .8125rem">
+            {{
+              (measurements as Measurement)['status'] === 'Offline'
+                ? '-'
+                : (measurements as Measurement)[p.property as keyof Measurement] ?? '-'
+            }} {{ p.unit }}
+          </v-list-item-title>
         </template>
       </v-list-item>
     </v-list>
@@ -113,7 +119,7 @@ const measurements = computed<Measurement | {}>(() => {
 const activeProperties = computed<WeatherProperty[]>(() => {
   // filter the properties where the measurement is null
   return Object.values(wp)
-    .filter((p: WeatherProperty) => measurements.value[p.property as any] !== null);
+    .filter((p: WeatherProperty) => (measurements.value as Measurement)[p.property as keyof Measurement] !== null);
 });
 
 function removeFromList() {

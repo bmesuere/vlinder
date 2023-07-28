@@ -3,7 +3,7 @@
     <v-list-item lines="two">
       <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
         {{ station.name }}
-        <span v-if="measurements['status'] == 'Offline'"> &middot; offline</span>
+        <span v-if="(measurements as Measurement)['status'] == 'Offline'"> &middot; offline</span>
       </div>
       <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
       <v-list-item-subtitle style="white-space: nowrap; text-overflow: ellipsis; display: block;">
@@ -24,8 +24,8 @@
         <v-col cols="6" class="py-0 pr-0" v-for="p in activeProperties" :key="p.property">
           <v-list-item class="pr-0" style="min-height: 36px;">
             <v-list-item-subtitle :title="p.title" style="font-weight: 500;">
-              <v-icon class='mr-1'>{{ p.icon }}</v-icon> {{ measurements['status'] == "Offline" ? "-" :
-                  measurements[p.property]
+              <v-icon class='mr-1'>{{ p.icon }}</v-icon> {{ (measurements as Measurement)['status'] == "Offline" ? "-" :
+                  (measurements as Measurement)[p.property as keyof Measurement]
               }} {{ p.unit }}
             </v-list-item-subtitle>
           </v-list-item>
@@ -59,6 +59,6 @@ const measurements = computed<Measurement | {}>(() => {
 const activeProperties = computed<WeatherProperty[]>(() => {
   // filter the properties where the measurement is null
   return Object.values(wp)
-    .filter((p: WeatherProperty) => measurements.value[p.property as any] !== null);
+    .filter((p: WeatherProperty) => (measurements.value as Measurement)[p.property as keyof Measurement] !== null);
 });
 </script>
