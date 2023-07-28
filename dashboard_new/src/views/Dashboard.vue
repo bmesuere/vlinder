@@ -3,8 +3,10 @@
     <v-alert type="error" variant='outlined' v-if="isError">
       Er ging iets fout bij het ophalen van de meetgegevens. Probeer het later opnieuw.
     </v-alert>
+
     <v-row>
       <v-col cols="12">
+        <StationsMap :dataLoaded="initialDataLoaded" />
       </v-col>
     </v-row>
 
@@ -60,6 +62,8 @@ import { useVlinderStore } from '@/store/app';
 import GraphCard from '@/components/GraphCard.vue';
 import StationSelector from '@/components/StationSelector.vue';
 import StationCard from '@/components/StationCard.vue';
+import StationsMap from '@/components/StationsMap.vue';
+
 
 import { weatherProperties as wp } from '../app/weatherProperties';
 
