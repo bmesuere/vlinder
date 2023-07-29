@@ -9,13 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v2 
+        uses: actions/checkout@v2
         with:
           persist-credentials: false
 
       - name: Install and Build 🔧
         run: |
           cd dashboard
+          sed -i 's|createWebHistory("/dashboard/")|createWebHistory("/vlinder/")|g' src/router/index.ts
           yarn install
           yarn build
 
