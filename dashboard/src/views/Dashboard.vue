@@ -30,7 +30,7 @@
       </v-chip>
     </v-banner>
 
-    <v-row>
+    <v-row class="mt-4">
       <v-col cols="12" md="6" lg="4" >
         <GraphCard :weatherProperty="weatherProperties.temp" :tooltipPosition="tooltipPosition" updateLegendColors />
       </v-col>
