@@ -4,3 +4,4 @@ venv/
 api/login.json
 */__pycache__/
 
+.DS_Store

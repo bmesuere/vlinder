@@ -6,7 +6,7 @@
     {
       "label": "serve",
       "type": "shell",
-      "command": "yarn serve"
+      "command": "yarn dev"
     },
     {
       "label": "lint",

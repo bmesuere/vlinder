@@ -175,6 +175,12 @@ export class D3Graph {
     this.x.domain(d3.extent(this.measurements.timestamps, d => Date.parse(d)) as [number, number]);
     this.y.domain([d3.min(filteredSeries, d => d3.min(d.values)) as number, d3.max(filteredSeries, d => d3.max(d.values)) as number]).nice();
 
+    // this is done to force the color scale to assign the same color to old stations and a new color to new stations
+    // even if they don't have data for this property
+    this.measurements.series.forEach(s => {
+      this.color(s.stationId);
+    });
+
     // redraw axes
     // @ts-ignore
     this.xAxis.transition().call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(multiFormat));

@@ -1,100 +1,97 @@
-<script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
-
-import { useVlinderStore } from '@/stores';
-
-import { Station } from '@/app/types';
-
-export default defineComponent({
-  name: 'StationSelector',
-  setup (_props, _context) {
-    const dialog = ref(false);
-    const search = ref('');
-    const activeStations = ref<string[]>([]);
-
-    const vlinderStore = useVlinderStore();
-
-    const stations = computed<Station[]>(() => vlinderStore.stations);
-    const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
-
-    function filter (station: Station, query: string): boolean {
-      const searchKey = station.city + station.given_name + station.name + station.sponsor + station.school;
-      return searchKey.toLowerCase().includes(query.toLowerCase());
-    }
-
-    function selectStation (stations: string[]): void {
-      const addedStations = stations.filter(s => !activeStations.value.includes(s));
-      const removeStations = activeStations.value.filter(s => !stations.includes(s));
-      addedStations.forEach(station => {
-        vlinderStore.selectStationById(station);
-      });
-      removeStations.forEach(station => {
-        vlinderStore.deselectStationById(station);
-      });
-    }
-
-    watch(selectedStations, () => {
-      activeStations.value = selectedStations.value.map(s => s.id);
-    }, { deep: true });
-
-    return {
-      dialog,
-      search,
-      activeStations,
-      stations,
-      selectedStations,
-      filter,
-      selectStation
-    };
-  }
-});
-</script>
 
 <template>
-  <v-dialog v-model="dialog" scrollable max-width="500" transition="dialog-bottom-transition">
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn depressed outlined color="primary" v-bind="attrs" v-on="on">
+  <v-dialog v-model="dialog" scrollable max-width="500" transition="slide-y-reverse-transition">
+    <template v-slot:activator="{ props }">
+      <v-btn variant="tonal" rounded="xl" color="primary" size="large" v-bind="props">
         <v-icon left dark>mdi-magnify</v-icon>
         Selecteer stations
       </v-btn>
     </template>
-    <v-card class="mx-auto" max-width="500">
+
+    <v-card rounded="lg" class="mx-auto" max-width="500" min-width="500">
       <v-card-title>
-        <v-text-field v-model="search" label="Typ om te filteren" prepend-inner-icon="mdi-magnify" hide-details
+        <v-text-field v-model="search" label="Typ om te filteren" prepend-inner-icon="mdi-magnify" variant="underlined" color="primary" hide-details
           autofocus clearable>
         </v-text-field>
 
       </v-card-title>
 
       <v-card-text style="height: 300px;">
-        <v-treeview v-on:update:active="selectStation" :items="stations" :search="search" :filter="filter"
-          :active="activeStations" activatable hoverable multiple-active open-on-click>
-          <template v-slot:label="{ item }">
-            {{ item.city + " &middot; " + item.given_name }}
-            <div class="caption mt-n1">
-              <span v-if="item.sponsor !== ''" title="sponsor">
-                {{ item.sponsor }}
+        <v-list lines="two" select-strategy="classic" active-color="primary" v-model:selected="activeStations" v-on:update:selected="selectStation">
+
+          <v-list-item v-for="station in filteredStations" :value="station.id">
+            <template v-slot:prepend="{ isActive }">
+              <v-list-item-action start>
+                <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+              </v-list-item-action>
+            </template>
+            <v-list-item-title>
+              {{ station.city + " &middot; " + station.given_name }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              <span v-if="station.sponsor !== ''" title="sponsor">
+                {{ station.sponsor }}
                 &middot;
               </span>
               <span title="school">
-                {{ item.school }}
+                {{ station.school }}
               </span>
-            </div>
-          </template>
-          <template v-slot:prepend="{ active }">
-            <v-icon>
-              {{ active ? 'mdi-checkbox-outline' : 'mdi-checkbox-blank-outline' }}
-            </v-icon>
-          </template>
-        </v-treeview>
+            </v-list-item-subtitle>
+          </v-list-item>
+
+        </v-list>
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="dialog = false">
+        <v-btn color="blue darken-1" @click="dialog = false" rounded="xl">
           Sluiten
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
+
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue';
+
+import { useVlinderStore } from '@/store/app';
+
+import { Station } from '@/app/types';
+
+const dialog = ref(false);
+const search = ref('');
+const activeStations = ref<string[]>([]);
+
+const vlinderStore = useVlinderStore();
+
+const stations = computed<Station[]>(() => vlinderStore.stations);
+const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
+
+const filteredStations = computed<Station[]>(() => {
+  return stations.value.filter(s => filter(s, search.value));
+});
+
+function filter (station: Station, query: string): boolean {
+  const searchKey = station.city + station.given_name + station.name + station.sponsor + station.school;
+  return searchKey.toLowerCase().includes((query|| "").toLowerCase());
+}
+
+function selectStation (): void {
+  const selectedIds = selectedStations.value.map(s => s.id);
+  const activeIds = activeStations.value as string[];
+  const removeStations = selectedIds.filter(s => !activeIds.includes(s));
+  const addedStations = activeIds.filter(s => !selectedIds.includes(s));
+  addedStations.forEach(station => {
+    vlinderStore.selectStationById(station);
+  });
+  removeStations.forEach(station => {
+    vlinderStore.deselectStationById(station);
+  });
+}
+
+watch(selectedStations, () => {
+  activeStations.value = selectedStations.value.map(s => s.id);
+}, { deep: true });
+
+</script>

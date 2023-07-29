@@ -1,25 +1,30 @@
-import Vue from 'vue';
-import App from './App.vue';
-import { createPinia, PiniaVuePlugin } from 'pinia';
-import VueGtag from 'vue-gtag';
-import './registerServiceWorker';
-import vuetify from './plugins/vuetify';
-import 'whatwg-fetch';
+/**
+ * main.ts
+ *
+ * Bootstraps Vuetify and other plugins then mounts the App`
+ */
 
-import router from './router';
+// Components
+import App from './App.vue'
 
-Vue.config.productionTip = false;
+// Composables
+import { createApp } from 'vue'
 
-Vue.use(PiniaVuePlugin);
-const pinia = createPinia();
+// Plugins
+import { registerPlugins } from '@/plugins'
 
-Vue.use(VueGtag, {
-  config: { id: 'G-YY7WRV394E' }
-}, router);
+import VueGtag from "vue-gtag-next";
 
-new Vue({
-  vuetify,
-  pinia,
-  router,
-  render: h => h(App)
-}).$mount('#app');
+import router from '@/router'
+
+const app = createApp(App)
+
+registerPlugins(app)
+
+app.use(VueGtag, {
+  property: { id: 'G-YY7WRV394E' },
+})
+
+app.use(router)
+
+app.mount('#app')

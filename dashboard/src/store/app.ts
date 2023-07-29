@@ -34,7 +34,7 @@ export const useVlinderStore = defineStore('vlinder', {
     }
   },
   actions: {
-    fetchStations (): Promise<Station[]> {
+    fetchStations(): Promise<Station[]> {
       return fetch(API_URL + STATIONS_PATH)
         .then(r => {
           if (!r.ok) return Promise.reject(new Error('station fetch failed'));
@@ -51,7 +51,7 @@ export const useVlinderStore = defineStore('vlinder', {
           return Promise.reject(r);
         });
     },
-    fetchMeasurements (): Promise<Measurement[]> {
+    fetchMeasurements(): Promise<Measurement[]> {
       return fetch(API_URL + MEASUREMENTS_PATH)
         .then(r => {
           if (!r.ok) return Promise.reject(new Error('measurement fetch failed'));
@@ -67,7 +67,7 @@ export const useVlinderStore = defineStore('vlinder', {
           return Promise.reject(r);
         });
     },
-    fetchHistoricMeasurements (): Promise<Measurement[][]> {
+    fetchHistoricMeasurements(): Promise<Measurement[][]> {
       this.loadingHistoricMeasurements = true;
       return Promise.all(
         this.selectedStations.map(s => {
@@ -80,7 +80,7 @@ export const useVlinderStore = defineStore('vlinder', {
         return ms;
       });
     },
-    selectStationById (stationId: string) {
+    selectStationById(stationId: string) {
       const station = this.stations.find(s => s.id === stationId);
       if (station) {
         this.addSelectedStation(station);
@@ -88,13 +88,13 @@ export const useVlinderStore = defineStore('vlinder', {
       }
       return false;
     },
-    deselectStationById (stationId: string) {
+    deselectStationById(stationId: string) {
       const station = this.stations.find(s => s.id === stationId);
       if (station) {
         this.removeSelectedStation(station);
       }
     },
-    selectStationByName (stationName: string) {
+    selectStationByName(stationName: string) {
       const station = this.stations.find(s => s.name === stationName);
       if (station) {
         this.addSelectedStation(station);
@@ -102,7 +102,7 @@ export const useVlinderStore = defineStore('vlinder', {
       }
       return false;
     },
-    toggleStationById (stationId: string) {
+    toggleStationById(stationId: string) {
       const station = this.stations.find(s => s.id === stationId);
       if (station) {
         if (this.selectedStations.includes(station)) {
@@ -112,15 +112,15 @@ export const useVlinderStore = defineStore('vlinder', {
         }
       }
     },
-    setLegendColors (legendColors: {}) {
+    setLegendColors(legendColors: {}) {
       this.legendColors = legendColors;
     },
-    addSelectedStation (station: Station) {
+    addSelectedStation(station: Station) {
       if (!this.selectedStations.includes(station)) {
         this.selectedStations.push(station);
       }
     },
-    removeSelectedStation (station: Station) {
+    removeSelectedStation(station: Station) {
       this.selectedStations.splice(this.selectedStations.indexOf(station), 1);
     }
   }

@@ -1,101 +1,16 @@
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from 'vue';
-
-import { useVlinderStore } from '@/stores';
-
-import { event } from 'vue-gtag';
-
-import TooltipCard from './TooltipCard.vue';
-
-import { weatherProperties as wp } from '../app/weatherProperties';
-import { Measurement, Station } from '@/app/types';
-import { D3StationsMap } from '@/app/d3/D3StationsMap';
-
-export default defineComponent({
-  name: 'StationsMap',
-  components: { TooltipCard },
-  props: {
-    mapId: {
-      type: String,
-      default: 'stationsMap'
-    },
-    dataLoaded: {
-      type: Promise<[Station[], Measurement[]]>,
-      required: true
-    }
-  },
-  setup (props, _context) {
-    let map: D3StationsMap | undefined;
-    const weatherProperties = wp;
-    const allowedProperties = ['temp', 'rainVolume', 'windSpeed'];
-
-    const tooltipInfo = ref({ shown: false, station: null, x: 0, y: 0 });
-    const selectedProperty = ref('temp');
-
-    const vlinderStore = useVlinderStore();
-
-    const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
-    const measurements = computed<Measurement[]>(() => vlinderStore.liveMeasurements);
-
-    onMounted(async () => {
-      map = new D3StationsMap(`#${props.mapId}`, selectedProperty.value, selectedStations.value, tooltipInfo.value, toggleStation);
-      const [s, m] = await props.dataLoaded;
-      map.init(s, m);
-    });
-
-    // adds or removes a station to the list of selected stations
-    function toggleStation (stationId: string): void {
-      event('station_toggle', { event_category: 'stations', value: stationId });
-      vlinderStore.toggleStationById(stationId);
-    }
-
-    // when stations are selected or removed, update the D3 map
-    watch(selectedStations, () => {
-      if (map) {
-        map.updateSelectedStations();
-      }
-    }, { deep: true });
-
-    // when a different property is selected, we have to manually update the D3 map
-    watch(selectedProperty, () => {
-      event('property_change', { event_category: 'properties', value: selectedProperty.value });
-      if (map) {
-        map.updateProperty(selectedProperty.value);
-      }
-    });
-
-    // when measurements are updated, we have to manually update the D3 map
-    watch(measurements, () => {
-      if (map) {
-        map.updateMeasurements(measurements.value);
-      }
-    }, { deep: true });
-
-    return {
-      weatherProperties,
-      selectedProperty,
-      allowedProperties,
-      tooltipInfo
-    };
-  }
-});
-</script>
-
 <template>
   <div class="text-center">
-    <v-toolbar flat>
-      <v-toolbar-title class="text-h5 ml-n4 d-none d-sm-flex">{{ weatherProperties[selectedProperty].title }}</v-toolbar-title>
-      <v-toolbar-title class="text-h5 ml-n4 d-sm-none">{{ weatherProperties[selectedProperty].name }}</v-toolbar-title>
+    <v-toolbar variant="flat" color="white">
+      <v-toolbar-title class="text-h5 ml-0 d-none d-sm-flex">{{ weatherProperties[selectedProperty as keyof typeof weatherProperties].title }}</v-toolbar-title>
+      <v-toolbar-title class="text-h5 ml-0 d-sm-none d-flex">{{ weatherProperties[selectedProperty as keyof typeof weatherProperties].name }}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn-toggle v-model="selectedProperty" mandatory>
-        <v-tooltip bottom v-for="p in allowedProperties" :key="p">
-          <template v-slot:activator="{ on }">
-            <v-btn :value="p" v-on="on">
-              <v-icon>{{ weatherProperties[p].icon }}</v-icon>
-            </v-btn>
-          </template>
-          <span>{{ weatherProperties[p].name }}</span>
-        </v-tooltip>
+      <v-btn-toggle v-model="selectedProperty" variant="outlined" divided mandatory="force" rounded="xl">
+        <v-btn v-for="p in allowedProperties" :key="p" :value="p">
+          <v-icon size="large">{{ weatherProperties[p as keyof typeof weatherProperties].icon }}</v-icon>
+          <v-tooltip activator="parent" location="bottom">
+            {{ weatherProperties[p as keyof typeof weatherProperties].name }}
+          </v-tooltip>
+        </v-btn>
       </v-btn-toggle>
     </v-toolbar>
     <div v-bind:id="mapId">
@@ -107,9 +22,83 @@ export default defineComponent({
     />
     </div>
     <v-fade-transition>
-      <div v-if="tooltipInfo.shown" class="text-left" :style="{width: '250px', 'z-index': '10', position: 'absolute', left: (tooltipInfo.x + 15) + 'px', top: (tooltipInfo.y - 45) + 'px'}">
-        <TooltipCard :station="tooltipInfo.station" />
+      <div v-if="tooltipInfo.shown" class="text-left" :style="{width: '260px', 'z-index': '10', position: 'absolute', left: (tooltipInfo.x + 15) + 'px', top: (tooltipInfo.y - 45) + 'px'}">
+        <TooltipCard :station="(tooltipInfo.station as Station)" />
       </div>
     </v-fade-transition>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from 'vue';
+
+import { useVlinderStore } from '@/store/app';
+
+import { useGtag } from 'vue-gtag-next';
+
+import TooltipCard from './TooltipCard.vue';
+
+import { weatherProperties as wp } from '../app/weatherProperties';
+import { Measurement, Station } from '@/app/types';
+import { D3StationsMap } from '@/app/d3/D3StationsMap';
+
+
+const props = defineProps({
+  mapId: {
+    type: String,
+    default: 'stationsMap'
+  },
+  dataLoaded: {
+    type: Promise<[Station[], Measurement[]]>,
+    required: true
+  }
+});
+let map: D3StationsMap | undefined;
+const weatherProperties = wp;
+const allowedProperties = ['temp', 'rainVolume', 'windSpeed'];
+
+const tooltipInfo = ref({ shown: false, station: {} as Station, x: 0, y: 0 });
+const selectedProperty = ref('temp');
+
+const vlinderStore = useVlinderStore();
+
+const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
+const measurements = computed<Measurement[]>(() => vlinderStore.liveMeasurements);
+
+onMounted(async () => {
+  map = new D3StationsMap(`#${props.mapId}`, selectedProperty.value, selectedStations.value, tooltipInfo.value, toggleStation);
+  const [s, m] = await props.dataLoaded;
+  map.init(s, m);
+});
+
+// adds or removes a station to the list of selected stations
+function toggleStation (stationId: string): void {
+  const { event } = useGtag();
+  event('station_toggle', { event_category: 'stations', value: stationId });
+  vlinderStore.toggleStationById(stationId);
+}
+
+// when stations are selected or removed, update the D3 map
+watch(selectedStations, () => {
+  if (map) {
+    map.updateSelectedStations();
+  }
+}, { deep: true });
+
+// when a different property is selected, we have to manually update the D3 map
+watch(selectedProperty, () => {
+  const { event } = useGtag();
+  event('property_change', { event_category: 'properties', value: selectedProperty.value });
+  if (map) {
+    map.updateProperty(selectedProperty.value);
+  }
+});
+
+// when measurements are updated, we have to manually update the D3 map
+watch(measurements, () => {
+  if (map) {
+    map.updateMeasurements(measurements.value);
+  }
+}, { deep: true });
+
+</script>

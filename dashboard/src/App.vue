@@ -1,25 +1,11 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'App',
-  setup(_props, _context) {
-    const version = '1.3.0';
-    return {
-      version
-    };
-  }
-});
-</script>
-
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark dense>
+    <v-app-bar color="primary" density="compact">
       <v-toolbar-title>VLINDER</v-toolbar-title>
 
       <v-spacer />
 
-      <v-btn href="http://vlinder.ugent.be" target="_blank" text >
+      <v-btn href="http://vlinder.ugent.be" target="_blank" variant="text" >
         <span class="mr-2">VLINDER website</span>
         <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
@@ -28,28 +14,25 @@ export default defineComponent({
     <v-main>
       <router-view></router-view>
     </v-main>
-    <v-footer padless>
-      <v-card class="flex blue-grey darken-4" flat tile >
-        <v-card-title class="white--text text-body-2 px-8">
-          &copy; {{ new Date().getFullYear() }} Universiteit Gent &middot; v{{ version }}
-          <v-spacer></v-spacer>
-          <v-btn class="mx-4" dark icon href="https://app.swaggerhub.com/apis-docs/bmesuere/VLINDER/" target="_blank">
-            <v-icon size="24px">mdi-api</v-icon>
-          </v-btn>
-          <v-btn class="mx-4" dark icon href="https://github.com/bmesuere/vlinder" target="_blank">
-            <v-icon size="24px">mdi-github</v-icon>
-          </v-btn>
-          <v-btn class="mx-4" dark icon href="https://twitter.com/VLINDER_project" target="_blank">
-            <v-icon size="24px">mdi-twitter</v-icon>
-          </v-btn>
-        </v-card-title>
-      </v-card>
+
+    <v-footer class="d-flex flex-row bg-blue-grey-darken-4">
+      <v-card-title class="white--text text-body-2 px-8">
+        &copy; {{ new Date().getFullYear() }} Universiteit Gent &middot; v{{ version }}
+      </v-card-title>
+      <v-spacer></v-spacer>
+      <v-btn class="mx-4" icon="mdi-api" variant="plain" href="https://app.swaggerhub.com/apis-docs/bmesuere/VLINDER/" target="_blank"></v-btn>
+      <v-btn class="mx-4" icon="mdi-github" variant="plain" href="https://github.com/bmesuere/vlinder" target="_blank"></v-btn>
+      <v-btn class="mx-4" icon="mdi-twitter" variant="plain" href="https://twitter.com/VLINDER_project" target="_blank"></v-btn>
     </v-footer>
   </v-app>
 </template>
 
 <style>
-  svg {
-    display: block;
-  }
+.v-application {
+  overflow: visible !important;
+}
 </style>
+
+<script setup lang="ts">
+const version = '1.3.0';
+</script>
