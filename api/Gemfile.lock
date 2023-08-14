@@ -36,9 +36,9 @@ GEM
     nio4r (2.5.9)
     puma (6.3.0)
       nio4r (~> 2.0)
-    rack (2.2.6.4)
-    rack-protection (3.0.6)
-      rack
+    rack (2.2.8)
+    rack-protection (3.1.0)
+      rack (~> 2.2, >= 2.2.4)
     rom (5.3.0)
       rom-changeset (~> 5.3, >= 5.3.0)
       rom-core (~> 5.3, >= 5.3.0)
@@ -67,18 +67,18 @@ GEM
       sequel (>= 4.49)
     ruby2_keywords (0.0.5)
     sequel (5.62.0)
-    sinatra (3.0.6)
+    sinatra (3.1.0)
       mustermann (~> 3.0)
       rack (~> 2.2, >= 2.2.4)
-      rack-protection (= 3.0.6)
+      rack-protection (= 3.1.0)
       tilt (~> 2.0)
-    sinatra-contrib (3.0.6)
+    sinatra-contrib (3.1.0)
       multi_json
       mustermann (~> 3.0)
-      rack-protection (= 3.0.6)
-      sinatra (= 3.0.6)
+      rack-protection (= 3.1.0)
+      sinatra (= 3.1.0)
       tilt (~> 2.0)
-    tilt (2.1.0)
+    tilt (2.2.0)
     transproc (1.1.1)
     zeitwerk (2.6.6)
 
@@ -92,8 +92,8 @@ DEPENDENCIES
   mysql2 (~> 0.5.5)
   puma (~> 6.3)
   rom-sql (~> 3.6)
-  sinatra (~> 3.0)
-  sinatra-contrib (~> 3.0)
+  sinatra (~> 3.1)
+  sinatra-contrib (~> 3.1)
 
 BUNDLED WITH
    2.1.4
