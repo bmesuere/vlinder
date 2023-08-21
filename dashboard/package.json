@@ -23,7 +23,7 @@
   "devDependencies": {
     "@babel/types": "^7.22.10",
     "@types/d3": "^7.4.0",
-    "@types/node": "^18.15.0",
+    "@types/node": "^20.5.1",
     "@types/topojson-client": "^3.1.1",
     "@types/webfontloader": "^1.6.35",
     "@vitejs/plugin-vue": "^4.3.1",
