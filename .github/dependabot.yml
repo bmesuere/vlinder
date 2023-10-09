@@ -3,12 +3,12 @@ updates:
 - package-ecosystem: npm
   directory: "/dashboard"
   schedule:
-    interval: weekly
+    interval: monthly
     time: "04:00"
   open-pull-requests-limit: 10
 - package-ecosystem: bundler
   directory: "/api"
   schedule:
-    interval: weekly
+    interval: monthly
     time: "04:00"
   open-pull-requests-limit: 10
