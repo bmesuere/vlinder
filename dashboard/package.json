@@ -14,7 +14,7 @@
     "pinia": "^2.1.7",
     "roboto-fontface": "*",
     "topojson-client": "^3.1.0",
-    "vue": "^3.2.0",
+    "vue": "^3.3.7",
     "vue-gtag-next": "^1.14.0",
     "vue-router": "^4.2.5",
     "vuetify": "^3.3.20",
