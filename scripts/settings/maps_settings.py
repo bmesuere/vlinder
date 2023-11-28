@@ -3,20 +3,29 @@
 """
 Settings file related to the calculation of landcover fractions
 """
+from pathlib import Path
+import os
+
+scripts_path = Path(__file__).resolve().parents[1]
 
 # =============================================================================
 # IO settings
 # =============================================================================
-output_folder = ""
-north_arrow = ""
+output_folder = os.path.join(scripts_path, 'output')
+north_arrow = os.path.join(scripts_path, 'resources', 'north.png')
 
 # =============================================================================
 # Boolean settings
 # =============================================================================
-
 add_other_locations_in_plot = True #others will be plotted in blue
 
-# plot_all_stations = False
+figure_with_title = False
+add_hist_to_figure = False
+add_scale_bar = True
+add_north_arrow = True
+add_buffer_circles = False
+run_mogrify = True #only on unix
+
 
 # =============================================================================
 # Map settings
@@ -31,7 +40,8 @@ target_width = 590 #will be used by mogrify
 target_height = 255 #will be used by mogrify
 
 # Physical size of the figure !! Normal 7000 / 3500 but for hitt bestendige steden a higher resolution is required to desinguish stations.
-xrange=8000 #physical range of the map in meters
+xrange=8000 #physical range of the map in meter
+yrange = xrange/(width/height)
 east_displacement = 0. #in meters to move to the left out of center
 south_displacement = 0. #in meters to move to the north out of center
 

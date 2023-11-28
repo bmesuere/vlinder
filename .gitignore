@@ -7,4 +7,5 @@ api/login.json
 .DS_Store
 
 .spyproject/
-
+scripts/output/
+*__pycache__*

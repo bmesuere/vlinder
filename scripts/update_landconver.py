@@ -16,6 +16,7 @@ import rasterstats
 from shapely.geometry import box
 # import settings
 import settings.landcover_settings as lc_settings
+from format_data import write_vlinder_data_to_csv
 
 
 #%% Setup paths
@@ -411,45 +412,46 @@ def calculate_landuse(lat, lon, bufferlist, BBK_settings, s2glc_settings):
     return returndict
 
 
-#%%
-# read data
-df = pd.read_csv(data_path)
-
-# iterate over the stations to update
-if update_all:
-    updatedf = df
-    # outdf = pd.DataFrame()
-else:
-    updatedf = df[df['VLINDER'].isin(update_list)]
-    # outdf = df[~df['VLINDER'].isin(update_list)]
 
 
 
+if __name__ == "__main__":
+
+    # read data
+    df = pd.read_csv(data_path)
+
+    # iterate over the stations to update
+    if update_all:
+        updatedf = df
+    else:
+        updatedf = df[df['VLINDER'].isin(update_list)]
 
 
+    for _idx, row in updatedf.iterrows():
+        print(f' Getting LC fractions for {row["VLINDER"]}')
+        # extract lat and lon --> convert to numeric
+        lat, lon = float(row['lat']), float(row['lon'])
 
-for _idx, row in updatedf.iterrows():
-    print(f' Getting LC fractions for {row["VLINDER"]}')
-    # extract lat and lon --> convert to numeric
-    lat, lon = float(row['lat']), float(row['lon'])
+        # get landcover fractions
+        landcover = calculate_landuse(lat = lat,
+                                      lon = lon,
+                                      bufferlist = lc_settings.buffers,
+                                      BBK_settings = lc_settings.BBK_settings,
+                                      s2glc_settings=lc_settings.s2glc_settings)
 
-    # get landcover fractions
-    landcover = calculate_landuse(lat = lat,
-                                  lon = lon,
-                                  bufferlist = lc_settings.buffers,
-                                  BBK_settings = lc_settings.BBK_settings,
-                                  s2glc_settings=lc_settings.s2glc_settings)
-
-
-    #update fractions
-    for landcover_frac in landcover:
-        # overwrite the df
-        df.loc[df['VLINDER'] == row["VLINDER"], landcover_frac] = landcover[landcover_frac]
+        #update fractions
+        for landcover_frac in landcover:
+            # overwrite the df
+            df.loc[df['VLINDER'] == row["VLINDER"], landcover_frac] = landcover[landcover_frac]
 
 
+    print(f'The head of the updated data file: \n {df}')
 
 
-# Overwrite the data
-if overwrite:
-    df.to_csv(data_path)
+    # Overwrite the data
+    if overwrite:
+        print("Overwrite the data file")
+        write_vlinder_data_to_csv(data=df,
+                                  data_path=data_path)
+
 
