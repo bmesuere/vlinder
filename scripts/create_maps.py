@@ -8,9 +8,6 @@ Created on Tue Sep 14 15:42:26 2021
 @author: thoverga
 """
 
-#%% Imports
-
-
 import pandas as pd
 from pyproj import Proj, transform
 
@@ -18,6 +15,8 @@ from matplotlib_scalebar.scalebar import ScaleBar
 from matplotlib.patches import Circle
 
 import contextily as cx
+import matplotlib.ticker as ticker
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import matplotlib.pyplot as plt
 import os, sys
 from pathlib import Path
@@ -25,9 +24,6 @@ from pathlib import Path
 import geopandas as gpd
 import shapely
 
-# import csv
-# import selenium
-# import geckodriver
 
 # import the settings
 import settings.maps_settings as map_settings
@@ -42,9 +38,7 @@ plot_list = ['vlinder34', 'vlinder02']
 
 
 #%%
-# yrange = xrange/(width/height)
-import matplotlib.ticker as ticker
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
 
 def make_stacked_hist(station, data,
                       landcovers=lc_settings.landcovers,
