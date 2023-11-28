@@ -1,5 +1,5 @@
 ### Updating landcover fractions
-To calculate the landcover fractions at different buffers for a station, you can use the *update_landcover.py* script. 
+To calculate the landcover fractions at different buffers for a station, you can use the *update_landcover.py* script. Make sure to work on a specific branch and **merging with the master is always done in a PR**.
 
 ## Requirements
 To run the *update_landcover.py* you need:
@@ -17,3 +17,13 @@ To run the *update_landcover.py* you need:
 5. Run the script: `python3 update_ladcover.py`.
 6. The *../api/data.csv* is updated.
   
+### Creating maps
+The requirements for creating the maps are the same as for the landcover calculations. 
+
+## To Run
+1. Activate your environment `conda activate vlinderkaart_2_env` (comes with spyder as IDE).
+2. Check the *settings/map_settings.py* file and update the settings to your needs.
+3. Check the *create_maps.py* script and update the `plot_all=True` (= to make a map for all stations) are set it to `False` and specify the stations to plot with the `update_list` variable.
+4. (The coordinates, and landcover, at the *../api/data.csv* file are used.)
+5. Run the script: `python3 create_maps.py`.
+6. The maps are written to */output/* .
