@@ -25,8 +25,8 @@ from pathlib import Path
 import geopandas as gpd
 import shapely
 
-import csv
-import selenium
+# import csv
+# import selenium
 # import geckodriver
 
 # import the settings
@@ -38,7 +38,7 @@ root_path = Path(__file__).resolve().parents[1]
 data_path = os.path.join(root_path, 'api', 'data.csv')
 
 plot_all = False
-plot_list = ['vlinder34']
+plot_list = ['vlinder34', 'vlinder02']
 
 
 #%%
@@ -286,6 +286,7 @@ def makefigure(station, data,
         newax = fig.add_axes([0.83,0.01,0.15,0.15], anchor='SE', zorder=1)
         newax.imshow(im)
         newax.axis('off')
+        fig.tight_layout()
 
 
 
