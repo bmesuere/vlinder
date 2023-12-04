@@ -453,10 +453,10 @@
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.2.tgz#31f6eec1ed7ec23f4f05608d3a2d381df041f564"
   integrity sha512-7aqorHYgdNO4DM36stTiGO3DvKoex9TQRwsJU6vMaFGyqpBA1MNZkz+PG3gaNUPpTAOYhT1WR7M1JyA3fbS9Cw==
 
-"@types/topojson-client@^3.1.3":
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/@types/topojson-client/-/topojson-client-3.1.3.tgz#d710e90f0a4a25bbdbf4fc0c1863f9a6b5023e26"
-  integrity sha512-liC+dHCxoqQy5bbJMsF59Cx1WZZwbcT084v/5bdp3NWSFUuzQpsm4gbLQh+wlv58Mng4jCsO4p8hWelqGlb7rg==
+"@types/topojson-client@^3.1.4":
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/@types/topojson-client/-/topojson-client-3.1.4.tgz#81b83f9ecd6542dc5c3df21967f992e3fe192c33"
+  integrity sha512-Ntf3ZSetMYy7z3PrVCvcqmdRoVhgKA9UKN0ZuuZf8Ts2kcyL4qK34IXBs6qO5fem62EK4k03PtkJPVoroVu4/w==
   dependencies:
     "@types/geojson" "*"
     "@types/topojson-specification" "*"
