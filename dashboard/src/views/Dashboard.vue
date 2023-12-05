@@ -12,7 +12,6 @@
 
     <v-toolbar class="mt-n4" variant="flat" color="white">
       <v-toolbar-title class="text-h5 ml-0">Geselecteerde stations</v-toolbar-title>
-      <v-spacer></v-spacer>
       <StationSelector />
     </v-toolbar>
 

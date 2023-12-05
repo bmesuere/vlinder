@@ -42,8 +42,7 @@
         </v-list>
       </v-card-text>
       <v-divider></v-divider>
-      <v-card-actions>
-        <v-spacer></v-spacer>
+      <v-card-actions class="flex-row-reverse">
         <v-btn color="blue darken-1" @click="dialog = false" rounded="xl">
           Sluiten
         </v-btn>
