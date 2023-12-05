@@ -4,7 +4,7 @@
     <template v-slot:activator="{ props }">
       <v-btn variant="tonal" rounded="xl" color="primary" size="large" v-bind="props">
         <v-icon left dark>mdi-magnify</v-icon>
-        Selecteer stations
+        <span class="d-none d-sm-inline">Selecteer stations</span>
       </v-btn>
     </template>
 
