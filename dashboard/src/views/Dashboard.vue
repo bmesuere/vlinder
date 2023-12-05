@@ -23,7 +23,7 @@
 
     <v-toolbar-title class="mt-5 text-h5">Afgelopen 24u</v-toolbar-title>
 
-    <v-banner sticky class="chip-banner" color="white" style="top:40px; z-index:10;">
+    <v-banner sticky class="px-0" color="white" style="top:40px; z-index:10;">
       <v-chip size="small" label closable v-for="s in selectedStations" :key="s.id" class="ma-1" :color="legendColors[s.id]" v-on:click:close="removeFromList(s.id)">
         {{ s.city }} &middot; {{ s.given_name }}
       </v-chip>
@@ -51,6 +51,12 @@
     </v-row>
   </v-container>
 </template>
+
+<style>
+.v-banner__content {
+  display: block !important;
+}
+</style>
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';

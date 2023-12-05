@@ -2,7 +2,7 @@
 <template>
   <v-dialog v-model="dialog" scrollable max-width="500" transition="slide-y-reverse-transition">
     <template v-slot:activator="{ props }">
-      <v-btn variant="tonal" rounded="xl" color="primary" size="large" v-bind="props">
+      <v-btn class="mr-0" variant="tonal" rounded="xl" color="primary" size="large" v-bind="props">
         <v-icon left dark>mdi-magnify</v-icon>
         <span class="d-none d-sm-inline">Selecteer stations</span>
       </v-btn>
