@@ -41,7 +41,7 @@ Then follow the checklist:
 - [X] Calculate the landcover fractions (see above)
 - [X] Create maps for them (see above)
 - [X] Copy the maps (in `/output/`) to `resources/img/maps/`
-- [X] Copy the maps (in `/output/`) to `resources/img/maps/` and run [imgoptim](https://github.com/JamieMason/ImageOptim-CLI) on them (macOS only)
+- [X] Copy the maps (in `/output/`) to `dashboard/public/img/maps/` and run [imgoptim](https://github.com/JamieMason/ImageOptim-CLI) on them (macOS only)
 
   
   
