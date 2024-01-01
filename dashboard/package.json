@@ -26,7 +26,7 @@
     "@types/node": "^20.8.3",
     "@types/topojson-client": "^3.1.4",
     "@types/webfontloader": "^1.6.38",
-    "@vitejs/plugin-vue": "^4.5.0",
+    "@vitejs/plugin-vue": "^4.6.2",
     "@vue/eslint-config-typescript": "^12.0.0",
     "eslint": "^8.55.0",
     "eslint-plugin-vue": "^9.19.2",
