@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
-    "d3": "^7.8.5",
+    "d3": "^7.9.0",
     "pinia": "^2.1.7",
     "roboto-fontface": "*",
     "topojson-client": "^3.1.0",
