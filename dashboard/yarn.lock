@@ -1998,10 +1998,10 @@ vue-gtag-next@^1.14.0:
   resolved "https://registry.yarnpkg.com/vue-gtag-next/-/vue-gtag-next-1.14.0.tgz#793aef0b90dff4213b9f3a79827cd99b06e678dd"
   integrity sha512-iJl+cOG2GU5NuxqzSSIpt03WVOvZqyKB9TOy7d55KiuvRklcnb2nlqxW5B/a3/sbIt7fla+XEkRyMCcoz0zAHw==
 
-vue-router@^4.3.2:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.3.2.tgz#08096c7765dacc6832f58e35f7a081a8b34116a7"
-  integrity sha512-hKQJ1vDAZ5LVkKEnHhmm1f9pMiWIBNGF5AwU67PdH7TyXCj/a4hTccuUuYCAMgJK6rO/NVYtQIEN3yL8CECa7Q==
+vue-router@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.4.0.tgz#128e3fc0c84421035a9bd26027245e6bd68f69ab"
+  integrity sha512-HB+t2p611aIZraV2aPSRNXf0Z/oLZFrlygJm+sZbdJaW6lcFqEDQwnzUBXn+DApw+/QzDU/I9TeWx9izEjTmsA==
   dependencies:
     "@vue/devtools-api" "^6.5.1"
 
