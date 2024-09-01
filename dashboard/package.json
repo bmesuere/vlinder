@@ -33,6 +33,6 @@
     "typescript": "^5.5.4",
     "vite": "^4.5.3",
     "vite-plugin-vuetify": "^1.0.0",
-    "vue-tsc": "^2.0.29"
+    "vue-tsc": "^2.1.4"
   }
 }
