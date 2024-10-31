@@ -29,10 +29,6 @@
               {{ station.city + " &middot; " + station.given_name }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              <span v-if="station.sponsor !== ''" title="sponsor">
-                {{ station.sponsor }}
-                &middot;
-              </span>
               <span title="school">
                 {{ station.school }}
               </span>
@@ -72,7 +68,7 @@ const filteredStations = computed<Station[]>(() => {
 });
 
 function filter (station: Station, query: string): boolean {
-  const searchKey = station.city + station.given_name + station.name + station.sponsor + station.school;
+  const searchKey = station.city + station.given_name + station.name + station.school;
   return searchKey.toLowerCase().includes((query|| "").toLowerCase());
 }
 

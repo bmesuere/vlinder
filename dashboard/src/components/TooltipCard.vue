@@ -7,11 +7,6 @@
       </div>
       <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
       <v-list-item-subtitle style="white-space: nowrap; text-overflow: ellipsis; display: block;">
-        <span v-if="station.sponsor !== ''" title="sponsor">
-          <v-icon size="small" icon="mdi-heart-outline"></v-icon>
-          {{ station.sponsor }}
-          &middot;
-        </span>
         <span title="school">
           <v-icon size="small" icon="mdi-school-outline"></v-icon>
           {{ station.school }}
