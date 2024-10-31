@@ -19,13 +19,6 @@
         <LandUseGraph :station="station" />
       </v-carousel-item>
 
-      <v-carousel-item>
-        <v-img
-          aspect-ratio="2.3137254902"
-          :src="sponsorUrl"
-          lazy-src="data:image/png;base64,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"
-        />
-      </v-carousel-item>
     </v-carousel>
 
     <v-list-item lines="three" class="pb-0">
@@ -38,16 +31,6 @@
         <span title="Betrokken school">
           <v-icon size="small" icon="mdi-school-outline" class="mr-1"></v-icon>
           <span>{{ station.school }}</span>
-        </span>
-        <br>
-        <span title="Sponsor" style="display: inline-block" class="mt-1">
-          <v-icon size="small" icon="mdi-heart-outline" class="mr-1"></v-icon>
-          <span v-if="station.sponsor !== ''" >
-            {{ station.sponsor }}
-          </span>
-          <a v-else href="mailto:vlinder@ugent.be">
-            Dit station sponsoren?
-          </a>
         </span>
       </v-list-item-subtitle>
     </v-list-item>
@@ -112,7 +95,6 @@ const props = defineProps({
 const vlinderStore = useVlinderStore();
 
 const mapUrl = computed<string>(() => `./img/maps/${props.station.name}.png`);
-const sponsorUrl = computed<string>(() => `./img/sponsors/${props.station.name}.png`);
 const measurements = computed<Measurement | {}>(() => {
   return (vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === props.station.id) || {};
 });
