@@ -34,7 +34,7 @@ root_path = Path(__file__).resolve().parents[1]
 data_path = os.path.join(root_path, 'api', 'data.csv')
 
 plot_all = False
-plot_list = ['vlinder34', 'vlinder02']
+plot_list = ['vlinder19', 'vlinder20', 'vlinder92', 'vlinder93', 'vlinder94', 'vlinder95', 'vlinder97']
 
 
 #%%
@@ -187,7 +187,7 @@ def makefigure(station, data,
     stad = list(refstation['stad'])[0]
     titel = naam +' (' + stad + ') - ' + school
 
-    print(titel)
+    print(f'Figure title: {titel}')
 
 
 
