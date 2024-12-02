@@ -5,3 +5,7 @@ api/login.json
 */__pycache__/
 
 .DS_Store
+
+.spyproject/
+scripts/output/
+*__pycache__*
