@@ -35,7 +35,7 @@ Then follow the checklist:
 - [X] Create and switch to a new branch.
 - [X] Update the `api/data.csv` file:
   * update the coordinates, make sure you use `.` as a decimal sign.
-  * update the locations, sponsor, project etc.
+  * update the locations (and related project if applicable).
   * add the ID if this is a new station.
   * (no need to delete the landcover-fractions, these will be overwritten)
 - [X] Calculate the landcover fractions (see above)
