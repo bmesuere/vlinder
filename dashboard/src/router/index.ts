@@ -8,6 +8,7 @@ const routes = [
     children: [
       {
         path: '',
+        alias: 'index.html',
         name: 'Home',
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route

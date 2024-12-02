@@ -2,9 +2,9 @@
 <template>
   <v-dialog v-model="dialog" scrollable max-width="500" transition="slide-y-reverse-transition">
     <template v-slot:activator="{ props }">
-      <v-btn variant="tonal" rounded="xl" color="primary" size="large" v-bind="props">
+      <v-btn class="mr-0" variant="tonal" rounded="xl" color="primary" size="large" v-bind="props">
         <v-icon left dark>mdi-magnify</v-icon>
-        Selecteer stations
+        <span class="d-none d-sm-inline">Selecteer stations</span>
       </v-btn>
     </template>
 
@@ -29,10 +29,6 @@
               {{ station.city + " &middot; " + station.given_name }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              <span v-if="station.sponsor !== ''" title="sponsor">
-                {{ station.sponsor }}
-                &middot;
-              </span>
               <span title="school">
                 {{ station.school }}
               </span>
@@ -42,8 +38,7 @@
         </v-list>
       </v-card-text>
       <v-divider></v-divider>
-      <v-card-actions>
-        <v-spacer></v-spacer>
+      <v-card-actions class="flex-row-reverse">
         <v-btn color="blue darken-1" @click="dialog = false" rounded="xl">
           Sluiten
         </v-btn>
@@ -73,7 +68,7 @@ const filteredStations = computed<Station[]>(() => {
 });
 
 function filter (station: Station, query: string): boolean {
-  const searchKey = station.city + station.given_name + station.name + station.sponsor + station.school;
+  const searchKey = station.city + station.given_name + station.name + station.school;
   return searchKey.toLowerCase().includes((query|| "").toLowerCase());
 }
 

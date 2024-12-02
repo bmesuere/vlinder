@@ -6,18 +6,18 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
 # gem "rails"
 
-gem "sinatra", "~> 3.1"
+gem "sinatra", "~> 4.1"
 
-gem "json", "~> 2.6"
+gem "json", "~> 2.8"
 
-gem "sinatra-contrib", "~> 3.1"
+gem "sinatra-contrib", "~> 4.1"
 
-gem "mysql2", "~> 0.5.5"
+gem "mysql2", "~> 0.5.6"
 
-gem "csv", "~> 3.2"
+gem "csv", "~> 3.3"
 
 gem "byebug", "~> 11.1", :group => :development
 
 gem "rom-sql", "~> 3.6"
 
-gem "puma", "~> 6.4", :group => :development
+gem "puma", "~> 6.5", :group => :development
