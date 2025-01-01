@@ -31,7 +31,7 @@ GEM
       dry-logic (~> 1.4)
       zeitwerk (~> 2.6)
     ice_nine (0.11.2)
-    json (2.8.2)
+    json (2.9.1)
     logger (1.6.1)
     multi_json (1.15.0)
     mustermann (3.0.3)
@@ -99,7 +99,7 @@ PLATFORMS
 DEPENDENCIES
   byebug (~> 11.1)
   csv (~> 3.3)
-  json (~> 2.8)
+  json (~> 2.9)
   mysql2 (~> 0.5.6)
   puma (~> 6.5)
   rom-sql (~> 3.6)
