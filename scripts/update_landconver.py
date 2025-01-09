@@ -24,7 +24,7 @@ root_path = Path(__file__).resolve().parents[1]
 data_path = os.path.join(root_path, 'api', 'data.csv')
 
 update_all = False
-update_list = ['vlinder34']
+update_list = ['vlinder92', 'vlinder93', 'vlinder94', 'vlinder95', 'vlinder97']
 
 overwrite=True
 
