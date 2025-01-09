@@ -18,6 +18,6 @@ gem "csv", "~> 3.3"
 
 gem "byebug", "~> 11.1", :group => :development
 
-gem "rom-sql", "~> 3.6"
+gem "rom-sql", "~> 3.7"
 
 gem "puma", "~> 6.5", :group => :development
