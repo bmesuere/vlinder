@@ -34,7 +34,7 @@ root_path = Path(__file__).resolve().parents[1]
 data_path = os.path.join(root_path, 'api', 'data.csv')
 
 plot_all = False
-plot_list = ['vlinder19', 'vlinder20', 'vlinder92', 'vlinder93', 'vlinder94', 'vlinder95', 'vlinder97']
+plot_list = ['vlinder90', 'vlinder96', 'vlinder74', 'vlinder92', 'vlinder93', 'vlinder94', 'vlinder95', 'vlinder97']
 
 
 #%%
