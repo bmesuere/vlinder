@@ -21,7 +21,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/types": "^7.26.7",
+    "@babel/types": "^7.26.9",
     "@types/d3": "^7.4.3",
     "@types/node": "^22.13.0",
     "@types/topojson-client": "^3.1.5",
