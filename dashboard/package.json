@@ -30,7 +30,7 @@
     "@vue/eslint-config-typescript": "^13.0.0",
     "eslint": "^8.57.1",
     "eslint-plugin-vue": "^9.33.0",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "vite": "^4.5.14",
     "vite-plugin-vuetify": "^1.0.0",
     "vue-tsc": "^3.0.4"
