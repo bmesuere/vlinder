@@ -20,4 +20,4 @@ gem "byebug", "~> 12.0", :group => :development
 
 gem "rom-sql", "~> 3.7"
 
-gem "puma", "~> 6.6", :group => :development
+gem "puma", "~> 7.0", :group => :development
