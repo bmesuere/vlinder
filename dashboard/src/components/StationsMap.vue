@@ -67,7 +67,8 @@ const measurements = computed<Measurement[]>(() => vlinderStore.liveMeasurements
 onMounted(async () => {
   map = new D3StationsMap(`#${props.mapId}`, selectedProperty.value, selectedStations.value, tooltipInfo.value, toggleStation);
   const [s, m] = await props.dataLoaded;
-  map.init(s, m);
+  const topology = await fetch('./belgium.topo.json').then(r => r.json()) as TopoJSON.Topology;
+  map.init(s, m, topology);
 });
 
 // adds or removes a station to the list of selected stations
