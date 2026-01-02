@@ -21,11 +21,17 @@ const formatMonth = f.format('%B');
 const formatYear = f.format('%Y');
 
 export function multiFormat (date: Date | d3.NumberValue) {
+  let d: Date;
   if (typeof date === 'number') {
-    date = new Date(date);
+    d = new Date(date);
+  } else if (date instanceof Date) {
+    d = date;
+  } else if (typeof date === 'object' && date !== null && 'valueOf' in date) {
+    d = new Date(date.valueOf());
+  } else {
+    // Fallback or error case, though types should prevent this
+    d = new Date(Number(date));
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const d = date as any as Date;
 
   return (d3.timeSecond(d) < d
     ? formatMillisecond

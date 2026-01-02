@@ -1,6 +1,6 @@
 <template>
   <v-card rounded="lg">
-    <v-btn position="absolute" size="x-small" elevation="3" class="close mr-n3 mt-1 right-0" @click="removeFromList" icon="mdi-close">
+    <v-btn position="absolute" size="x-small" elevation="3" class="close mr-n3 mt-1" @click="removeFromList" icon="mdi-close">
     </v-btn>
     <v-carousel
       hide-delimiters
@@ -67,9 +67,6 @@
   .v-btn.close {
     right: 16px;
     z-index: 1;
-  }
-  .right-0 {
-    right: 0;
   }
   svg {
     display: block;

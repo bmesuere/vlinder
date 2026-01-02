@@ -50,6 +50,8 @@ export class D3LandUse {
 
     const series: LandUseSeries[] = seriesRaw.map(d => {
       // We extend the series with the key property for easier access
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      d.forEach((p: any) => { p.key = d.key; });
       return Object.assign(d, { key: d.key });
     });
 
@@ -71,18 +73,9 @@ export class D3LandUse {
       .call(d3.axisBottom(this.radius).tickSizeOuter(0).tickFormat(d => d + ' m'))
       .call(g => g.selectAll('.domain').remove());
 
-    // Re-doing the series mapping to attach key to points for easier access in leaf nodes
-    const seriesWithKey = seriesRaw.map(d => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      d.forEach((p: any) => { p.key = d.key; });
-      return Object.assign(d, { key: d.key });
-    });
-
-    const gMain = svg.append('g').attr('transform', `translate(0, ${this.height - this.margin.bottom})`);
-
-    gMain.append('g')
+    svg.append('g')
       .selectAll('g')
-      .data(seriesWithKey)
+      .data(series)
       .join('g')
       .attr('fill', (d) => (color(d.key) as string))
       .selectAll('path')
@@ -93,10 +86,10 @@ export class D3LandUse {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .text((d: any) => `${d3.format('.0%')(d.data.usage[d.key])} ${this.names[d.key].toLowerCase()} in een straal van ${d.data.distance}m rond het station`);
 
-    gMain.append('g')
+    svg.append('g')
       .call(rAxis);
 
-    const legend = gMain.append('g')
+    const legend = svg.append('g')
       .attr('transform', `translate(10, ${-1 * (this.height - this.margin.bottom) + 10})`);
     legend.append('text').attr('y', 12).text('Landgebruik');
     ['water', 'paved', 'green'].forEach((type, i) => {
