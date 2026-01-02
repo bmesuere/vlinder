@@ -45,6 +45,7 @@ vi.mock('vue-gtag-next', () => ({
 const mockTopology = { objects: { municipalities: {}, provinces: {} } }
 global.fetch = vi.fn(() =>
   Promise.resolve({
+    ok: true,
     json: () => Promise.resolve(mockTopology)
   })
 ) as unknown as typeof fetch

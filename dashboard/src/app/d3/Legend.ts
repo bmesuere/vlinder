@@ -46,19 +46,20 @@ export function legend ({
     .style('overflow', 'visible')
     .style('display', 'block');
 
-  let tickAdjust = (g: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>) => g.selectAll('.tick line').attr('y1', marginTop + marginBottom - height);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let tickAdjust = (g: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>) => g.selectAll('.tick line').attr('y1', marginTop + marginBottom - height) as any;
 
-  let x: d3.ScaleContinuousNumeric<number, number, never> | d3.ScaleBand<string> | d3.ScaleLinear<number, number, never>;
+  // x can be ScaleLinear (continuous) or ScaleBand (ordinal), which have incompatible types for domain/range/copy
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let x: any;
 
   // Continuous
-  // We check for 'interpolate' which exists on ScaleSequential and ScaleDiverging in some D3 types, but specifically on ScaleLinear/Continuous in others.
-  // Ideally we check if it is NOT sequential/ordinal in a way that implies continuous.
-  // Casting to 'any' was the old way.
-  // A safer check is to see if 'invert' exists which implies continuous/linear-like, but 'interpolate' is what the original code checked.
-  // In @types/d3, ScaleSequential has 'interpolator', ScaleLinear has 'interpolate'.
   if ('interpolate' in color) {
-    const c = color as d3.ScaleLinear<number, number>;
-    const n = Math.min(c.domain().length, (c.range() as unknown[]).length);
+    // d3.ScaleLinear<string, string> is what we expect for a color scale, but d3 types might be complex.
+    // Casting to any for the copy/range operations to avoid complex generic mess.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c = color as any;
+    const n = Math.min(c.domain().length, c.range().length);
 
     x = c.copy().rangeRound(d3.quantize(d3.interpolate(marginLeft, width - marginRight), n));
 
@@ -68,7 +69,8 @@ export function legend ({
       .attr('width', width - marginLeft - marginRight)
       .attr('height', height - marginTop - marginBottom)
       .attr('preserveAspectRatio', 'none')
-      .attr('xlink:href', ramp(c.copy().domain(d3.quantize(d3.interpolate(0, 1), n))).toDataURL());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .attr('xlink:href', ramp(c.copy().domain(d3.quantize(d3.interpolate(0, 1), n)) as any).toDataURL());
   }
 
   // Sequential
@@ -79,7 +81,7 @@ export function legend ({
     // Create a linear scale for the axis
     const linearScale = Object.assign(c.copy()
       .interpolator(d3.interpolateRound(marginLeft, width - marginRight)),
-    { range () { return [marginLeft, width - marginRight]; } }) as unknown as d3.ScaleLinear<number, number>;
+    { range () { return [marginLeft, width - marginRight]; } });
 
     x = linearScale;
 
@@ -95,7 +97,7 @@ export function legend ({
     if (!x.ticks) {
       if (tickValues === undefined) {
         const n = Math.round(ticks + 1);
-        tickValues = d3.range(n).map(i => d3.quantile(c.domain(), i / (n - 1)));
+        tickValues = d3.range(n).map(i => d3.quantile(c.domain(), i / (n - 1))).filter(d => d !== undefined) as number[];
       }
       if (typeof tickFormat !== 'function') {
         tickFormat = d3.format(tickFormat === undefined ? ',f' : tickFormat);
@@ -131,7 +133,8 @@ export function legend ({
       .attr('fill', (d) => d as string);
 
     tickValues = d3.range(thresholds.length);
-    tickFormat = ((i: number) => thresholdFormat(thresholds[i] as number, i));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    tickFormat = ((i: any) => thresholdFormat(thresholds[i] as any, i)) as any;
   }
 
   // Ordinal
@@ -145,7 +148,7 @@ export function legend ({
       .selectAll('rect')
       .data(c.domain())
       .join('rect')
-      .attr('x', (d) => x(d)!)
+      .attr('x', (d) => x(d))
       .attr('y', marginTop)
       .attr('width', Math.max(0, x.bandwidth() - 1))
       .attr('height', height - marginTop - marginBottom)
@@ -156,12 +159,15 @@ export function legend ({
 
   svg.append('g')
     .attr('transform', `translate(0,${height - marginBottom})`)
-    .call(d3.axisBottom(x as d3.AxisScale<d3.NumberValue>)
+    .call(d3.axisBottom(x)
       .ticks(ticks, typeof tickFormat === 'string' ? tickFormat : undefined)
-      .tickFormat(typeof tickFormat === 'function' ? tickFormat : null)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .tickFormat(typeof tickFormat === 'function' ? tickFormat as any : null)
       .tickSize(tickSize)
-      .tickValues(tickValues as d3.NumberValue[]))
-    .call(tickAdjust)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .tickValues(tickValues as any))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .call(tickAdjust as any)
     .call(g => g.select('.domain').remove())
     .call(g => g.append('text')
       .attr('x', marginLeft)
@@ -193,6 +199,9 @@ export function swatches ({
   marginLeft?: number;
   id?: string;
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const colorFn = color as any;
+
   if (columns !== null) {
     return `<div style="display: flex; align-items: center; margin-left: ${+marginLeft}px; min-height: 33px; font: 10px sans-serif;">
   <style>
@@ -221,7 +230,7 @@ export function swatches ({
   <div style="width: 100%; columns: ${columns};">${color.domain().map((value: unknown) => {
     const label = format(value) + "";
     return `<div class="${id}-item">
-      <div class="${id}-swatch" style="background:${(color as unknown as (v: unknown) => string)(value)};"></div>
+      <div class="${id}-swatch" style="background:${colorFn(value)};"></div>
       <div class="${id}-label" title="${label.replace(/["&]/g, entity)}">${document.createTextNode(label)}</div>
     </div>`;
   })}
@@ -247,14 +256,15 @@ export function swatches ({
 }
 
   </style>
-  <div>${color.domain().map((value: unknown) => `<span class="${id}" style="--color: ${(color as unknown as (v: unknown) => string)(value)}">${document.createTextNode(format(value) as string)}</span>`)}</div>`;
+  <div>${color.domain().map((value: unknown) => `<span class="${id}" style="--color: ${(colorFn)(value)}">${document.createTextNode(format(value) as string)}</span>`)}</div>`;
 }
 
 function entity (character: string) {
   return `&#${character.charCodeAt(0).toString()};`;
 }
 
-function ramp (color: (t: number) => string, n = 256) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ramp (color: any, n = 256) {
   const canvas = d3.create('canvas').attr("width", n).attr("height", 1).node();
   if (!canvas) throw new Error("Canvas creation failed");
   const context = canvas.getContext('2d');

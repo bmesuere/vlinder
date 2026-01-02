@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
+import type { Topology } from 'topojson-specification';
 
 import { useVlinderStore } from '@/store/app';
 
@@ -67,8 +68,14 @@ const measurements = computed<Measurement[]>(() => vlinderStore.liveMeasurements
 onMounted(async () => {
   map = new D3StationsMap(`#${props.mapId}`, selectedProperty.value, selectedStations.value, tooltipInfo.value, toggleStation);
   const [s, m] = await props.dataLoaded;
-  const topology = await fetch('./belgium.topo.json').then(r => r.json()) as TopoJSON.Topology;
-  map.init(s, m, topology);
+  try {
+    const res = await fetch('./belgium.topo.json');
+    if (!res.ok) throw new Error('Failed to load topology');
+    const topology = await res.json() as Topology;
+    map.init(s, m, topology);
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 // adds or removes a station to the list of selected stations
