@@ -40,7 +40,8 @@ describe('GraphCard', () => {
     name: 'Temperature',
     unit: '°C',
     icon: 'mdi-thermometer',
-    title: 'Temperature'
+    title: 'Temperature',
+    legend: 'Temperature'
   }
 
   it('renders correctly', () => {

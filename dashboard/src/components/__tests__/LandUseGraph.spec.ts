@@ -26,14 +26,15 @@ describe('LandUseGraph', () => {
     city: 'Ghent',
     given_name: 'City Station',
     school: 'Test School',
-    lat: 51.05,
-    lon: 3.71,
-    coordinates: [3.71, 51.05],
-    status: 'Online',
-    temp: 20,
-    humidity: 50,
-    pressure: 1013,
-    landUse: [10, 20, 30, 40]
+    coordinates: {
+      longitude: 3.71,
+      latitude: 51.05
+    },
+    measurements: 'https://example.com/measurements',
+    landUse: [
+      { distance: 100, usage: { water: 10, paved: 20, green: 70 } },
+      { distance: 200, usage: { water: 20, paved: 30, green: 50 } }
+    ]
   }
 
   it('renders correctly', () => {

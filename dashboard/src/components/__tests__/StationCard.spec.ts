@@ -32,13 +32,12 @@ describe('StationCard', () => {
     city: 'Ghent',
     given_name: 'City Station',
     school: 'Test School',
-    lat: 51.05,
-    lon: 3.71,
-    coordinates: [3.71, 51.05],
-    status: 'Online',
-    temp: 20,
-    humidity: 50,
-    pressure: 1013,
+    coordinates: {
+      longitude: 3.71,
+      latitude: 51.05
+    },
+    measurements: 'https://example.com/measurements',
+    landUse: [],
   }
 
   const measurement: Measurement = {
@@ -48,14 +47,13 @@ describe('StationCard', () => {
     humidity: 60,
     pressure: 1015,
     status: 'Online',
-    wind_speed: 10,
-    wind_direction: 180,
-    wind_gust: 15,
-    rain_intensity: 0,
-    rain_volume: 0,
-    uv: 1,
-    illuminance: 1000,
-    radiation: 100,
+    windSpeed: 10,
+    windDirection: 180,
+    windGust: 15,
+    rainIntensity: 0,
+    rainVolume: 0,
+    station: 'https://example.com/station',
+    measurements: 'https://example.com/measurements',
   }
 
   it('renders station information correctly', () => {
