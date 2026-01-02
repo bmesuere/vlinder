@@ -1,6 +1,6 @@
 <template>
   <v-card rounded="lg">
-    <v-btn position="absolute" size="x-small" elevation="3" class="close mr-n3 mt-1" @click="removeFromList" icon="mdi-close">
+    <v-btn position="absolute" size="x-small" elevation="3" class="close mr-n3 mt-1" @click="removeFromList" icon="mdi-close" aria-label="Verwijder station">
     </v-btn>
     <v-carousel
       hide-delimiters
