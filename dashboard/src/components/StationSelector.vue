@@ -4,7 +4,9 @@
     <template v-slot:activator="{ props }">
       <v-btn class="mr-0" variant="tonal" rounded="xl" color="primary" size="large" v-bind="props" aria-label="Selecteer stations">
         <v-icon start>mdi-magnify</v-icon>
-        <span class="d-none d-sm-inline">Selecteer stations</span>
+        <span class="d-none d-sm-inline">
+          Selecteer stations
+        </span>
       </v-btn>
     </template>
 
@@ -45,7 +47,11 @@
         </v-list>
       </v-card-text>
       <v-divider></v-divider>
-      <v-card-actions class="flex-row-reverse">
+      <v-card-actions>
+        <v-btn v-if="activeStations.length > 0" color="error" variant="text" @click="clearSelection" rounded="xl">
+          Wis selectie
+        </v-btn>
+        <v-spacer></v-spacer>
         <v-btn color="blue darken-1" @click="dialog = false" rounded="xl">
           Sluiten
         </v-btn>
@@ -90,6 +96,13 @@ function selectStation (): void {
   });
   removeStations.forEach(station => {
     vlinderStore.deselectStationById(station);
+  });
+}
+
+function clearSelection (): void {
+  const selectedIds = selectedStations.value.map(s => s.id);
+  selectedIds.forEach(id => {
+    vlinderStore.deselectStationById(id);
   });
 }
 
