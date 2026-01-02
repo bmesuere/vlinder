@@ -25,7 +25,7 @@
     "@babel/types": "^7.28.5",
     "@pinia/testing": "^1.0.3",
     "@types/d3": "^7.4.3",
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.0.3",
     "@types/topojson-client": "^3.1.5",
     "@types/webfontloader": "^1.6.38",
     "@vitejs/plugin-vue": "^4.6.2",
