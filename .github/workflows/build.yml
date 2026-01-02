@@ -1,4 +1,4 @@
-name: Build
+name: Test and Build
 
 on: [push]
 
@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install and Build
+      - name: Install, Test, and Build
         run: |
           cd dashboard
           yarn install
