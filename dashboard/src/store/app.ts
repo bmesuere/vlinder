@@ -112,7 +112,7 @@ export const useVlinderStore = defineStore('vlinder', {
         }
       }
     },
-    setLegendColors(legendColors: {}) {
+    setLegendColors(legendColors: Record<string, unknown>) {
       this.legendColors = legendColors;
     },
     addSelectedStation(station: Station) {

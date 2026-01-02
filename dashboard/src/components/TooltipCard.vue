@@ -47,7 +47,7 @@ const props = defineProps({
 });
 const vlinderStore = useVlinderStore();
 
-const measurements = computed<Measurement | {}>(() => {
+const measurements = computed<Measurement | Record<string, unknown>>(() => {
   return (vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === props.station.id) || {};
 });
 

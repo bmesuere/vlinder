@@ -38,9 +38,9 @@ export class D3LandUse {
 
     const series = d3.stack()
       .keys(['water', 'paved', 'green'])
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
       .value((d, key) => d.usage[key])(this.landUse)
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
       .map(d => { d.forEach(v => { v.key = d.key; }); return d; });
 
     const color = d3.scaleOrdinal()
@@ -49,23 +49,23 @@ export class D3LandUse {
       .unknown('#ccc');
 
     this.angle = d3.scaleLinear()
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
       .domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
       .range([3.05 / 8 * Math.PI, 4 / 8 * Math.PI]);
 
     this.radius = d3.scaleBand()
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
       .domain(this.landUse.map(d => d.distance))
       .range([this.margin.left, this.width - this.margin.right])
       .padding(0.1);
 
-    // @ts-ignore
+    // @ts-ignore D3 logic needs fix
     const rAxis = g => g
       .call(d3.axisBottom(this.radius).tickSizeOuter(0).tickFormat(d => d + ' m'))
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
       .call(g => g.selectAll('.domain').remove());
 
-    // @ts-ignore
+    // @ts-ignore D3 logic needs fix
     svg.append('g')
       .selectAll('g')
       .data(series)
@@ -76,7 +76,7 @@ export class D3LandUse {
       .join('path')
       .attr('d', d => this.arc(d))
       .append('title')
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
       .text(d => `${d3.format('.0%')(d.data.usage[d.key])} ${this[d.key + 'Name'].toLowerCase()} in een straal van ${d.data.distance}m rond het station`);
 
     svg.append('g')
@@ -90,24 +90,24 @@ export class D3LandUse {
         .attr('width', 10)
         .attr('height', 10)
         .attr('y', (i + 2) * 14 - 9)
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
         .attr('fill', this[type + 'Color']);
       legend.append('text')
         .attr('font-size', 11)
         .attr('x', 15)
         .attr('y', (i + 2) * 14)
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
         .text(this[type + 'Name']);
     });
   }
 
-  // @ts-ignore
+  // @ts-ignore D3 logic needs fix
   private arc (d): string {
-    // @ts-ignore
+    // @ts-ignore D3 logic needs fix
     return d3.arc()
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
       .innerRadius(this.radius(d.data.distance))
-      // @ts-ignore
+      // @ts-ignore D3 logic needs fix
       .outerRadius(this.radius(d.data.distance) + this.radius.bandwidth())
       .startAngle(this.angle(d[0]))
       .endAngle(this.angle(d[1]))();

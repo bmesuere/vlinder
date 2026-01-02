@@ -95,7 +95,7 @@ const props = defineProps({
 const vlinderStore = useVlinderStore();
 
 const mapUrl = computed<string>(() => `./img/maps/${props.station.name}.png`);
-const measurements = computed<Measurement | {}>(() => {
+const measurements = computed<Measurement | Record<string, unknown>>(() => {
   return (vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === props.station.id) || {};
 });
 const activeProperties = computed<WeatherProperty[]>(() => {

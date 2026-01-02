@@ -86,7 +86,7 @@ const vlinderStore = useVlinderStore();
 const router = useRouter();
 const route = useRoute();
 
-let resolveDataLoaded : Function;
+let resolveDataLoaded : (value: unknown) => void;
 const initialDataLoaded = ref(new Promise((resolve) => { resolveDataLoaded = resolve; }));
 const tooltipPosition = ref({ timestamp: -1, i: -1 });
 
@@ -151,6 +151,7 @@ watch(selectedStations, async () => {
   window.localStorage.setItem('selectedStations', JSON.stringify(selectedStations.value.map(s => s.id)));
 }, { deep: true });
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 function scheduleFetch(f: Function): void {
   setTimeout(() => {
     requestAnimationFrame(() => {
