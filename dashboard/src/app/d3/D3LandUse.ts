@@ -2,6 +2,10 @@ import * as d3 from 'd3';
 
 import { LandUse } from '../types';
 
+interface LandUseSeries extends d3.Series<LandUse, string> {
+  key: string;
+}
+
 export class D3LandUse {
   private readonly selector: string;
   private readonly landUse: LandUse[];
@@ -11,16 +15,20 @@ export class D3LandUse {
   private readonly width = 295;
   private readonly height = 127.5;
 
-  private readonly waterColor = '#9ab5cd';
-  private readonly pavedColor = '#efc7c8';
-  private readonly greenColor = '#b4c49c';
+  private readonly colors: Record<string, string> = {
+    water: '#9ab5cd',
+    paved: '#efc7c8',
+    green: '#b4c49c'
+  };
 
-  private readonly waterName = 'Water';
-  private readonly pavedName = 'Verhard';
-  private readonly greenName = 'Groen';
+  private readonly names: Record<string, string> = {
+    water: 'Water',
+    paved: 'Verhard',
+    green: 'Groen'
+  };
 
-  private angle!: number[] & d3.ScaleLinear<number, number>;
-  private radius!: string[] & d3.ScaleBand<string>;
+  private angle!: d3.ScaleLinear<number, number>;
+  private radius!: d3.ScaleBand<number>;
 
   constructor (selector: string, landUse: LandUse[]) {
     this.selector = selector;
@@ -31,41 +39,40 @@ export class D3LandUse {
     const svg = d3.select(this.selector)
       .html('')
       .append('svg')
-      .attr('viewBox', `0, 0, ${this.width}, ${this.height}`)
+      .attr('viewBox', `0 0 ${this.width} ${this.height}`)
       .attr('style', 'color: black')
       .append('g')
       .attr('transform', `translate(0, ${this.height - this.margin.bottom})`);
 
-    const series = d3.stack()
+    const seriesRaw = d3.stack<LandUse>()
       .keys(['water', 'paved', 'green'])
-      // @ts-ignore D3 logic needs fix
-      .value((d, key) => d.usage[key])(this.landUse)
-      // @ts-ignore D3 logic needs fix
-      .map(d => { d.forEach(v => { v.key = d.key; }); return d; });
+      .value((d, key) => d.usage[key as keyof LandUse['usage']])(this.landUse);
 
-    const color = d3.scaleOrdinal()
+    const series: LandUseSeries[] = seriesRaw.map(d => {
+      // We extend the series with the key property for easier access
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      d.forEach((p: any) => { p.key = d.key; });
+      return Object.assign(d, { key: d.key });
+    });
+
+    const color = d3.scaleOrdinal<string>()
       .domain(series.map(d => d.key))
-      .range([this.waterColor, this.pavedColor, this.greenColor])
+      .range([this.colors.water, this.colors.paved, this.colors.green])
       .unknown('#ccc');
 
     this.angle = d3.scaleLinear()
-      // @ts-ignore D3 logic needs fix
-      .domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
+      .domain([0, d3.max(series, d => d3.max(d, d => d[1])) as number])
       .range([3.05 / 8 * Math.PI, 4 / 8 * Math.PI]);
 
-    this.radius = d3.scaleBand()
-      // @ts-ignore D3 logic needs fix
+    this.radius = d3.scaleBand<number>()
       .domain(this.landUse.map(d => d.distance))
       .range([this.margin.left, this.width - this.margin.right])
       .padding(0.1);
 
-    // @ts-ignore D3 logic needs fix
-    const rAxis = g => g
+    const rAxis = (g: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>) => g
       .call(d3.axisBottom(this.radius).tickSizeOuter(0).tickFormat(d => d + ' m'))
-      // @ts-ignore D3 logic needs fix
       .call(g => g.selectAll('.domain').remove());
 
-    // @ts-ignore D3 logic needs fix
     svg.append('g')
       .selectAll('g')
       .data(series)
@@ -76,8 +83,8 @@ export class D3LandUse {
       .join('path')
       .attr('d', d => this.arc(d))
       .append('title')
-      // @ts-ignore D3 logic needs fix
-      .text(d => `${d3.format('.0%')(d.data.usage[d.key])} ${this[d.key + 'Name'].toLowerCase()} in een straal van ${d.data.distance}m rond het station`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .text((d: any) => `${d3.format('.0%')(d.data.usage[d.key])} ${this.names[d.key].toLowerCase()} in een straal van ${d.data.distance}m rond het station`);
 
     svg.append('g')
       .call(rAxis);
@@ -90,26 +97,24 @@ export class D3LandUse {
         .attr('width', 10)
         .attr('height', 10)
         .attr('y', (i + 2) * 14 - 9)
-      // @ts-ignore D3 logic needs fix
-        .attr('fill', this[type + 'Color']);
+        .attr('fill', this.colors[type]);
       legend.append('text')
         .attr('font-size', 11)
         .attr('x', 15)
         .attr('y', (i + 2) * 14)
-      // @ts-ignore D3 logic needs fix
-        .text(this[type + 'Name']);
+        .text(this.names[type]);
     });
   }
 
-  // @ts-ignore D3 logic needs fix
-  private arc (d): string {
-    // @ts-ignore D3 logic needs fix
-    return d3.arc()
-      // @ts-ignore D3 logic needs fix
-      .innerRadius(this.radius(d.data.distance))
-      // @ts-ignore D3 logic needs fix
-      .outerRadius(this.radius(d.data.distance) + this.radius.bandwidth())
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private arc (d: any): string {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const generator = d3.arc<any>()
+      .innerRadius(this.radius(d.data.distance) as number)
+      .outerRadius((this.radius(d.data.distance) as number) + this.radius.bandwidth())
       .startAngle(this.angle(d[0]))
-      .endAngle(this.angle(d[1]))();
+      .endAngle(this.angle(d[1]));
+
+    return generator(d) || '';
   }
 }

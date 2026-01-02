@@ -6,7 +6,7 @@
 
     <v-row>
       <v-col cols="12">
-        <StationsMap :dataLoaded="initialDataLoaded as any" />
+        <StationsMap :dataLoaded="initialDataLoaded" />
       </v-col>
     </v-row>
 
@@ -24,7 +24,7 @@
     <v-toolbar-title class="mt-5 text-h5">Afgelopen 24u</v-toolbar-title>
 
     <v-banner sticky class="px-0" color="white" style="top:40px; z-index:10;">
-      <v-chip size="small" label closable v-for="s in selectedStations" :key="s.id" class="ma-1" :color="legendColors[s.id]" v-on:click:close="removeFromList(s.id)">
+      <v-chip size="small" label closable v-for="s in selectedStations" :key="s.id" class="ma-1" :color="legendColors[s.id]" @click:close="removeFromList(s.id)">
         {{ s.city }} &middot; {{ s.given_name }}
       </v-chip>
     </v-banner>
@@ -73,7 +73,7 @@ import { useGtag } from 'vue-gtag-next';
 
 import { weatherProperties as wp } from '../app/weatherProperties';
 
-import { Measurement } from '@/app/types';
+import { Measurement, Station } from '@/app/types';
 
 const props = defineProps({
   urlStations: {
@@ -86,8 +86,8 @@ const vlinderStore = useVlinderStore();
 const router = useRouter();
 const route = useRoute();
 
-let resolveDataLoaded : (value: unknown) => void;
-const initialDataLoaded = ref(new Promise((resolve) => { resolveDataLoaded = resolve; }));
+let resolveDataLoaded : (value: [Station[], Measurement[]]) => void;
+const initialDataLoaded = ref(new Promise<[Station[], Measurement[]]>((resolve) => { resolveDataLoaded = resolve; }));
 const tooltipPosition = ref({ timestamp: -1, i: -1 });
 
 const weatherProperties = computed(() => {

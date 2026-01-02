@@ -20,18 +20,30 @@ const formatWeek = f.format('%a %d %b');
 const formatMonth = f.format('%B');
 const formatYear = f.format('%Y');
 
-export function multiFormat (date: Date) {
-  return (d3.timeSecond(date) < date
+export function multiFormat (date: Date | d3.NumberValue) {
+  let d: Date;
+  if (typeof date === 'number') {
+    d = new Date(date);
+  } else if (date instanceof Date) {
+    d = date;
+  } else if (typeof date === 'object' && date !== null && 'valueOf' in date) {
+    d = new Date(date.valueOf());
+  } else {
+    // Fallback or error case, though types should prevent this
+    d = new Date(Number(date));
+  }
+
+  return (d3.timeSecond(d) < d
     ? formatMillisecond
-    : d3.timeMinute(date) < date
+    : d3.timeMinute(d) < d
       ? formatSecond
-      : d3.timeHour(date) < date
+      : d3.timeHour(d) < d
         ? formatMinute
-        : d3.timeDay(date) < date
+        : d3.timeDay(d) < d
           ? formatHour
-          : d3.timeMonth(date) < date
-            ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
-            : d3.timeYear(date) < date
+          : d3.timeMonth(d) < d
+            ? (d3.timeWeek(d) < d ? formatDay : formatWeek)
+            : d3.timeYear(d) < d
               ? formatMonth
-              : formatYear)(date);
+              : formatYear)(d);
 }

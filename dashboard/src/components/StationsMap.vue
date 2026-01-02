@@ -12,7 +12,7 @@
         </v-btn>
       </v-btn-toggle>
     </v-toolbar>
-    <div v-bind:id="mapId">
+    <div :id="mapId">
       <v-img
       v-once
       aspect-ratio="3"

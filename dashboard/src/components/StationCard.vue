@@ -1,6 +1,6 @@
 <template>
   <v-card rounded="lg">
-    <v-btn position="absolute"  right="0" size="x-small" elevation="3" class="close mr-n3 mt-1" v-on:click="removeFromList" icon="mdi-close">
+    <v-btn position="absolute" size="x-small" elevation="3" class="close mr-n3 mt-1" @click="removeFromList" icon="mdi-close">
     </v-btn>
     <v-carousel
       hide-delimiters
@@ -24,7 +24,7 @@
     <v-list-item lines="three" class="pb-0">
       <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
         {{ station.name }}
-        <span v-if="(measurements as Measurement)['status'] == 'Offline'"> &middot; offline</span>
+        <span v-if="typedMeasurements['status'] == 'Offline'"> &middot; offline</span>
       </div>
       <v-list-item-title class="mb-1">{{ station.city }} &middot; {{ station.given_name }}</v-list-item-title>
       <v-list-item-subtitle>
@@ -41,9 +41,9 @@
         <template v-slot:append>
           <v-list-item-title class="font-weight-medium" style="font-size: .8125rem">
             {{
-              (measurements as Measurement)['status'] === 'Offline'
+              typedMeasurements['status'] === 'Offline'
                 ? '-'
-                : (measurements as Measurement)[p.property as keyof Measurement] ?? '-'
+                : typedMeasurements[p.property as keyof Measurement] ?? '-'
             }} {{ p.unit }}
           </v-list-item-title>
         </template>
@@ -98,6 +98,11 @@ const mapUrl = computed<string>(() => `./img/maps/${props.station.name}.png`);
 const measurements = computed<Measurement | Record<string, unknown>>(() => {
   return (vlinderStore.liveMeasurements as Measurement[]).find(m => m.id === props.station.id) || {};
 });
+
+const typedMeasurements = computed<Measurement | Record<string, unknown>>(() => {
+    return measurements.value;
+})
+
 const activeProperties = computed<WeatherProperty[]>(() => {
   // filter the properties where the measurement is null
   return Object.values(wp)
