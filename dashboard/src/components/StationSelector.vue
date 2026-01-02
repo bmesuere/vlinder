@@ -3,7 +3,7 @@
   <v-dialog v-model="dialog" scrollable max-width="500" transition="slide-y-reverse-transition">
     <template v-slot:activator="{ props }">
       <v-btn class="mr-0" variant="tonal" rounded="xl" color="primary" size="large" v-bind="props" aria-label="Selecteer stations">
-        <v-icon left dark>mdi-magnify</v-icon>
+        <v-icon start>mdi-magnify</v-icon>
         <span class="d-none d-sm-inline">Selecteer stations</span>
       </v-btn>
     </template>
@@ -24,7 +24,7 @@
           <v-icon icon="mdi-magnify-remove-outline" size="large" class="mb-2"></v-icon>
           <div>Geen stations gevonden</div>
         </div>
-        <v-list v-else lines="two" select-strategy="classic" active-color="primary" v-model:selected="activeStations" v-on:update:selected="selectStation">
+        <v-list v-else lines="two" select-strategy="classic" active-color="primary" v-model:selected="activeStations" @update:selected="selectStation">
 
           <v-list-item v-for="station in filteredStations" :key="station.id" :value="station.id">
             <template v-slot:prepend="{ isActive }">

@@ -1,7 +1,7 @@
-/* eslint-disable */
-// @ts-nocheck
+
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
+import { FeatureCollection, Geometry } from 'geojson';
 
 import { Station, Measurement, WeatherPropertyName } from '../types';
 import { weatherProperties } from '../weatherProperties';
@@ -13,7 +13,7 @@ export class D3StationsMap {
   private selectedProperty: WeatherPropertyName = 'temp';
   private readonly selectedStations: Station[];
   private readonly tooltipInfo: { station: Station, shown: boolean, x: number, y: number };
-  private readonly toggleCallback: Function;
+  private readonly toggleCallback: (stationId: string) => void;
 
   private loading = true;
 
@@ -32,9 +32,9 @@ export class D3StationsMap {
   // D3 internals
   private stationDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, Station, SVGGElement, unknown>;
   private colorScale!: d3.ScaleSequential<string>;
-  private legend!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
+  private legend!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
 
-  constructor (selector: string, selectedProperty = 'temp', selectedStations: Station[], tooltipInfo, toggleStationCallback: Function) {
+  constructor (selector: string, selectedProperty = 'temp', selectedStations: Station[], tooltipInfo: { station: Station, shown: boolean, x: number, y: number }, toggleStationCallback: (stationId: string) => void) {
     this.selector = selector;
     this.setProperty(selectedProperty);
     this.selectedStations = selectedStations;
@@ -63,24 +63,28 @@ export class D3StationsMap {
       .domain(d3.extent(this.measurements.filter(d => d.status === "Ok"), d => d[this.selectedProperty]) as [number, number]);
 
     // fit the map for what we want to show
+    // Cast to any first because TopoJSON types are not perfectly aligned with GeoJSON types expected by D3
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const muni = topojson.feature(this.belgium, this.belgium.objects.municipalities as any) as unknown as FeatureCollection<Geometry, { name_nl: string }>;
+
     const projection = d3.geoMercator()
       .fitExtent(
         [
           [this.margin.left, this.margin.top],
           [this.width - this.margin.right, this.height - this.margin.bottom]
-        ], topojson.feature(this.belgium, this.belgium.objects.municipalities));
+        ], muni);
 
     const path = d3.geoPath().projection(projection);
 
     const svg = d3.select(this.selector)
       .html("")
       .append('svg')
-      .attr('viewBox', `0, 0, ${this.width}, ${this.height}`);
+      .attr('viewBox', `0 0 ${this.width} ${this.height}`);
 
     // draw muni's
     svg.append('g')
       .selectAll('.muni')
-      .data(topojson.feature(this.belgium, this.belgium.objects.municipalities).features)
+      .data(muni.features)
       .join('path')
       .attr('class', 'muni d-none d-sm-inline')
       .attr('fill', '#e5e5e5')
@@ -90,10 +94,13 @@ export class D3StationsMap {
       .append('title')
       .text(d => d?.properties?.name_nl);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const provinces = topojson.feature(this.belgium, this.belgium.objects.provinces as any) as unknown as FeatureCollection;
+
     // draw provinces
     svg.append('g')
       .selectAll('.province-bg')
-      .data(topojson.feature(this.belgium, this.belgium.objects.provinces).features)
+      .data(provinces.features)
       .join('path')
       .attr('class', 'province-bg d-sm-none')
       .attr('fill', '#e5e5e5')
@@ -104,7 +111,7 @@ export class D3StationsMap {
     // draw provinces
     svg.append('g')
       .selectAll('.province')
-      .data(topojson.feature(this.belgium, this.belgium.objects.provinces).features)
+      .data(provinces.features)
       .join('path')
       .attr('class', 'province')
       .attr('fill', 'none')
@@ -119,8 +126,8 @@ export class D3StationsMap {
       .join('circle')
       .attr('class', 'station')
       .attr('id', d => 'station-' + d.id)
-      .attr('cx', d => projection([d.coordinates.longitude, d.coordinates.latitude])[0])
-      .attr('cy', d => projection([d.coordinates.longitude, d.coordinates.latitude])[1])
+      .attr('cx', d => projection([d.coordinates.longitude, d.coordinates.latitude])![0])
+      .attr('cy', d => projection([d.coordinates.longitude, d.coordinates.latitude])![1])
       .style('cursor', 'pointer')
       .on('mouseenter', (event, datum) => {
         d3.select('#station-' + datum.id)
@@ -146,8 +153,8 @@ export class D3StationsMap {
   private tooltip (station: Station | null, x?: number, y?: number) {
     if (station) {
       this.tooltipInfo.station = station;
-      this.tooltipInfo.x = x;
-      this.tooltipInfo.y = y;
+      this.tooltipInfo.x = x!;
+      this.tooltipInfo.y = y!;
       this.tooltipInfo.shown = true;
     } else {
       this.tooltipInfo.shown = false;

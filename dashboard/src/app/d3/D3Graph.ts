@@ -18,28 +18,21 @@ export class D3Graph {
   private readonly height = 250;
 
   // svg stuff
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private svg!: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
+  private svg!: d3.Selection<SVGSVGElement, unknown, HTMLElement, unknown>;
   private x!: d3.ScaleTime<number, number>;
   private y!: d3.ScaleLinear<number, number>;
   private color!: d3.ScaleOrdinal<string, string>;
-  private line!: d3.Line<[number, number]>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private xAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private yAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private lines!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
-  private bisector!: (array: ArrayLike<string>, x: unknown, lo?: number | undefined, hi?: number | undefined) => number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private mouseG!: d3.Selection<SVGGElement, unknown, HTMLElement, any>;
+  private line!: d3.Line<number>;
+  private xAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
+  private yAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
+  private lines!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
+  private bisector!: (array: ArrayLike<string>, x: number, lo?: number | undefined, hi?: number | undefined) => number;
+  private mouseG!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
   private mouseDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
   private mouseLabels!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGTextElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
   private mouseBGLabels!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGTextElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private mouseLine!: d3.Selection<SVGLineElement, unknown, HTMLElement, any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private timeLabel!: d3.Selection<SVGTextElement, unknown, HTMLElement, any>;
+  private mouseLine!: d3.Selection<SVGLineElement, unknown, HTMLElement, unknown>;
+  private timeLabel!: d3.Selection<SVGTextElement, unknown, HTMLElement, unknown>;
 
   constructor (selector: string, property: WeatherProperty, selectedStations: Station[], tooltipPosition: { timestamp: number; i: number }) {
     this.selector = selector;
@@ -52,7 +45,7 @@ export class D3Graph {
     this.svg = d3.select(this.selector)
       .html('')
       .append('svg')
-      .attr('viewBox', `0, 0, ${this.width}, ${this.height}`);
+      .attr('viewBox', `0 0 ${this.width} ${this.height}`);
 
     this.x = d3.scaleTime()
       .range([this.margin.left, this.width - this.margin.right]);
@@ -62,12 +55,11 @@ export class D3Graph {
 
     this.color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    this.line = d3.line()
+    this.line = d3.line<number>()
       .curve(d3.curveMonotoneX)
-      // @ts-ignore D3 logic needs fix
       .defined(d => !(isNaN(d) || d === null))
+
       .x((d, i) => this.x(Date.parse(this.measurements.timestamps[i])))
-      // @ts-ignore D3 logic needs fix
       .y(d => this.y(d));
 
     this.lines = this.svg.append('g')
@@ -77,7 +69,6 @@ export class D3Graph {
 
     this.xAxis = this.svg.append('g')
       .attr('transform', `translate(0,${this.height - this.margin.bottom})`)
-      // @ts-ignore D3 logic needs fix
       .call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(multiFormat));
 
     this.yAxis = this.svg.append('g')
@@ -100,11 +91,12 @@ export class D3Graph {
       .style('font-size', 'small')
       .style('opacity', '0');
 
-    this.bisector = d3.bisector((d: string) => Date.parse(d)).left;
+    // D3 bisector on the timestamp strings, using a numeric accessor/comparator
+    // Since timestamps are strings, we can bisect on the parsed numeric value
+    this.bisector = d3.bisector<string, number>((d) => Date.parse(d)).left;
 
     this.svg.on('touchmove mousemove', (event) => {
       if (!this.measurements) { return; }
-      // @ts-ignore D3 logic needs fix
       const { timestamp, i } = this.bisect(d3.pointer(event, this.svg.node() as SVGSVGElement)[0]);
       this.tooltipPosition.timestamp = timestamp;
       this.tooltipPosition.i = i;
@@ -121,9 +113,8 @@ export class D3Graph {
   }
 
   getLegendColors () {
-    const result = {};
+    const result: Record<string, string> = {};
     this.measurements.series.forEach(s => {
-      // @ts-ignore D3 logic needs fix
       result[s.stationId] = this.color(s.stationId);
     });
     return result;
@@ -153,8 +144,7 @@ export class D3Graph {
         .attr('x1', this.x(timestamp))
         .attr('x2', this.x(timestamp));
       this.timeLabel
-        // @ts-ignore D3 logic needs fix
-        .text(multiFormat(timestamp))
+        .text(multiFormat(timestamp as unknown as Date))
         .attr('x', -5 + this.x(timestamp))
         .style('opacity', 1);
       this.mouseDots
@@ -189,23 +179,19 @@ export class D3Graph {
     });
 
     // redraw axes
-    // @ts-ignore D3 logic needs fix
     this.xAxis.transition().call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(multiFormat));
     this.yAxis.transition().call(d3.axisLeft(this.y).ticks(5));
 
     // redraw lines
     this.lines.selectAll('path')
-      // @ts-ignore D3 logic needs fix
-      .data(filteredSeries, d => d.stationId)
+      .data(filteredSeries, d => (d as { stationId: string; values: number[] }).stationId)
       .join('path')
       .transition()
-      // @ts-ignore D3 logic needs fix
       .attr('d', d => this.line(d.values))
       .attr('stroke', d => this.color(d.stationId));
 
     this.mouseDots = this.mouseG.selectAll('.mouseover-dot')
-      // @ts-ignore D3 logic needs fix
-      .data(filteredSeries, d => d.stationId)
+      .data(filteredSeries, d => (d as { stationId: string; values: number[] }).stationId)
       .join('circle')
       .attr('class', 'mouseover-dot')
       .attr('r', 3)
@@ -214,8 +200,7 @@ export class D3Graph {
       .style('fill', d => this.color(d.stationId));
 
     this.mouseBGLabels = this.mouseG.selectAll('.mouseover-BGlabels')
-      // @ts-ignore D3 logic needs fix
-      .data(filteredSeries, d => d.stationId)
+      .data(filteredSeries, d => (d as { stationId: string; values: number[] }).stationId)
       .join('text')
       .attr('class', 'mouseover-BGlabels')
       .attr('x', this.labelxPos())
@@ -226,8 +211,7 @@ export class D3Graph {
       .style('stroke-width', 3);
 
     this.mouseLabels = this.mouseG.selectAll('.mouseover-labels')
-      // @ts-ignore D3 logic needs fix
-      .data(filteredSeries, d => d.stationId)
+      .data(filteredSeries, d => (d as { stationId: string; values: number[] }).stationId)
       .join('text')
       .attr('class', 'mouseover-labels')
       .attr('x', this.labelxPos())
@@ -256,11 +240,13 @@ export class D3Graph {
       return { timestamp: 0, i: 0 };
     }
     const date = this.x.invert(mx);
-    const index = this.bisector(this.measurements.timestamps, date, 1);
+    // this.bisector matches the date against Date.parse(d)
+    const index = this.bisector(this.measurements.timestamps, date.valueOf(), 1);
     const a = Date.parse(this.measurements.timestamps[index - 1]);
     const b = Date.parse(this.measurements.timestamps[index]);
-    // @ts-ignore D3 logic needs fix
-    if (date - a > b - date) {
+
+    // Compare numeric timestamp values
+    if (date.valueOf() - a > b - date.valueOf()) {
       return { timestamp: b, i: index };
     } else {
       return { timestamp: a, i: index - 1 };
