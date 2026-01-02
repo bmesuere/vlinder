@@ -4,11 +4,17 @@ import LandUseGraph from '../LandUseGraph.vue'
 import { Station } from '@/app/types'
 
 // Mock D3LandUse class
+const { mockInit } = vi.hoisted(() => {
+  return {
+    mockInit: vi.fn()
+  }
+})
+
 vi.mock('@/app/d3/D3LandUse', () => {
   return {
     D3LandUse: class {
       constructor() {}
-      init() {}
+      init = mockInit
     }
   }
 })
@@ -43,5 +49,6 @@ describe('LandUseGraph', () => {
     })
 
     expect(wrapper.find(`#land_use_${station.id}`).exists()).toBe(true)
+    expect(mockInit).toHaveBeenCalled()
   })
 })

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
@@ -12,14 +12,14 @@ const vuetify = createVuetify({
 })
 
 describe('StationSelector', () => {
-  it('renders properly', () => {
+  it('renders station selector button with correct text', () => {
     const wrapper = mount(StationSelector, {
       global: {
         plugins: [
           vuetify,
           createTestingPinia({
              // mocks and initial state if needed
-             createSpy: (fn) => fn, // Stub actions with empty spy
+             createSpy: vi.fn,
           })
         ],
       },

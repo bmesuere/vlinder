@@ -13,14 +13,23 @@ const vuetify = createVuetify({
 })
 
 // Mock D3Graph class
+const { mockInit, mockUpdateData, mockGetLegendColors, mockUpdateTooltip } = vi.hoisted(() => {
+  return {
+    mockInit: vi.fn(),
+    mockUpdateData: vi.fn(),
+    mockGetLegendColors: vi.fn().mockReturnValue([]),
+    mockUpdateTooltip: vi.fn()
+  }
+})
+
 vi.mock('@/app/d3/D3Graph', () => {
   return {
     D3Graph: class {
       constructor() {}
-      init() {}
-      updateData() {}
-      getLegendColors() { return [] }
-      updateTooltip() {}
+      init = mockInit
+      updateData = mockUpdateData
+      getLegendColors = mockGetLegendColors
+      updateTooltip = mockUpdateTooltip
     }
   }
 })
@@ -52,5 +61,6 @@ describe('GraphCard', () => {
     expect(wrapper.text()).toContain('Temperature')
     expect(wrapper.text()).toContain('°C')
     expect(wrapper.find(`#weather_graph_temp`).exists()).toBe(true)
+    expect(mockInit).toHaveBeenCalled()
   })
 })
