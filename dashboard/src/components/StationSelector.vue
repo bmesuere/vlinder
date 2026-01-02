@@ -1,4 +1,3 @@
-
 <template>
   <v-dialog v-model="dialog" scrollable max-width="500" transition="slide-y-reverse-transition">
     <template v-slot:activator="{ props }">
@@ -26,7 +25,7 @@
           <v-icon icon="mdi-magnify-remove-outline" size="large" class="mb-2"></v-icon>
           <div>Geen stations gevonden</div>
         </div>
-        <v-list v-else lines="two" select-strategy="classic" active-color="primary" v-model:selected="activeStations" @update:selected="selectStation">
+        <v-list v-else lines="two" select-strategy="classic" active-color="primary" v-model:selected="activeStations">
 
           <v-list-item v-for="station in filteredStations" :key="station.id" :value="station.id">
             <template v-slot:prepend="{ isActive }">
@@ -61,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 
 import { useVlinderStore } from '@/store/app';
 
@@ -69,7 +68,6 @@ import { Station } from '@/app/types';
 
 const dialog = ref(false);
 const search = ref('');
-const activeStations = ref<string[]>([]);
 
 const vlinderStore = useVlinderStore();
 
@@ -77,37 +75,36 @@ const stations = computed<Station[]>(() => vlinderStore.stations);
 const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
 const stationsLoaded = computed<boolean>(() => vlinderStore.stationsLoaded);
 
+// Compute search keys once or on demand
+// Since we have a small list, we can just filter.
+// But we can clean up the filter logic.
 const filteredStations = computed<Station[]>(() => {
-  return stations.value.filter(s => filter(s, search.value));
+  const query = (search.value || "").toLowerCase();
+  if (!query) return stations.value;
+  return stations.value.filter(station => {
+    const searchKey = (station.city + station.given_name + station.name + station.school).toLowerCase();
+    return searchKey.includes(query);
+  });
 });
 
-function filter (station: Station, query: string): boolean {
-  const searchKey = station.city + station.given_name + station.name + station.school;
-  return searchKey.toLowerCase().includes((query|| "").toLowerCase());
-}
+const activeStations = computed<string[]>({
+  get() {
+    return selectedStations.value.map(s => s.id);
+  },
+  set(newActiveIds: string[]) {
+    // Determine added and removed stations
+    const currentSelectedIds = selectedStations.value.map(s => s.id);
+    const addedIds = newActiveIds.filter(id => !currentSelectedIds.includes(id));
+    const removedIds = currentSelectedIds.filter(id => !newActiveIds.includes(id));
 
-function selectStation (): void {
-  const selectedIds = selectedStations.value.map(s => s.id);
-  const activeIds = activeStations.value as string[];
-  const removeStations = selectedIds.filter(s => !activeIds.includes(s));
-  const addedStations = activeIds.filter(s => !selectedIds.includes(s));
-  addedStations.forEach(station => {
-    vlinderStore.selectStationById(station);
-  });
-  removeStations.forEach(station => {
-    vlinderStore.deselectStationById(station);
-  });
-}
+    addedIds.forEach(id => vlinderStore.selectStationById(id));
+    removedIds.forEach(id => vlinderStore.deselectStationById(id));
+  }
+});
 
 function clearSelection (): void {
-  const selectedIds = selectedStations.value.map(s => s.id);
-  selectedIds.forEach(id => {
-    vlinderStore.deselectStationById(id);
-  });
+  // Clearing via the computed setter isn't straightforward as we need to set it to [],
+  // but let's just use the store actions directly for clarity or use the setter.
+  activeStations.value = [];
 }
-
-watch(selectedStations, () => {
-  activeStations.value = selectedStations.value.map(s => s.id);
-}, { deep: true });
-
 </script>

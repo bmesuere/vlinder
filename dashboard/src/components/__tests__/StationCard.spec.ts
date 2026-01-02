@@ -54,6 +54,7 @@ describe('StationCard', () => {
     rainVolume: 0,
     station: 'https://example.com/station',
     measurements: 'https://example.com/measurements',
+    wbgt: 18.0
   }
 
   it('renders station information correctly', () => {
