@@ -2,7 +2,7 @@
 <template>
   <v-dialog v-model="dialog" scrollable max-width="500" transition="slide-y-reverse-transition">
     <template v-slot:activator="{ props }">
-      <v-btn class="mr-0" variant="tonal" rounded="xl" color="primary" size="large" v-bind="props">
+      <v-btn class="mr-0" variant="tonal" rounded="xl" color="primary" size="large" v-bind="props" aria-label="Selecteer stations">
         <v-icon left dark>mdi-magnify</v-icon>
         <span class="d-none d-sm-inline">Selecteer stations</span>
       </v-btn>
@@ -17,9 +17,16 @@
       </v-card-title>
 
       <v-card-text style="height: 300px;">
-        <v-list lines="two" select-strategy="classic" active-color="primary" v-model:selected="activeStations" v-on:update:selected="selectStation">
+        <div v-if="!stationsLoaded" class="d-flex justify-center align-center h-100">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        </div>
+        <div v-else-if="filteredStations.length === 0" class="d-flex flex-column justify-center align-center h-100 text-medium-emphasis">
+          <v-icon icon="mdi-magnify-remove-outline" size="large" class="mb-2"></v-icon>
+          <div>Geen stations gevonden</div>
+        </div>
+        <v-list v-else lines="two" select-strategy="classic" active-color="primary" v-model:selected="activeStations" v-on:update:selected="selectStation">
 
-          <v-list-item v-for="station in filteredStations" :value="station.id">
+          <v-list-item v-for="station in filteredStations" :key="station.id" :value="station.id">
             <template v-slot:prepend="{ isActive }">
               <v-list-item-action start>
                 <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
@@ -62,6 +69,7 @@ const vlinderStore = useVlinderStore();
 
 const stations = computed<Station[]>(() => vlinderStore.stations);
 const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
+const stationsLoaded = computed<boolean>(() => vlinderStore.stationsLoaded);
 
 const filteredStations = computed<Station[]>(() => {
   return stations.value.filter(s => filter(s, search.value));
