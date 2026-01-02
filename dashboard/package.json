@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "test": "vitest",
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore"
   },
@@ -22,17 +23,22 @@
   },
   "devDependencies": {
     "@babel/types": "^7.28.5",
+    "@pinia/testing": "^1.0.3",
     "@types/d3": "^7.4.3",
     "@types/node": "^24.10.1",
     "@types/topojson-client": "^3.1.5",
     "@types/webfontloader": "^1.6.38",
     "@vitejs/plugin-vue": "^4.6.2",
     "@vue/eslint-config-typescript": "^13.0.0",
+    "@vue/test-utils": "^2.4.6",
     "eslint": "^8.57.1",
     "eslint-plugin-vue": "^9.33.0",
+    "jsdom": "^25.0.0",
+    "resize-observer-polyfill": "^1.5.1",
     "typescript": "^5.9.3",
     "vite": "^5.4.21",
     "vite-plugin-vuetify": "^2.1.2",
+    "vitest": "^2.1.0",
     "vue-tsc": "^3.1.5"
   }
 }

@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 // Plugins
 import vue from '@vitejs/plugin-vue'
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
@@ -17,6 +18,16 @@ export default defineConfig({
       autoImport: true,
     }),
   ],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: 'src/tests/setup.ts',
+    server: {
+      deps: {
+        inline: ['vuetify'],
+      },
+    },
+  },
 
   base: process.env.CI
     ? '/vlinder/'
