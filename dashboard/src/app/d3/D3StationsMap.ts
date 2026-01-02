@@ -30,7 +30,7 @@ export class D3StationsMap {
   private readonly height = 300;
 
   // D3 internals
-  private stationDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, Station, SVGGElement, unknown>;
+  private stationDots!: d3.Selection<SVGCircleElement, Station, SVGGElement, unknown>;
   private colorScale!: d3.ScaleSequential<string>;
   private legend!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
 
@@ -42,12 +42,8 @@ export class D3StationsMap {
     this.toggleCallback = toggleStationCallback;
   }
 
-  async prepareData (stations: Station[], measurements: Measurement[]) {
-    // fetch data
-    const belgium = fetch('./belgium.topo.json')
-      .then(r => r.json());
-
-    this.belgium = await belgium as TopoJSON.Topology;
+  async prepareData (stations: Station[], measurements: Measurement[], topology: TopoJSON.Topology) {
+    this.belgium = topology;
     // only draw the vlinder stations on the map
     this.stations = stations.filter(s => s.name.startsWith('vlinder'));
     this.measurements = measurements;
@@ -56,16 +52,14 @@ export class D3StationsMap {
     this.measurementsMap = new Map(this.measurements.map(m => [m.id, m]));
   }
 
-  async init (stations: Station[], measurements: Measurement[]) {
-    await this.prepareData(stations, measurements);
+  async init (stations: Station[], measurements: Measurement[], topology: TopoJSON.Topology) {
+    await this.prepareData(stations, measurements, topology);
 
     this.colorScale = d3.scaleSequential(d3.interpolateViridis)
       .domain(d3.extent(this.measurements.filter(d => d.status === "Ok"), d => d[this.selectedProperty]) as [number, number]);
 
     // fit the map for what we want to show
-    // Cast to any first because TopoJSON types are not perfectly aligned with GeoJSON types expected by D3
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const muni = topojson.feature(this.belgium, this.belgium.objects.municipalities as any) as unknown as FeatureCollection<Geometry, { name_nl: string }>;
+    const muni = topojson.feature(this.belgium, this.belgium.objects.municipalities) as unknown as FeatureCollection<Geometry, { name_nl: string }>;
 
     const projection = d3.geoMercator()
       .fitExtent(
@@ -94,8 +88,7 @@ export class D3StationsMap {
       .append('title')
       .text(d => d?.properties?.name_nl);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const provinces = topojson.feature(this.belgium, this.belgium.objects.provinces as any) as unknown as FeatureCollection;
+    const provinces = topojson.feature(this.belgium, this.belgium.objects.provinces) as unknown as FeatureCollection;
 
     // draw provinces
     svg.append('g')
@@ -121,7 +114,7 @@ export class D3StationsMap {
 
     // draw stations
     this.stationDots = svg.append('g')
-      .selectAll('.station')
+      .selectAll<SVGCircleElement, Station>('.station')
       .data(this.stations)
       .join('circle')
       .attr('class', 'station')

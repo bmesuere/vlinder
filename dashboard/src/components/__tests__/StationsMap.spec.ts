@@ -41,6 +41,15 @@ vi.mock('vue-gtag-next', () => ({
   })
 }))
 
+// Mock fetch for topology
+const mockTopology = { objects: { municipalities: {}, provinces: {} } }
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve(mockTopology)
+  })
+) as unknown as typeof fetch
+
 describe('StationsMap', () => {
   const station: Station = {
     id: '1',
@@ -103,5 +112,7 @@ describe('StationsMap', () => {
 
     expect(wrapper.find('#stationsMap').exists()).toBe(true)
     expect(mockInit).toHaveBeenCalled()
+    // Verify init called with correct arguments
+    expect(mockInit).toHaveBeenCalledWith([station], [measurement], mockTopology)
   })
 })
