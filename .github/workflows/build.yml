@@ -13,4 +13,5 @@ jobs:
         run: |
           cd dashboard
           yarn install
+          yarn test
           yarn build
