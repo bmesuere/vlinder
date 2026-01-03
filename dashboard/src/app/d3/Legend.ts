@@ -67,7 +67,7 @@ export function legend ({
       .attr('width', width - marginLeft - marginRight)
       .attr('height', height - marginTop - marginBottom)
       .attr('preserveAspectRatio', 'none')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       .attr('xlink:href', ramp(c.copy().domain(d3.quantize(d3.interpolate(0, 1), n)) as unknown as (t: number) => string).toDataURL());
   }
 

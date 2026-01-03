@@ -67,6 +67,36 @@ export const useVlinderStore = defineStore('vlinder', {
           return Promise.reject(r);
         });
     },
+    async initialize(urlStations: string[]) {
+      const stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
+
+      try {
+        await this.fetchStations();
+
+        let stationsSelected = false;
+        if (urlStations.length > 0) {
+          urlStations.forEach(s => {
+            const wasAdded = this.selectStationByName(s);
+            stationsSelected ||= wasAdded;
+          });
+        }
+
+        if (!stationsSelected && stationsFromStorage.length > 0) {
+          stationsFromStorage.forEach(s => {
+            const wasAdded = this.selectStationById(s);
+            stationsSelected ||= wasAdded;
+          });
+        }
+
+        if (!stationsSelected) {
+          this.selectStationById('zZ6ZeSg11dJ5zp5GrNwNck9A');
+          this.selectStationById('Do5lLMfezIdmUCzzsE0IwIbE');
+          this.selectStationById('XeIIA97QzN5xxk6AvdzAPquY');
+        }
+      } catch (error) {
+        console.error('Failed to initialize stations', error);
+      }
+    },
     fetchHistoricMeasurements(): Promise<Measurement[][]> {
       this.loadingHistoricMeasurements = true;
       return Promise.all(

@@ -63,6 +63,7 @@ import { computed, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
 import { useVlinderStore } from '@/store/app';
+import { usePolling } from '@/composables/usePolling';
 
 import GraphCard from '@/components/GraphCard.vue';
 import StationSelector from '@/components/StationSelector.vue';
@@ -106,38 +107,34 @@ const isError = computed(() => {
   return vlinderStore.isStationsError || vlinderStore.isMeasurementsError;
 });
 
-const stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
-// fetch data a first time
-const stationsPromise = vlinderStore.fetchStations();
+const measurementsPolling = usePolling(vlinderStore.fetchMeasurements);
+const historicPolling = usePolling(vlinderStore.fetchHistoricMeasurements);
 
-stationsPromise.then(() => {
-  let stationsSelected = false;
-  if (props.urlStations.length > 0) {
-    props.urlStations.forEach(s => {
-      const wasAdded = vlinderStore.selectStationByName(s);
-      stationsSelected ||= wasAdded;
-    });
-  }
-  if (!stationsSelected && stationsFromStorage.length > 0) {
-    stationsFromStorage.forEach(s => {
-      const wasAdded = vlinderStore.selectStationById(s);
-      stationsSelected ||= wasAdded;
-    });
-  }
-  if (!stationsSelected) {
-    vlinderStore.selectStationById('zZ6ZeSg11dJ5zp5GrNwNck9A');
-    vlinderStore.selectStationById('Do5lLMfezIdmUCzzsE0IwIbE');
-    vlinderStore.selectStationById('XeIIA97QzN5xxk6AvdzAPquY');
-  }
+// fetch data a first time
+vlinderStore.initialize(props.urlStations as string[]).then(() => {
+  // If we needed to know when stations are ready, we can check vlinderStore.stationsLoaded
 });
 
 const measurementsPromise: Promise<Measurement[]> = vlinderStore.fetchMeasurements();
 
-Promise.all([stationsPromise, measurementsPromise])
+Promise.all([
+  new Promise<Station[]>(resolve => {
+    if (vlinderStore.stationsLoaded) resolve(vlinderStore.stations);
+    else {
+      const unwatch = watch(() => vlinderStore.stationsLoaded, (loaded) => {
+        if (loaded) {
+          resolve(vlinderStore.stations);
+          unwatch();
+        }
+      });
+    }
+  }),
+  measurementsPromise
+])
   .then((d) => { resolveDataLoaded(d); });
 
-scheduleFetch(vlinderStore.fetchMeasurements);
-scheduleFetch(vlinderStore.fetchHistoricMeasurements);
+measurementsPolling.start();
+historicPolling.start();
 
 watch(selectedStations, async () => {
   vlinderStore.fetchHistoricMeasurements();
@@ -151,15 +148,6 @@ watch(selectedStations, async () => {
   window.localStorage.setItem('selectedStations', JSON.stringify(selectedStations.value.map(s => s.id)));
 }, { deep: true });
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-function scheduleFetch(f: Function): void {
-  setTimeout(() => {
-    requestAnimationFrame(() => {
-      scheduleFetch(f);
-      f();
-    });
-  }, 60000);
-}
 function removeFromList (id: string): void {
   const { event } = useGtag()
   event('station_deselect', { event_category: 'stations', value: id });
