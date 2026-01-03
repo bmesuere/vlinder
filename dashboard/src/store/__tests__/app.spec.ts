@@ -75,4 +75,13 @@ describe('Vlinder Store', () => {
     expect(store.selectedStations).toHaveLength(1);
     expect(store.selectedStations[0].id).toBe('s1');
   });
+
+  it('initialize propagates error when fetchStations fails', async () => {
+    const error = new Error('Network error');
+    global.fetch = vi.fn().mockRejectedValue(error);
+    const store = useVlinderStore();
+
+    await expect(store.initialize([])).rejects.toThrow(error);
+    expect(store.isStationsError).toBe(true);
+  });
 });

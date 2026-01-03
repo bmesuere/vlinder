@@ -68,7 +68,12 @@ export const useVlinderStore = defineStore('vlinder', {
         });
     },
     async initialize(urlStations: string[]) {
-      const stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
+      let stationsFromStorage: string[] = [];
+      try {
+        stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
+      } catch (e) {
+        console.warn('Failed to access localStorage', e);
+      }
 
       try {
         await this.fetchStations();

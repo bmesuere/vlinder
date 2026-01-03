@@ -57,4 +57,21 @@ describe('usePolling', () => {
 
     expect(onUnmounted).toHaveBeenCalled();
   });
+
+  it('should not start multiple polling loops if start is called multiple times', () => {
+    const fn = vi.fn();
+    const { start } = usePolling(fn, 1000);
+
+    start();
+    start();
+    start();
+
+    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(10);
+    expect(fn).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(10);
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
 });
