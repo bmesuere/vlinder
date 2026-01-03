@@ -30,7 +30,7 @@
           <v-list-item v-for="station in filteredStations" :key="station.id" :value="station.id">
             <template v-slot:prepend="{ isActive }">
               <v-list-item-action start>
-                <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                <v-checkbox-btn :model-value="isActive" style="pointer-events: none;"></v-checkbox-btn>
               </v-list-item-action>
             </template>
             <v-list-item-title>
@@ -75,9 +75,6 @@ const stations = computed<Station[]>(() => vlinderStore.stations);
 const selectedStations = computed<Station[]>(() => vlinderStore.selectedStations);
 const stationsLoaded = computed<boolean>(() => vlinderStore.stationsLoaded);
 
-// Compute search keys once or on demand
-// Since we have a small list, we can just filter.
-// But we can clean up the filter logic.
 const filteredStations = computed<Station[]>(() => {
   const query = (search.value || "").toLowerCase();
   if (!query) return stations.value;
@@ -103,8 +100,6 @@ const activeStations = computed<string[]>({
 });
 
 function clearSelection (): void {
-  // Clearing via the computed setter isn't straightforward as we need to set it to [],
-  // but let's just use the store actions directly for clarity or use the setter.
   activeStations.value = [];
 }
 </script>

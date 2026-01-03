@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 type ColorScale =
   | d3.ScaleSequential<string>
   | d3.ScaleOrdinal<string, string>
-  | d3.ScaleLinear<number, number>
+  | d3.ScaleLinear<number, string>
   | d3.ScaleQuantile<string>
   | d3.ScaleQuantize<string>
   | d3.ScaleThreshold<number, string>
@@ -56,7 +56,7 @@ export function legend ({
   // Continuous
   if ('interpolate' in color) {
     // d3.ScaleLinear
-    const c = color as unknown as d3.ScaleLinear<number, string>;
+    const c = color as d3.ScaleLinear<number, string>;
     const n = Math.min(c.domain().length, c.range().length);
 
     x = c.copy().rangeRound(d3.quantize(d3.interpolate(marginLeft, width - marginRight), n));
