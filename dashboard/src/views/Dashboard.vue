@@ -63,6 +63,7 @@ import { computed, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
 import { useVlinderStore } from '@/store/app';
+import { usePolling } from '@/composables/usePolling';
 
 import GraphCard from '@/components/GraphCard.vue';
 import StationSelector from '@/components/StationSelector.vue';
@@ -106,38 +107,26 @@ const isError = computed(() => {
   return vlinderStore.isStationsError || vlinderStore.isMeasurementsError;
 });
 
-const stationsFromStorage = JSON.parse(window.localStorage.getItem('selectedStations') || '[]') as string[];
-// fetch data a first time
-const stationsPromise = vlinderStore.fetchStations();
+const measurementsPolling = usePolling(vlinderStore.fetchMeasurements);
+const historicPolling = usePolling(vlinderStore.fetchHistoricMeasurements);
 
-stationsPromise.then(() => {
-  let stationsSelected = false;
-  if (props.urlStations.length > 0) {
-    props.urlStations.forEach(s => {
-      const wasAdded = vlinderStore.selectStationByName(s);
-      stationsSelected ||= wasAdded;
-    });
-  }
-  if (!stationsSelected && stationsFromStorage.length > 0) {
-    stationsFromStorage.forEach(s => {
-      const wasAdded = vlinderStore.selectStationById(s);
-      stationsSelected ||= wasAdded;
-    });
-  }
-  if (!stationsSelected) {
-    vlinderStore.selectStationById('zZ6ZeSg11dJ5zp5GrNwNck9A');
-    vlinderStore.selectStationById('Do5lLMfezIdmUCzzsE0IwIbE');
-    vlinderStore.selectStationById('XeIIA97QzN5xxk6AvdzAPquY');
-  }
-});
+const initPromise = vlinderStore.initialize(props.urlStations as string[]);
+const measurementsPromise = initPromise.then(() => vlinderStore.fetchMeasurements());
 
-const measurementsPromise: Promise<Measurement[]> = vlinderStore.fetchMeasurements();
+Promise.all([initPromise, measurementsPromise])
+  .then(([, measurements]) => {
+    // We pass the current stations list (which is populated by initialize)
+    resolveDataLoaded([vlinderStore.stations, measurements]);
+  })
+  .catch(() => {
+    // If initialization fails, we might still want to proceed or allow the error alert to show.
+    // Since vlinderStore handles error states, we can check if we have data or not.
+    // If stations failed, vlinderStore.stations will be empty.
+    resolveDataLoaded([vlinderStore.stations, vlinderStore.liveMeasurements]);
+  });
 
-Promise.all([stationsPromise, measurementsPromise])
-  .then((d) => { resolveDataLoaded(d); });
-
-scheduleFetch(vlinderStore.fetchMeasurements);
-scheduleFetch(vlinderStore.fetchHistoricMeasurements);
+measurementsPolling.start();
+historicPolling.start();
 
 watch(selectedStations, async () => {
   vlinderStore.fetchHistoricMeasurements();
@@ -151,15 +140,6 @@ watch(selectedStations, async () => {
   window.localStorage.setItem('selectedStations', JSON.stringify(selectedStations.value.map(s => s.id)));
 }, { deep: true });
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-function scheduleFetch(f: Function): void {
-  setTimeout(() => {
-    requestAnimationFrame(() => {
-      scheduleFetch(f);
-      f();
-    });
-  }, 60000);
-}
 function removeFromList (id: string): void {
   const { event } = useGtag()
   event('station_deselect', { event_category: 'stations', value: id });
