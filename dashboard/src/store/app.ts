@@ -95,6 +95,7 @@ export const useVlinderStore = defineStore('vlinder', {
         }
       } catch (error) {
         console.error('Failed to initialize stations', error);
+        throw error;
       }
     },
     fetchHistoricMeasurements(): Promise<Measurement[][]> {

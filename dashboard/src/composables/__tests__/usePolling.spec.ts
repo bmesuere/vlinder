@@ -51,7 +51,7 @@ describe('usePolling', () => {
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
-  it('should register cleanup on unmounted', () => {
+  it('should register onUnmounted hook', () => {
     const fn = vi.fn();
     usePolling(fn, 1000);
 

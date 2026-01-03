@@ -110,28 +110,20 @@ const isError = computed(() => {
 const measurementsPolling = usePolling(vlinderStore.fetchMeasurements);
 const historicPolling = usePolling(vlinderStore.fetchHistoricMeasurements);
 
-// fetch data a first time
-vlinderStore.initialize(props.urlStations as string[]).then(() => {
-  // If we needed to know when stations are ready, we can check vlinderStore.stationsLoaded
-});
+const initPromise = vlinderStore.initialize(props.urlStations as string[]);
+const measurementsPromise = initPromise.then(() => vlinderStore.fetchMeasurements());
 
-const measurementsPromise: Promise<Measurement[]> = vlinderStore.fetchMeasurements();
-
-Promise.all([
-  new Promise<Station[]>(resolve => {
-    if (vlinderStore.stationsLoaded) resolve(vlinderStore.stations);
-    else {
-      const unwatch = watch(() => vlinderStore.stationsLoaded, (loaded) => {
-        if (loaded) {
-          resolve(vlinderStore.stations);
-          unwatch();
-        }
-      });
-    }
-  }),
-  measurementsPromise
-])
-  .then((d) => { resolveDataLoaded(d); });
+Promise.all([initPromise, measurementsPromise])
+  .then(([, measurements]) => {
+    // We pass the current stations list (which is populated by initialize)
+    resolveDataLoaded([vlinderStore.stations, measurements]);
+  })
+  .catch(() => {
+    // If initialization fails, we might still want to proceed or allow the error alert to show.
+    // Since vlinderStore handles error states, we can check if we have data or not.
+    // If stations failed, vlinderStore.stations will be empty.
+    resolveDataLoaded([vlinderStore.stations, vlinderStore.liveMeasurements]);
+  });
 
 measurementsPolling.start();
 historicPolling.start();

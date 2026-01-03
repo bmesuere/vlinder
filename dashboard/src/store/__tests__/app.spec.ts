@@ -67,12 +67,12 @@ describe('Vlinder Store', () => {
   });
 
   it('initialize combines URL stations (priority) over LocalStorage', async () => {
-     getItemSpy.mockReturnValue(JSON.stringify(['s2']));
-     const store = useVlinderStore();
+    getItemSpy.mockReturnValue(JSON.stringify(['s2']));
+    const store = useVlinderStore();
 
-     await store.initialize(['station1']);
+    await store.initialize(['station1']);
 
-     expect(store.selectedStations).toHaveLength(1);
-     expect(store.selectedStations[0].id).toBe('s1');
+    expect(store.selectedStations).toHaveLength(1);
+    expect(store.selectedStations[0].id).toBe('s1');
   });
 });
