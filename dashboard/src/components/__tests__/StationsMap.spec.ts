@@ -79,6 +79,7 @@ describe('StationsMap', () => {
     rainVolume: 0,
     station: 'https://example.com/station',
     measurements: 'https://example.com/measurements',
+    wbgt: 18.0
   }
 
   it('renders and initializes map', async () => {

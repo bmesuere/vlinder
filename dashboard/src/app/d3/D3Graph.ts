@@ -11,6 +11,7 @@ export class D3Graph {
 
   // data
   private measurements!: MeasurementSeries;
+  private numericTimestamps: number[] = [];
 
   // settings
   private readonly margin = { top: 15, right: 35, bottom: 30, left: 45 };
@@ -26,7 +27,7 @@ export class D3Graph {
   private xAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
   private yAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
   private lines!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
-  private bisector!: (array: ArrayLike<string>, x: number, lo?: number | undefined, hi?: number | undefined) => number;
+  private bisector!: (array: ArrayLike<number>, x: number, lo?: number | undefined, hi?: number | undefined) => number;
   private mouseG!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
   private mouseDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
   private mouseLabels!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGTextElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
@@ -58,8 +59,7 @@ export class D3Graph {
     this.line = d3.line<number>()
       .curve(d3.curveMonotoneX)
       .defined(d => !(isNaN(d) || d === null))
-
-      .x((d, i) => this.x(Date.parse(this.measurements.timestamps[i])))
+      .x((d, i) => this.x(this.numericTimestamps[i]))
       .y(d => this.y(d));
 
     this.lines = this.svg.append('g')
@@ -69,7 +69,7 @@ export class D3Graph {
 
     this.xAxis = this.svg.append('g')
       .attr('transform', `translate(0,${this.height - this.margin.bottom})`)
-      .call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(multiFormat));
+      .call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(d => multiFormat(d as Date | d3.NumberValue)));
 
     this.yAxis = this.svg.append('g')
       .attr('transform', `translate(${this.margin.left},0)`)
@@ -91,9 +91,8 @@ export class D3Graph {
       .style('font-size', 'small')
       .style('opacity', '0');
 
-    // D3 bisector on the timestamp strings, using a numeric accessor/comparator
-    // Since timestamps are strings, we can bisect on the parsed numeric value
-    this.bisector = d3.bisector<string, number>((d) => Date.parse(d)).left;
+    // D3 bisector on numeric timestamps
+    this.bisector = d3.bisector<number, number>((d) => d).left;
 
     this.svg.on('touchmove mousemove', (event) => {
       if (!this.measurements) { return; }
@@ -109,6 +108,7 @@ export class D3Graph {
 
   updateData (measurements: MeasurementSeries) {
     this.measurements = measurements;
+    this.numericTimestamps = this.measurements.timestamps.map(t => Date.parse(t));
     this.update();
   }
 
@@ -128,7 +128,7 @@ export class D3Graph {
       this.mouseLine.style('opacity', 0);
       this.mouseDots
         .attr('r', 3)
-        .attr('cx', () => this.x(Date.parse(this.measurements.timestamps[this.measurements.timestamps.length - 1])))
+        .attr('cx', () => this.x(this.numericTimestamps[this.numericTimestamps.length - 1]))
         .attr('cy', d => this.y(d.values[d.values.length - 1]));
       this.mouseBGLabels
         .attr('x', this.labelxPos())
@@ -169,7 +169,7 @@ export class D3Graph {
     const filteredSeries = this.measurements.series.filter(s => s.values[0] !== null);
 
     // update scales
-    this.x.domain(d3.extent(this.measurements.timestamps, d => Date.parse(d)) as [number, number]);
+    this.x.domain(d3.extent(this.numericTimestamps) as [number, number]);
     this.y.domain([d3.min(filteredSeries, d => d3.min(d.values)) as number, d3.max(filteredSeries, d => d3.max(d.values)) as number]).nice();
 
     // this is done to force the color scale to assign the same color to old stations and a new color to new stations
@@ -179,7 +179,7 @@ export class D3Graph {
     });
 
     // redraw axes
-    this.xAxis.transition().call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(multiFormat));
+    this.xAxis.transition().call(d3.axisBottom(this.x).ticks(this.width / 80).tickFormat(d => multiFormat(d as Date | d3.NumberValue)));
     this.yAxis.transition().call(d3.axisLeft(this.y).ticks(5));
 
     // redraw lines
@@ -195,7 +195,7 @@ export class D3Graph {
       .join('circle')
       .attr('class', 'mouseover-dot')
       .attr('r', 3)
-      .attr('cx', () => this.x(Date.parse(this.measurements.timestamps[this.measurements.timestamps.length - 1])))
+      .attr('cx', () => this.x(this.numericTimestamps[this.numericTimestamps.length - 1]))
       .attr('cy', d => this.y(d.values[d.values.length - 1]))
       .style('fill', d => this.color(d.stationId));
 
@@ -222,7 +222,7 @@ export class D3Graph {
   }
 
   private labelxPos (timestamp?: number) {
-    timestamp = timestamp || Date.parse(this.measurements.timestamps[this.measurements.timestamps.length - 1]);
+    timestamp = timestamp || this.numericTimestamps[this.numericTimestamps.length - 1];
     return 5 + this.x(timestamp);
   }
 
@@ -240,10 +240,9 @@ export class D3Graph {
       return { timestamp: 0, i: 0 };
     }
     const date = this.x.invert(mx);
-    // this.bisector matches the date against Date.parse(d)
-    const index = this.bisector(this.measurements.timestamps, date.valueOf(), 1);
-    const a = Date.parse(this.measurements.timestamps[index - 1]);
-    const b = Date.parse(this.measurements.timestamps[index]);
+    const index = this.bisector(this.numericTimestamps, date.valueOf(), 1);
+    const a = this.numericTimestamps[index - 1];
+    const b = this.numericTimestamps[index];
 
     // Compare numeric timestamp values
     if (date.valueOf() - a > b - date.valueOf()) {

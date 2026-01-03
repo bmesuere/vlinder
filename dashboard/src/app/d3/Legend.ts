@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 type ColorScale =
   | d3.ScaleSequential<string>
   | d3.ScaleOrdinal<string, string>
-  | d3.ScaleLinear<number, number>
+  | d3.ScaleLinear<number, string>
   | d3.ScaleQuantile<string>
   | d3.ScaleQuantize<string>
   | d3.ScaleThreshold<number, string>
@@ -47,18 +47,16 @@ export function legend ({
     .style('display', 'block');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let tickAdjust = (g: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>) => g.selectAll('.tick line').attr('y1', marginTop + marginBottom - height) as any;
+  let tickAdjust: (g: any) => any = (g) => g.selectAll('.tick line').attr('y1', marginTop + marginBottom - height);
 
-  // x can be ScaleLinear (continuous) or ScaleBand (ordinal), which have incompatible types for domain/range/copy
+  // Use 'any' for x to avoid union hell with incompatible scale methods
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let x: any;
 
   // Continuous
   if ('interpolate' in color) {
-    // d3.ScaleLinear<string, string> is what we expect for a color scale, but d3 types might be complex.
-    // Casting to any for the copy/range operations to avoid complex generic mess.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c = color as any;
+    // d3.ScaleLinear
+    const c = color as d3.ScaleLinear<number, string>;
     const n = Math.min(c.domain().length, c.range().length);
 
     x = c.copy().rangeRound(d3.quantize(d3.interpolate(marginLeft, width - marginRight), n));
@@ -70,7 +68,7 @@ export function legend ({
       .attr('height', height - marginTop - marginBottom)
       .attr('preserveAspectRatio', 'none')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .attr('xlink:href', ramp(c.copy().domain(d3.quantize(d3.interpolate(0, 1), n)) as any).toDataURL());
+      .attr('xlink:href', ramp(c.copy().domain(d3.quantize(d3.interpolate(0, 1), n)) as unknown as (t: number) => string).toDataURL());
   }
 
   // Sequential
@@ -79,11 +77,9 @@ export function legend ({
     const interpolator = c.interpolator();
 
     // Create a linear scale for the axis
-    const linearScale = Object.assign(c.copy()
+    x = Object.assign(c.copy()
       .interpolator(d3.interpolateRound(marginLeft, width - marginRight)),
     { range () { return [marginLeft, width - marginRight]; } });
-
-    x = linearScale;
 
     svg.append('image')
       .attr('x', marginLeft)
@@ -94,7 +90,7 @@ export function legend ({
       .attr('xlink:href', ramp(interpolator).toDataURL());
 
     // scaleSequentialQuantile doesn’t implement ticks or tickFormat.
-    if (!x.ticks) {
+    if (!('ticks' in x)) {
       if (tickValues === undefined) {
         const n = Math.round(ticks + 1);
         tickValues = d3.range(n).map(i => d3.quantile(c.domain(), i / (n - 1))).filter(d => d !== undefined) as number[];
@@ -148,13 +144,13 @@ export function legend ({
       .selectAll('rect')
       .data(c.domain())
       .join('rect')
-      .attr('x', (d) => x(d))
+      .attr('x', (d) => x(d)!)
       .attr('y', marginTop)
       .attr('width', Math.max(0, x.bandwidth() - 1))
       .attr('height', height - marginTop - marginBottom)
       .attr('fill', (d) => c(d));
 
-    tickAdjust = () => { };
+    tickAdjust = () => {};
   }
 
   svg.append('g')
@@ -166,8 +162,7 @@ export function legend ({
       .tickSize(tickSize)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .tickValues(tickValues as any))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .call(tickAdjust as any)
+    .call(tickAdjust)
     .call(g => g.select('.domain').remove())
     .call(g => g.append('text')
       .attr('x', marginLeft)
@@ -263,8 +258,7 @@ function entity (character: string) {
   return `&#${character.charCodeAt(0).toString()};`;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ramp (color: any, n = 256) {
+function ramp (color: (t: number) => string, n = 256) {
   const canvas = d3.create('canvas').attr("width", n).attr("height", 1).node();
   if (!canvas) throw new Error("Canvas creation failed");
   const context = canvas.getContext('2d');

@@ -35,6 +35,7 @@ export interface Measurement {
   windDirection: number;
   windGust: number;
   windSpeed: number;
+  wbgt: number;
 }
 
 export interface MeasurementSeries {
@@ -52,4 +53,4 @@ export interface WeatherProperty {
   unit: string;
 }
 
-export type WeatherPropertyName = 'temp' | 'rainVolume' | 'windSpeed';
+export type WeatherPropertyName = 'temp' | 'rainVolume' | 'windSpeed' | 'pressure' | 'humidity' | 'wbgt';
