@@ -52,6 +52,10 @@ configure :production do
   $url = 'https://mooncake.ugent.be/api/'
 end
 
+configure :test do
+  $url = 'http://test.host/'
+end
+
 before do
   cache_control :public, :must_revalidate
 end
@@ -239,7 +243,7 @@ end
 #
 
 $station_info, $station_info_last_modified = read_stations
-$vlinder = reconnect_database
+$vlinder = reconnect_database unless ENV['RACK_ENV'] == 'test'
 $cache = Hash.new { |hash, key| hash[key] = {} }
 
 #
