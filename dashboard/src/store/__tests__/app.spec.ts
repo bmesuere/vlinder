@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useVlinderStore } from '../app';
 
@@ -12,7 +12,7 @@ const mockStations = [
 ];
 
 describe('Vlinder Store', () => {
-  let getItemSpy: any;
+  let getItemSpy: MockInstance;
 
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -60,7 +60,7 @@ describe('Vlinder Store', () => {
     await store.initialize([]);
 
     expect(store.selectedStations).toHaveLength(3);
-    const ids = store.selectedStations.map((s: any) => s.id);
+    const ids = store.selectedStations.map((s) => s.id);
     expect(ids).toContain('zZ6ZeSg11dJ5zp5GrNwNck9A');
     expect(ids).toContain('Do5lLMfezIdmUCzzsE0IwIbE');
     expect(ids).toContain('XeIIA97QzN5xxk6AvdzAPquY');

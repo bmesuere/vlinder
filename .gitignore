@@ -9,3 +9,6 @@ api/login.json
 .spyproject/
 scripts/output/
 *__pycache__*
+api/vendor/
+api/.bundle/
+dashboard/node_modules/
