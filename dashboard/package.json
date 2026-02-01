@@ -22,7 +22,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/types": "^7.28.5",
+    "@babel/types": "^7.29.0",
     "@pinia/testing": "^1.0.3",
     "@types/d3": "^7.4.3",
     "@types/node": "^25.0.3",
