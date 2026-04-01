@@ -79,9 +79,12 @@ describe('Vlinder Store', () => {
   it('initialize propagates error when fetchStations fails', async () => {
     const error = new Error('Network error');
     global.fetch = vi.fn().mockRejectedValue(error);
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const store = useVlinderStore();
 
     await expect(store.initialize([])).rejects.toThrow(error);
     expect(store.isStationsError).toBe(true);
+
+    consoleErrorSpy.mockRestore();
   });
 });
