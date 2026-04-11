@@ -2903,10 +2903,10 @@ vue@^3.5.31:
     "@vue/server-renderer" "3.5.31"
     "@vue/shared" "3.5.31"
 
-vuetify@3.11.6:
-  version "3.11.6"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.11.6.tgz#d992b5fcad53fd8a5a572635a4ea0a40b7ae5cd6"
-  integrity sha512-vaWvEpDSeldRoib1tCKNVBp60paTD2/n0a0TmrVLF9BN4CJJn6/A4VKG2Sg+DE8Yc+SNOtFtipChxSlQxjcUvw==
+vuetify@4.0.5:
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-4.0.5.tgz#bcaf674d2d5c9ebb6cf0517b733bbb4922e94cb3"
+  integrity sha512-pFysKOHuY3dROTVh9PdlhVz50ZR0E5/goY5ecTXc8F8tajUA2ee3xZ8Lqs1WtEw/X3w93wx/LogyjgaQCAL/Ig==
 
 w3c-xmlserializer@^5.0.0:
   version "5.0.0"
