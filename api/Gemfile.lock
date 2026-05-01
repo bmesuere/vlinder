@@ -42,7 +42,7 @@ GEM
     mysql2 (0.5.7)
       bigdecimal
     nio4r (2.7.5)
-    puma (7.2.0)
+    puma (8.0.1)
       nio4r (~> 2.0)
     rack (3.2.6)
     rack-protection (4.2.1)
@@ -121,7 +121,7 @@ DEPENDENCIES
   csv (~> 3.3.5)
   json (~> 2.19.3)
   mysql2 (~> 0.5.7)
-  puma (~> 7.2.0)
+  puma (~> 8.0.1)
   rack-test (~> 2.2.0)
   rom-sql (~> 3.7.0)
   rspec (~> 3.13.2)
