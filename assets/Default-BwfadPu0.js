@@ -1,0 +1,1 @@
+import{Cn as e,Fn as t,Mn as n,Sn as r,Vn as i,dt as a,l as o,vn as s}from"./index-CZuQry44.js";var c=e({__name:`View`,setup(e){return(e,a)=>{let c=t(`router-view`);return n(),s(o,null,{default:i(()=>[r(c)]),_:1})}}}),l=e({__name:`Default`,setup(e){return(e,t)=>(n(),s(a,null,{default:i(()=>[r(c)]),_:1}))}});export{l as default};
