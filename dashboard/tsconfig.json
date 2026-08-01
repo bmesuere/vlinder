@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
-    "baseUrl": ".",
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
@@ -17,7 +15,7 @@
     "noEmit": true,
     "paths": {
       "@/*": [
-       "src/*"
+       "./src/*"
       ]
      }
   },
