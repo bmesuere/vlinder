@@ -10,3 +10,5 @@ declare module '*.vue' {
 declare module 'vuetify'
 declare module 'vuetify/lib/components'
 declare module 'vuetify/lib/directives'
+// Resolves to a .css file, which TS 6 refuses to side-effect import without a declaration
+declare module 'vuetify/styles'
