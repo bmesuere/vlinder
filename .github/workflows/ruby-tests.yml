@@ -15,12 +15,12 @@ jobs:
         working-directory: ./api
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.2'
+        ruby-version-file: api/.ruby-version
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
         working-directory: ./api
 
