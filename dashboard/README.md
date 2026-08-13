@@ -1,44 +1,35 @@
-# default
+# VLINDER dashboard
+
+The dashboard for [VLINDER](http://vlinder.ugent.be/en), built with Vue 3, Vuetify, and Vite. It visualizes weather data served by the API in [`/api`](../api).
 
 ## Project setup
 
 ```
-# yarn
-yarn
-
-# npm
-npm install
-
-# pnpm
-pnpm install
+yarn install
 ```
 
-### Compiles and hot-reloads for development
+### Compile and hot-reload for development
 
 ```
-# yarn
 yarn dev
-
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
 ```
 
-### Compiles and minifies for production
+### Run unit tests
 
 ```
-# yarn
+yarn test
+```
+
+### Lint
+
+```
+yarn lint
+```
+
+### Compile and minify for production
+
+```
 yarn build
-
-# npm
-npm run build
-
-# pnpm
-pnpm build
 ```
 
-### Customize configuration
-
-See [Configuration Reference](https://vitejs.dev/config/).
+Node.js version is pinned in [`.nvmrc`](./.nvmrc); see `engines` in `package.json` for the minimum supported version.

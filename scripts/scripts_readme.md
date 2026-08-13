@@ -14,7 +14,7 @@ To run the *update_landcover.py* you need:
 2. Check the *settings/landcover_settings.py* file and update the path-settings to your needs.
 3. Check the *update_landcover.py* script and update the `update_all=True` (= to calculate the landcover for all stations) are set it to `False` and specify the stations to update with the `update_list` variable.
 4. (Change the coordinates of the *../api/data.csv* file if needed)
-5. Run the script: `python3 update_ladcover.py`.
+5. Run the script: `python3 update_landcover.py`.
 6. The *../api/data.csv* is updated.
   
 ## Creating maps
@@ -22,7 +22,7 @@ The requirements for creating the maps are the same as for the landcover calcula
 
 ### To Run
 1. Activate your environment `conda activate vlinderkaart_2_env` (comes with spyder as IDE).
-2. Check the *settings/map_settings.py* file and update the settings to your needs.
+2. Check the *settings/maps_settings.py* file and update the settings to your needs.
 3. Check the *create_maps.py* script and update the `plot_all=True` (= to make a map for all stations) set it to `False` and specify the stations to plot with the `update_list` variable.
 4. (The coordinates, and landcover, at the *../api/data.csv* file are used.)
 5. Run the script: `python3 create_maps.py`.
