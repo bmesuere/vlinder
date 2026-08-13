@@ -10,7 +10,9 @@
     "build": "vue-tsc --noEmit && vite build",
     "test": "vitest",
     "preview": "vite preview",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
@@ -26,6 +28,7 @@
   "devDependencies": {
     "@babel/types": "^7.29.7",
     "@pinia/testing": "^1.0.3",
+    "@playwright/test": "^1.62.1",
     "@types/d3": "^7.4.3",
     "@types/node": "^26.2.0",
     "@types/topojson-client": "^3.1.5",
