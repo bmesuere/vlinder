@@ -8,7 +8,7 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
 gem "sinatra", "~> 4.2.1"
 
-gem "json", "~> 2.21.1"
+gem "json", "~> 2.21.2"
 
 gem "sinatra-contrib", "~> 4.2.1"
 
@@ -18,9 +18,12 @@ gem "csv", "~> 3.3.6"
 
 gem "rom-sql", "~> 3.7.0"
 
-group :development, :test do
+group :development do
   gem "byebug", "~> 12.0.0"
   gem "puma", "~> 8.0.2"
+end
+
+group :test do
   gem "rspec", "~> 3.13.2"
   gem "rack-test", "~> 2.2.0"
 end

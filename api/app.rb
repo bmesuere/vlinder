@@ -15,8 +15,6 @@
 #            ██   ██ ██      ██    (;O/ \/ \O;)
 #                    
 
-require 'byebug'
-
 #
 # Configuration
 #
@@ -28,6 +26,10 @@ UPDATE_INTERVAL = 300
 LOOKBACK_UPDATES = 3
 DATETIME_FMT = '%a, %d %b %Y %H:%M:%S %Z'
 DB_MAX_RETRIES = 3
+# How long clients may treat a response as fresh without revalidating. Kept well
+# under UPDATE_INTERVAL so clients still pick up new data promptly, while
+# avoiding a revalidation round-trip on every single request.
+CACHE_MAX_AGE = UPDATE_INTERVAL / 5
 
 # vlinder database uses UTC, and we want to respond with UTC,
 # so setting our timezone to UTC makes our life easier
@@ -57,7 +59,7 @@ configure :test do
 end
 
 before do
-  cache_control :public, :must_revalidate
+  cache_control :public, :must_revalidate, max_age: CACHE_MAX_AGE
 end
 
 #
@@ -69,10 +71,21 @@ class Vlinder < ROM::Relation[:sql]
     attribute :StationID, Types::String
   end
 
-  def retry_until_succeeded
+  def retry_until_succeeded(&block)
     tries = 0
     begin
-      yield
+      # Dispatch on the current $vlinder (rather than plain `yield`/`self`) so
+      # that if a previous iteration reconnected below, this attempt actually
+      # runs against the fresh connection instead of the dead one `self` was
+      # bound to when this method was first called.
+      $vlinder.instance_exec(&block)
+    rescue Sequel::DatabaseConnectionError, Sequel::DatabaseDisconnectError => e
+      tries += 1
+      raise unless tries < DB_MAX_RETRIES
+
+      warn "#{Time.now}: #{e.inspect} - reconnecting and retrying query: #{tries}"
+      $vlinder = reconnect_database
+      retry
     rescue StandardError => e
       tries += 1
       raise unless tries < DB_MAX_RETRIES
@@ -92,7 +105,11 @@ class Vlinder < ROM::Relation[:sql]
     end
 
     {
-      last_modified: results.last[:datetime],
+      # results.last is nil when the lookback window has no rows yet (e.g. a
+      # slow/catching-up MQTT feed) - safe-navigate instead of crashing, so
+      # cache_fetch actually gets a chance to see (and not cache) an empty
+      # result instead of every request 500ing.
+      last_modified: results.last&.[](:datetime),
       data: results.group_by { |data| data[:StationID] }
                    .map { |_id, data| process(data, normalize_rain: false).last }
     }
@@ -110,7 +127,9 @@ class Vlinder < ROM::Relation[:sql]
     end
 
     {
-      last_modified: results.last[:datetime],
+      # Same as #all_stations: an empty result set for this station/range
+      # must produce data: [] and last_modified: nil, not a crash.
+      last_modified: results.last&.[](:datetime),
       data: process(results)
     }
   end
@@ -230,6 +249,10 @@ def reconnect_database
   opts = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
   opts[:connect_timeout] = 10
   opts[:adapter] = :mysql2
+  # Puma (in the Gemfile) is only used for local development; production runs
+  # under Passenger/Apache, which manages its own worker processes rather than
+  # threads within a single process, so a single-connection pool per process
+  # is intentional here, not an oversight.
   opts[:max_connections] = 1
 
   conf = ROM::Configuration.new(:sql, opts)
@@ -245,6 +268,42 @@ end
 $station_info, $station_info_last_modified = read_stations
 $vlinder = reconnect_database unless ENV['RACK_ENV'] == 'test'
 $cache = Hash.new { |hash, key| hash[key] = {} }
+# $cache is a plain Hash shared by every request-handling thread; guard its
+# read-check-write cycle with a mutex so concurrent requests can't race each
+# other (e.g. both deciding the cache is stale and both fetching/writing).
+$cache_mutex = Mutex.new
+
+# Fetches the cached value living at $cache[path[0]][path[1]]... (e.g.
+# cache_fetch(:measurements) or cache_fetch(:stations, id)), refreshing it by
+# calling the block when stale.
+#
+# Crucially, a freshly-fetched value is only written back to the cache when
+# it actually contains data. If the MQTT feed is slow/behind, a fetch can
+# legitimately come back with an empty result; caching that would mark the
+# cache "fresh" (via its last_modified) and serve the empty result to every
+# user until the next UPDATE_INTERVAL rolls around. Instead we keep serving
+# the last known-good cached value (or the empty result, if nothing has ever
+# been cached yet) and leave the cache stale, so the very next request
+# retries instead of getting stuck.
+def cache_fetch(*path)
+  $cache_mutex.synchronize do
+    container = path[0..-2].reduce($cache) { |hash, key| hash[key] ||= {} }
+    key = path.last
+    current = (container[key] ||= {})
+
+    next current unless updated_since?(current[:last_modified])
+
+    fresh = yield
+    if fresh[:data].nil? || fresh[:data].empty?
+      # Don't poison the cache with an empty result, but if there's nothing
+      # better cached yet (e.g. right after boot), still answer this request
+      # with the accurate (empty) result rather than nothing at all.
+      current[:data].nil? ? fresh : current
+    else
+      container[key] = fresh
+    end
+  end
+end
 
 #
 # Routes
@@ -255,6 +314,8 @@ not_found do
 end
 
 error do
+  e = env['sinatra.error']
+  warn "#{Time.now}: #{e.class}: #{e.message}\n#{e.backtrace&.join("\n")}"
   json error: 'the server is on fire'
 end
 
@@ -276,10 +337,17 @@ get '/stations/:id' do
 end
 
 get '/measurements/?' do
-  $cache[:measurements] = $vlinder.all_stations if updated_since? $cache[:measurements][:last_modified]
+  result = cache_fetch(:measurements) { $vlinder.all_stations }
 
-  last_modified $cache[:measurements][:last_modified]
-  json $cache[:measurements][:data]
+  if result[:data].nil? || result[:data].empty?
+    # An empty payload must not be cached by anything upstream either -
+    # override the before-filter's public/max-age with no-store, and don't
+    # hand out a (nil) Last-Modified as a validator for it.
+    cache_control :no_store
+  else
+    last_modified result[:last_modified]
+  end
+  json result[:data]
 end
 
 get '/measurements/:id' do
@@ -291,12 +359,12 @@ get '/measurements/:id' do
   if start.nil? && stop.nil?
     # This will be called most of the time: fetch the last 24h of a station.
 
-    result = $cache[:stations][id]
-    if result.nil? || updated_since?(result[:last_modified])
-      result = $vlinder.station(id)
-      $cache[:stations][id] = result
+    result = cache_fetch(:stations, id) { $vlinder.station(id) }
+    if result[:data].nil? || result[:data].empty?
+      cache_control :no_store
+    else
+      last_modified result[:last_modified]
     end
-    last_modified result[:last_modified]
     json result[:data]
 
   else
