@@ -11,6 +11,10 @@ updates:
       update-types:
       - minor
       - patch
+      exclude-patterns:
+      - "vue"
+      - "vuetify"
+      - "d3"
 - package-ecosystem: bundler
   directory: "/api"
   schedule:
