@@ -1,7 +1,7 @@
 <template>
-  <v-card rounded="lg" elevation=10>
+  <v-card rounded="lg" elevation="5">
     <v-list-item lines="two">
-      <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
+      <div class="text-label-medium text-uppercase" style="line-height: 1rem; font-size: 0.625rem !important;">
         {{ station.name }}
         <span v-if="typedMeasurements['status'] == 'Offline'"> &middot; offline</span>
       </div>

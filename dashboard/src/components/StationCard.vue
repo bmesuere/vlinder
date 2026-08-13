@@ -23,7 +23,7 @@
     </v-carousel>
 
     <v-list-item lines="three" class="pb-0">
-      <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
+      <div class="text-label-medium text-uppercase" style="line-height: 1rem; font-size: 0.625rem !important;">
         {{ station.name }}
         <span v-if="typedMeasurements['status'] == 'Offline'"> &middot; offline</span>
       </div>
