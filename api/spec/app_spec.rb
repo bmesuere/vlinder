@@ -85,6 +85,35 @@ RSpec.describe 'Vlinder API' do
       expect(json_response.first['id']).to eq('station1')
       expect(json_response.first['temp']).to eq(20)
     end
+
+    it 'does not stick an empty first fetch to the cache for the whole update window' do
+      # Regression test: if the MQTT feed is slow, the very first fetch after
+      # boot (or after the cache goes stale) can legitimately come back
+      # empty. That must not get cached - otherwise every request for the
+      # rest of UPDATE_INTERVAL would keep being served "no data" even once
+      # real data becomes available.
+      $cache[:measurements] = {} # start from a completely empty/stale cache
+
+      allow(mock_vlinder).to receive(:all_stations).and_return(
+        { last_modified: Time.now, data: [] },
+        { last_modified: Time.now, data: [{ id: 'station1', temp: 20 }] }
+      )
+
+      get '/measurements'
+      expect(last_response).to be_ok
+      expect(JSON.parse(last_response.body)).to eq([])
+
+      # The cache must still be considered stale, so this second request
+      # retries instead of serving the cached-empty result.
+      get '/measurements'
+      expect(last_response).to be_ok
+      json_response = JSON.parse(last_response.body)
+      expect(json_response).to be_an(Array)
+      expect(json_response.first['id']).to eq('station1')
+      expect(json_response.first['temp']).to eq(20)
+
+      expect(mock_vlinder).to have_received(:all_stations).twice
+    end
   end
 
   describe 'GET /measurements/:id' do

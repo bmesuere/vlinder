@@ -245,6 +245,42 @@ end
 $station_info, $station_info_last_modified = read_stations
 $vlinder = reconnect_database unless ENV['RACK_ENV'] == 'test'
 $cache = Hash.new { |hash, key| hash[key] = {} }
+# $cache is a plain Hash shared by every request-handling thread; guard its
+# read-check-write cycle with a mutex so concurrent requests can't race each
+# other (e.g. both deciding the cache is stale and both fetching/writing).
+$cache_mutex = Mutex.new
+
+# Fetches the cached value living at $cache[path[0]][path[1]]... (e.g.
+# cache_fetch(:measurements) or cache_fetch(:stations, id)), refreshing it by
+# calling the block when stale.
+#
+# Crucially, a freshly-fetched value is only written back to the cache when
+# it actually contains data. If the MQTT feed is slow/behind, a fetch can
+# legitimately come back with an empty result; caching that would mark the
+# cache "fresh" (via its last_modified) and serve the empty result to every
+# user until the next UPDATE_INTERVAL rolls around. Instead we keep serving
+# the last known-good cached value (or the empty result, if nothing has ever
+# been cached yet) and leave the cache stale, so the very next request
+# retries instead of getting stuck.
+def cache_fetch(*path)
+  $cache_mutex.synchronize do
+    container = path[0..-2].reduce($cache) { |hash, key| hash[key] ||= {} }
+    key = path.last
+    current = (container[key] ||= {})
+
+    next current unless updated_since?(current[:last_modified])
+
+    fresh = yield
+    if fresh[:data].nil? || fresh[:data].empty?
+      # Don't poison the cache with an empty result, but if there's nothing
+      # better cached yet (e.g. right after boot), still answer this request
+      # with the accurate (empty) result rather than nothing at all.
+      current[:data].nil? ? fresh : current
+    else
+      container[key] = fresh
+    end
+  end
+end
 
 #
 # Routes
@@ -276,10 +312,10 @@ get '/stations/:id' do
 end
 
 get '/measurements/?' do
-  $cache[:measurements] = $vlinder.all_stations if updated_since? $cache[:measurements][:last_modified]
+  result = cache_fetch(:measurements) { $vlinder.all_stations }
 
-  last_modified $cache[:measurements][:last_modified]
-  json $cache[:measurements][:data]
+  last_modified result[:last_modified]
+  json result[:data]
 end
 
 get '/measurements/:id' do
@@ -291,11 +327,7 @@ get '/measurements/:id' do
   if start.nil? && stop.nil?
     # This will be called most of the time: fetch the last 24h of a station.
 
-    result = $cache[:stations][id]
-    if result.nil? || updated_since?(result[:last_modified])
-      result = $vlinder.station(id)
-      $cache[:stations][id] = result
-    end
+    result = cache_fetch(:stations, id) { $vlinder.station(id) }
     last_modified result[:last_modified]
     json result[:data]
 
