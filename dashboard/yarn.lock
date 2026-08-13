@@ -2818,10 +2818,10 @@ vue@^3.5.41:
     "@vue/server-renderer" "3.5.41"
     "@vue/shared" "3.5.41"
 
-vuetify@3.11.6:
-  version "3.11.6"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.11.6.tgz#d992b5fcad53fd8a5a572635a4ea0a40b7ae5cd6"
-  integrity sha512-vaWvEpDSeldRoib1tCKNVBp60paTD2/n0a0TmrVLF9BN4CJJn6/A4VKG2Sg+DE8Yc+SNOtFtipChxSlQxjcUvw==
+vuetify@4.1.8:
+  version "4.1.8"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-4.1.8.tgz#f776a7e5676c16eb1bc214c9b6e2bd58f7bdcaa6"
+  integrity sha512-003D/8b5462uZCD5CMRTZF3smADmOn47mzthNY0aP/xkslovR5yIc1qXjPdFN0LHcu+p3GEAVmMQabldaIQ5pg==
 
 w3c-xmlserializer@^5.0.0:
   version "5.0.0"
