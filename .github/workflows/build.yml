@@ -7,11 +7,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Install, Test, and Build
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: dashboard/.nvmrc
+          cache: yarn
+          cache-dependency-path: dashboard/yarn.lock
+
+      - name: Install, Lint, Test, and Build
         run: |
           cd dashboard
-          yarn install
+          yarn install --frozen-lockfile
+          yarn eslint .
           yarn test
           yarn build

@@ -13,7 +13,7 @@ This repository contains the API and dashboard for [VLINDER](http://vlinder.ugen
 ## Repository structure
 
 - `/api`: The backend REST API as a Sinatra application. To run locally, run `bundle install` and `rackup`. Note that you need to be within the Ghent University network for this to work because of a local database access. This code is currently deployed at [https://mooncake.ugent.be/api](https://mooncake.ugent.be/api). Documentation can be found at [https://app.swaggerhub.com/apis-docs/bmesuere/VLINDER](https://app.swaggerhub.com/apis-docs/bmesuere/VLINDER).
-- `/dashboard`: Implementation of the dashboard, using Vue and the API in this repository. To run locally, first run `yarn install`, then `yarn serve`. To build, run `yarn build`. The code from the master branch is automatically deployed to [https://bmesuere.github.io/vlinder/](https://bmesuere.github.io/vlinder/).
+- `/dashboard`: Implementation of the dashboard, using Vue and the API in this repository. To run locally, first run `yarn install`, then `yarn dev`. To build, run `yarn build`. The code from the master branch is automatically deployed to [https://bmesuere.github.io/vlinder/](https://bmesuere.github.io/vlinder/).
 
 ## Acknowledgements
 
