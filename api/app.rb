@@ -28,6 +28,10 @@ UPDATE_INTERVAL = 300
 LOOKBACK_UPDATES = 3
 DATETIME_FMT = '%a, %d %b %Y %H:%M:%S %Z'
 DB_MAX_RETRIES = 3
+# How long clients may treat a response as fresh without revalidating. Kept well
+# under UPDATE_INTERVAL so clients still pick up new data promptly, while
+# avoiding a revalidation round-trip on every single request.
+CACHE_MAX_AGE = UPDATE_INTERVAL / 5
 
 # vlinder database uses UTC, and we want to respond with UTC,
 # so setting our timezone to UTC makes our life easier
@@ -57,7 +61,7 @@ configure :test do
 end
 
 before do
-  cache_control :public, :must_revalidate
+  cache_control :public, :must_revalidate, max_age: CACHE_MAX_AGE
 end
 
 #
@@ -69,10 +73,21 @@ class Vlinder < ROM::Relation[:sql]
     attribute :StationID, Types::String
   end
 
-  def retry_until_succeeded
+  def retry_until_succeeded(&block)
     tries = 0
     begin
-      yield
+      # Dispatch on the current $vlinder (rather than plain `yield`/`self`) so
+      # that if a previous iteration reconnected below, this attempt actually
+      # runs against the fresh connection instead of the dead one `self` was
+      # bound to when this method was first called.
+      $vlinder.instance_exec(&block)
+    rescue Sequel::DatabaseConnectionError, Sequel::DatabaseDisconnectError => e
+      tries += 1
+      raise unless tries < DB_MAX_RETRIES
+
+      warn "#{Time.now}: #{e.inspect} - reconnecting and retrying query: #{tries}"
+      $vlinder = reconnect_database
+      retry
     rescue StandardError => e
       tries += 1
       raise unless tries < DB_MAX_RETRIES
@@ -230,6 +245,10 @@ def reconnect_database
   opts = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
   opts[:connect_timeout] = 10
   opts[:adapter] = :mysql2
+  # Puma (in the Gemfile) is only used for local development; production runs
+  # under Passenger/Apache, which manages its own worker processes rather than
+  # threads within a single process, so a single-connection pool per process
+  # is intentional here, not an oversight.
   opts[:max_connections] = 1
 
   conf = ROM::Configuration.new(:sql, opts)
@@ -291,6 +310,8 @@ not_found do
 end
 
 error do
+  e = env['sinatra.error']
+  warn "#{Time.now}: #{e.class}: #{e.message}\n#{e.backtrace&.join("\n")}"
   json error: 'the server is on fire'
 end
 
