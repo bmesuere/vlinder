@@ -16,10 +16,7 @@ export default defineConfig({
     // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
     vuetify({
       autoImport: true,
-      // Compile Vuetify's styles from source so src/styles/settings.scss can
-      // override Sass variables (see that file: it pins the Vuetify 3 grid
-      // breakpoints). Without this, the precompiled vuetify/styles CSS is
-      // used and Sass settings are ignored.
+      // compile styles from source so settings.scss can override Sass variables
       styles: {
         configFile: 'src/styles/settings.scss',
       },

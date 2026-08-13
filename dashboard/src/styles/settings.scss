@@ -1,18 +1,4 @@
-// Vuetify Sass settings.
-//
-// This file exists purely to keep the dashboard's responsive behaviour
-// identical to what it was on Vuetify 3. Vuetify 4 lowered the default
-// breakpoints (md 960->840, lg 1280->1145, xl 1920->1545, xxl 2560->2138),
-// which both shifts when the station-card / graph-card grids re-wrap and -
-// because $container-max-widths is derived from $grid-breakpoints - shrinks
-// the page's content column (lg: 1200px -> 1000px).
-//
-// Restoring the Vuetify 3 breakpoint map restores both: the grid re-wraps at
-// the same widths as before and $container-max-widths computes back to
-// 900/1200/1800/2400px.
-//
-// The JS-side equivalent (useDisplay / $vuetify.display) is configured in
-// src/plugins/vuetify.ts and must be kept in sync with this map.
+// Vuetify 3 breakpoints (v4 lowered them); keep in sync with plugins/vuetify.ts
 @use 'vuetify/settings' with (
   $grid-breakpoints: (
     'md': 960px,
