@@ -23,15 +23,15 @@ export class D3Graph {
   private x!: d3.ScaleTime<number, number>;
   private y!: d3.ScaleLinear<number, number>;
   private color!: d3.ScaleOrdinal<string, string>;
-  private line!: d3.Line<number>;
+  private line!: d3.Line<number | null>;
   private xAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
   private yAxis!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
   private lines!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
   private bisector!: (array: ArrayLike<number>, x: number, lo?: number | undefined, hi?: number | undefined) => number;
   private mouseG!: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>;
-  private mouseDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
-  private mouseLabels!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGTextElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
-  private mouseBGLabels!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGTextElement | null, { stationId: string; values: number[] }, SVGGElement, unknown>;
+  private mouseDots!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGCircleElement | null, { stationId: string; values: (number | null)[] }, SVGGElement, unknown>;
+  private mouseLabels!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGTextElement | null, { stationId: string; values: (number | null)[] }, SVGGElement, unknown>;
+  private mouseBGLabels!: d3.Selection<Element | d3.EnterElement | Document | Window | SVGTextElement | null, { stationId: string; values: (number | null)[] }, SVGGElement, unknown>;
   private mouseLine!: d3.Selection<SVGLineElement, unknown, HTMLElement, unknown>;
   private timeLabel!: d3.Selection<SVGTextElement, unknown, HTMLElement, unknown>;
 
@@ -56,11 +56,13 @@ export class D3Graph {
 
     this.color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    this.line = d3.line<number>()
+    this.line = d3.line<number | null>()
       .curve(d3.curveMonotoneX)
-      .defined(d => !(isNaN(d) || d === null))
+      .defined(d => !(d === null || isNaN(d)))
       .x((d, i) => this.x(this.numericTimestamps[i]))
-      .y(d => this.y(d));
+      // .defined() above guarantees d3 only calls this accessor for non-null points
+      // (see d3-shape's line(): the x/y accessors are only invoked when defined() is true).
+      .y(d => this.y(d as number));
 
     this.lines = this.svg.append('g')
       .attr('fill', 'none')
@@ -129,7 +131,8 @@ export class D3Graph {
       this.mouseDots
         .attr('r', 3)
         .attr('cx', () => this.x(this.numericTimestamps[this.numericTimestamps.length - 1]))
-        .attr('cy', d => this.y(d.values[d.values.length - 1]));
+        // last value may be null (eg. a station that just went offline); matches pre-existing behaviour
+        .attr('cy', d => this.y(d.values[d.values.length - 1] as number));
       this.mouseBGLabels
         .attr('x', this.labelxPos())
         .attr('y', d => this.labelyPos(d))
@@ -150,7 +153,7 @@ export class D3Graph {
       this.mouseDots
         .attr('r', 4)
         .attr('cx', this.x(timestamp))
-        .attr('cy', d => this.y(d.values[i]));
+        .attr('cy', d => this.y(d.values[i] as number));
       this.mouseBGLabels
         .attr('x', this.labelxPos(timestamp))
         .attr('y', d => this.labelyPos(d, i))
@@ -170,7 +173,12 @@ export class D3Graph {
 
     // update scales
     this.x.domain(d3.extent(this.numericTimestamps) as [number, number]);
-    this.y.domain([d3.min(filteredSeries, d => d3.min(d.values)) as number, d3.max(filteredSeries, d => d3.max(d.values)) as number]).nice();
+    // pass an identity accessor so d3 ignores null values (missing readings) instead of
+    // rejecting the array outright, matching how filteredSeries.values may contain nulls
+    this.y.domain([
+      d3.min(filteredSeries, d => d3.min(d.values, v => v)) as number,
+      d3.max(filteredSeries, d => d3.max(d.values, v => v)) as number
+    ]).nice();
 
     // this is done to force the color scale to assign the same color to old stations and a new color to new stations
     // even if they don't have data for this property
@@ -184,23 +192,24 @@ export class D3Graph {
 
     // redraw lines
     this.lines.selectAll('path')
-      .data(filteredSeries, d => (d as { stationId: string; values: number[] }).stationId)
+      .data(filteredSeries, d => (d as { stationId: string; values: (number | null)[] }).stationId)
       .join('path')
       .transition()
       .attr('d', d => this.line(d.values))
       .attr('stroke', d => this.color(d.stationId));
 
     this.mouseDots = this.mouseG.selectAll('.mouseover-dot')
-      .data(filteredSeries, d => (d as { stationId: string; values: number[] }).stationId)
+      .data(filteredSeries, d => (d as { stationId: string; values: (number | null)[] }).stationId)
       .join('circle')
       .attr('class', 'mouseover-dot')
       .attr('r', 3)
       .attr('cx', () => this.x(this.numericTimestamps[this.numericTimestamps.length - 1]))
-      .attr('cy', d => this.y(d.values[d.values.length - 1]))
+      // last value may be null (eg. a station that just went offline); matches pre-existing behaviour
+      .attr('cy', d => this.y(d.values[d.values.length - 1] as number))
       .style('fill', d => this.color(d.stationId));
 
     this.mouseBGLabels = this.mouseG.selectAll('.mouseover-BGlabels')
-      .data(filteredSeries, d => (d as { stationId: string; values: number[] }).stationId)
+      .data(filteredSeries, d => (d as { stationId: string; values: (number | null)[] }).stationId)
       .join('text')
       .attr('class', 'mouseover-BGlabels')
       .attr('x', this.labelxPos())
@@ -211,7 +220,7 @@ export class D3Graph {
       .style('stroke-width', 3);
 
     this.mouseLabels = this.mouseG.selectAll('.mouseover-labels')
-      .data(filteredSeries, d => (d as { stationId: string; values: number[] }).stationId)
+      .data(filteredSeries, d => (d as { stationId: string; values: (number | null)[] }).stationId)
       .join('text')
       .attr('class', 'mouseover-labels')
       .attr('x', this.labelxPos())
@@ -226,13 +235,14 @@ export class D3Graph {
     return 5 + this.x(timestamp);
   }
 
-  private labelyPos (d: {values: number[]}, i?: number) {
+  private labelyPos (d: {values: (number | null)[]}, i?: number) {
     let offset = -5;
     if (i === undefined) {
       i = d.values.length - 1;
       offset = 4.5;
     }
-    return offset + this.y(d.values[i]);
+    // the value at this index may be null (eg. a station that just went offline); matches pre-existing behaviour
+    return offset + this.y(d.values[i] as number);
   }
 
   private bisect (mx: number): {timestamp: number; i: number} {

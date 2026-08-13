@@ -203,7 +203,8 @@ export class D3StationsMap {
 
   private stationColor (station: Station): string {
     const m = this.measurementsMap.get(station.id);
-    return m?.status === 'Ok' ? this.colorScale(m[this.selectedProperty]) : 'black';
+    // status 'Ok' implies a numeric reading for the currently selected property
+    return m?.status === 'Ok' ? this.colorScale(m[this.selectedProperty] as number) : 'black';
   }
 
   private stationFillOpacity (station: Station): number {

@@ -104,7 +104,7 @@ const selectedStations = computed(() => {
 });
 
 const isError = computed(() => {
-  return vlinderStore.isStationsError || vlinderStore.isMeasurementsError;
+  return vlinderStore.isStationsError || vlinderStore.isMeasurementsError || vlinderStore.isHistoricMeasurementsError;
 });
 
 const measurementsPolling = usePolling(vlinderStore.fetchMeasurements);

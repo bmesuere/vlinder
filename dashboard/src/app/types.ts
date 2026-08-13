@@ -22,25 +22,25 @@ export interface LandUse {
 }
 
 export interface Measurement {
-  humidity: number;
+  humidity: number | null;
   id: string;
   measurements: string;
-  pressure: number;
+  pressure: number | null;
   rainIntensity: number;
-  rainVolume: number;
+  rainVolume: number | null;
   station: string;
   status: string;
-  temp: number;
+  temp: number | null;
   time: string;
   windDirection: number;
   windGust: number;
-  windSpeed: number;
-  wbgt: number;
+  windSpeed: number | null;
+  wbgt: number | null;
 }
 
 export interface MeasurementSeries {
   property: string;
-  series: {stationId: string; values: number[]}[];
+  series: {stationId: string; values: (number | null)[]}[];
   timestamps: string[];
 }
 
