@@ -1,9 +1,14 @@
 import { Station, Measurement, MeasurementSeries, WeatherPropertyName } from '../app/types';
 import { defineStore } from 'pinia';
 
-const API_URL = 'https://mooncake.ugent.be/api';
+const API_URL = import.meta.env.VITE_API_URL ?? 'https://mooncake.ugent.be/api';
 const STATIONS_PATH = '/stations';
 const MEASUREMENTS_PATH = '/measurements';
+
+// Incrementing token used to guard against overlapping fetchHistoricMeasurements calls
+// (eg. a station toggle firing while a poll is still in flight) overwriting fresher data
+// with a stale response.
+let historicMeasurementsRequestId = 0;
 
 export const useVlinderStore = defineStore('vlinder', {
   state: () => ({
@@ -103,18 +108,35 @@ export const useVlinderStore = defineStore('vlinder', {
         throw error;
       }
     },
-    fetchHistoricMeasurements(): Promise<Measurement[][]> {
+    async fetchHistoricMeasurements(): Promise<Measurement[][]> {
+      const requestId = ++historicMeasurementsRequestId;
       this.loadingHistoricMeasurements = true;
-      return Promise.all(
-        this.selectedStations.map(s => {
-          return fetch(API_URL + MEASUREMENTS_PATH + '/' + s.id)
-            .then((r): Promise<Measurement[]> => r.json());
-        })
-      ).then(ms => {
-        this.historicMeasurements = ms;
-        this.loadingHistoricMeasurements = false;
+      try {
+        const ms = await Promise.all(
+          this.selectedStations.map(async (s): Promise<Measurement[]> => {
+            const r = await fetch(API_URL + MEASUREMENTS_PATH + '/' + s.id);
+            if (!r.ok) throw new Error('historic measurement fetch failed');
+            return r.json();
+          })
+        );
+
+        // Ignore this result if a newer fetchHistoricMeasurements call has started since.
+        if (requestId === historicMeasurementsRequestId) {
+          this.historicMeasurements = ms;
+          this.isHistoricMeasurementsError = false;
+        }
         return ms;
-      });
+      } catch (error) {
+        if (requestId === historicMeasurementsRequestId) {
+          this.isHistoricMeasurementsError = true;
+        }
+        console.error('Failed to fetch historic measurements', error);
+        return this.historicMeasurements;
+      } finally {
+        if (requestId === historicMeasurementsRequestId) {
+          this.loadingHistoricMeasurements = false;
+        }
+      }
     },
     selectStationById(stationId: string) {
       const station = this.stations.find(s => s.id === stationId);
