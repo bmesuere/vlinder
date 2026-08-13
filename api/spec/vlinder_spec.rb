@@ -193,4 +193,50 @@ RSpec.describe Vlinder do
       expect(rain_volumes).to eq([5.0, 5.6, 0.3])
     end
   end
+
+  # #all_stations and #station are public and call #retry_until_succeeded
+  # (which normally runs a real where/order/to_a query chain). Stubbing that
+  # one method lets these run for real against a canned result set, without
+  # needing a live DB connection - same technique as spec/app_spec.rb.
+  describe '#all_stations' do
+    it 'returns an empty, non-crashing result when the lookback window has no rows yet' do
+      allow(vlinder).to receive(:retry_until_succeeded).and_return([])
+
+      result = vlinder.all_stations
+
+      expect(result).to eq(last_modified: nil, data: [])
+    end
+
+    it 'groups rows by station and reports the last_modified of the latest row' do
+      rows = [row(StationID: 'station1', datetime: Time.utc(2024, 1, 1, 12, 0, 0)),
+              row(StationID: 'station2', datetime: Time.utc(2024, 1, 1, 12, 5, 0))]
+      allow(vlinder).to receive(:retry_until_succeeded).and_return(rows)
+
+      result = vlinder.all_stations
+
+      expect(result[:last_modified]).to eq(Time.utc(2024, 1, 1, 12, 5, 0))
+      expect(result[:data].map { |m| m[:id] }).to contain_exactly('station1', 'station2')
+    end
+  end
+
+  describe '#station' do
+    it 'returns an empty, non-crashing result when the station has no rows in range' do
+      allow(vlinder).to receive(:retry_until_succeeded).and_return([])
+
+      result = vlinder.station('station1')
+
+      expect(result).to eq(last_modified: nil, data: [])
+    end
+
+    it 'reports the data and last_modified of the latest row when rows exist' do
+      rows = [row(datetime: Time.utc(2024, 1, 1, 12, 0, 0)),
+              row(datetime: Time.utc(2024, 1, 1, 12, 5, 0))]
+      allow(vlinder).to receive(:retry_until_succeeded).and_return(rows)
+
+      result = vlinder.station('station1')
+
+      expect(result[:last_modified]).to eq(Time.utc(2024, 1, 1, 12, 5, 0))
+      expect(result[:data].size).to eq(2)
+    end
+  end
 end

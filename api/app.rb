@@ -105,7 +105,11 @@ class Vlinder < ROM::Relation[:sql]
     end
 
     {
-      last_modified: results.last[:datetime],
+      # results.last is nil when the lookback window has no rows yet (e.g. a
+      # slow/catching-up MQTT feed) - safe-navigate instead of crashing, so
+      # cache_fetch actually gets a chance to see (and not cache) an empty
+      # result instead of every request 500ing.
+      last_modified: results.last&.[](:datetime),
       data: results.group_by { |data| data[:StationID] }
                    .map { |_id, data| process(data, normalize_rain: false).last }
     }
@@ -123,7 +127,9 @@ class Vlinder < ROM::Relation[:sql]
     end
 
     {
-      last_modified: results.last[:datetime],
+      # Same as #all_stations: an empty result set for this station/range
+      # must produce data: [] and last_modified: nil, not a crash.
+      last_modified: results.last&.[](:datetime),
       data: process(results)
     }
   end
@@ -333,7 +339,14 @@ end
 get '/measurements/?' do
   result = cache_fetch(:measurements) { $vlinder.all_stations }
 
-  last_modified result[:last_modified]
+  if result[:data].nil? || result[:data].empty?
+    # An empty payload must not be cached by anything upstream either -
+    # override the before-filter's public/max-age with no-store, and don't
+    # hand out a (nil) Last-Modified as a validator for it.
+    cache_control :no_store
+  else
+    last_modified result[:last_modified]
+  end
   json result[:data]
 end
 
@@ -347,7 +360,11 @@ get '/measurements/:id' do
     # This will be called most of the time: fetch the last 24h of a station.
 
     result = cache_fetch(:stations, id) { $vlinder.station(id) }
-    last_modified result[:last_modified]
+    if result[:data].nil? || result[:data].empty?
+      cache_control :no_store
+    else
+      last_modified result[:last_modified]
+    end
     json result[:data]
 
   else
