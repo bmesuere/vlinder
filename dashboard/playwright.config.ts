@@ -14,6 +14,11 @@ const baseURL = `http://localhost:${port}${base}`;
 
 export default defineConfig({
   testDir: './e2e',
+  // e2e/visual.spec.ts is the manual before/after screenshot harness used for
+  // visual regression checks during framework upgrades. It is driven by
+  // playwright.visual.config.ts (`yarn test:visual`) and deliberately kept out
+  // of the CI run, which should only contain the functional smoke test.
+  testIgnore: /visual\.spec\.ts/,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

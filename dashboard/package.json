@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "test:e2e": "playwright test",
+    "test:visual": "playwright test --config playwright.visual.config.ts",
     "test:e2e:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
