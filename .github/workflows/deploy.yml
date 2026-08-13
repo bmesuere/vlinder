@@ -4,25 +4,34 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Setup Node ⚙️
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: dashboard/.nvmrc
+          cache: yarn
+          cache-dependency-path: dashboard/yarn.lock
 
       - name: Install and Build 🔧
         run: |
           cd dashboard
           sed -i 's|createWebHistory("/dashboard/")|createWebHistory("/vlinder/")|g' src/router/index.ts
-          yarn install
+          yarn install --frozen-lockfile
           yarn build
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@releases/v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: dashboard/dist
+          branch: gh-pages
+          folder: dashboard/dist
