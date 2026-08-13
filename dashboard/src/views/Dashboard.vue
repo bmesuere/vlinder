@@ -10,7 +10,17 @@
       </v-col>
     </v-row>
 
-    <v-toolbar class="mt-n4" variant="flat" color="white">
+    <!--
+      The negative top margin pulls this toolbar up against the map above it.
+      It used to be mt-n4 (-16px): Vuetify 3's grid gave every v-col 12px of
+      padding, so 16px of pull-up was needed to close a 12px gap and still
+      overlap by 4px. Vuetify 4's grid has no column padding (spacing comes
+      from CSS `gap` on the row instead), so the same visual result now needs
+      only mt-n1 (-4px). Without this adjustment everything below the map
+      moves up 12px, which - among other things - makes this toolbar's white
+      background cover the map legend's tick labels.
+    -->
+    <v-toolbar class="mt-n1" variant="flat" color="white">
       <v-toolbar-title class="text-headline-small ml-0">Geselecteerde stations</v-toolbar-title>
       <StationSelector />
     </v-toolbar>

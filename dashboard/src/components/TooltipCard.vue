@@ -15,8 +15,18 @@
     </v-list-item>
 
     <v-list density="compact" class="mb-3">
-      <v-row>
-        <v-col cols="6" class="py-0 pr-0" v-for="p in activeProperties" :key="p.property">
+      <!--
+        Two-up list of readings. On Vuetify 3 the tight layout came from
+        cancelling the grid's column padding (py-0 pr-0) against the row's
+        negative margins. Vuetify 4's grid has no padding/negative margins -
+        spacing is a CSS `gap` on the row - so those utility classes are
+        no-ops there and the default 24px gap would push the card ~50px
+        taller. `gap="[12, 0]"` reproduces the old spacing: 12px between the
+        two columns, nothing between the rows, and `my-n3` stands in for the
+        -12px vertical margins Vuetify 3's row applied by itself.
+      -->
+      <v-row :gap="[12, 0]" class="my-n3">
+        <v-col cols="6" v-for="p in activeProperties" :key="p.property">
           <v-list-item class="pr-0" style="min-height: 36px;">
             <v-list-item-subtitle :title="p.title" style="font-weight: 500;">
               <v-icon class='mr-1'>{{ p.icon }}</v-icon> {{ typedMeasurements['status'] == "Offline" ? "-" :
