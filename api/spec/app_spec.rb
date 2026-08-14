@@ -3,11 +3,7 @@ require 'spec_helper'
 RSpec.describe 'Vlinder API' do
   let(:mock_vlinder) { double('Vlinder Relation') }
 
-  # Builds a fake DB row hash shaped like what the mysql2/rom-sql adapter
-  # would hand to Vlinder#process (mirrors spec/vlinder_spec.rb's helper).
-  # Used to drive the REAL Vlinder#all_stations/#station by stubbing out only
-  # the DB query layer (#retry_until_succeeded), so tests exercise the actual
-  # last_modified/data-shaping logic instead of a hand-rolled return shape.
+  # a row hash shaped like what the rom-sql adapter hands to #process
   def row(overrides = {})
     {
       StationID: 'station1',
@@ -94,11 +90,6 @@ RSpec.describe 'Vlinder API' do
       # Or just clear cache
       $cache[:measurements] = { last_modified: Time.now - 1000, data: [] }
 
-      # We need to ensure updated_since? returns true.
-      # In app.rb: updated_since?(last_modified) checks if Time.now - UPDATE_INTERVAL > last_modified
-      # UPDATE_INTERVAL is 300.
-      # So if last_modified is old enough.
-
       get '/measurements'
       expect(last_response).to be_ok
       json_response = JSON.parse(last_response.body)
@@ -108,18 +99,8 @@ RSpec.describe 'Vlinder API' do
     end
 
     it 'does not stick an empty first fetch to the cache for the whole update window' do
-      # Regression test: if the MQTT feed is slow, the very first fetch after
-      # boot (or after the cache goes stale) can legitimately come back
-      # empty. That must not get cached - otherwise every request for the
-      # rest of UPDATE_INTERVAL would keep being served "no data" even once
-      # real data becomes available.
-      #
-      # This drives the REAL Vlinder#all_stations (via $vlinder being a real,
-      # allocated Vlinder instance) rather than stubbing all_stations itself
-      # with a return shape the real method could never produce - only the DB
-      # query layer (#retry_until_succeeded) is stubbed, with zero rows on
-      # the first call and one real row on the second.
-      $cache[:measurements] = {} # start from a completely empty/stale cache
+      # a slow feed can return an empty first fetch; it must not get cached
+      $cache[:measurements] = {}
 
       real_vlinder = Vlinder.allocate
       allow(real_vlinder).to receive(:retry_until_succeeded).and_return(

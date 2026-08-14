@@ -1,18 +1,11 @@
 require 'spec_helper'
 
-# These specs exercise the real business logic in Vlinder (changed?, rain_delta,
-# process) directly, instead of going through the mocked $vlinder double used
-# by spec/app_spec.rb. Vlinder < ROM::Relation[:sql] normally needs a live DB
-# connection to build its dataset/schema (see reconnect_database in app.rb),
-# but none of the methods under test touch the dataset or schema at all - they
-# are pure transformations over plain row hashes. So we use Vlinder.allocate
-# to get an instance without running ROM's initializer, and call the private
-# methods via #send. No changes to app.rb were needed for this.
+# The methods under test never touch the dataset/schema, so Vlinder.allocate
+# skips ROM's DB-backed initializer and no live DB is needed.
 RSpec.describe Vlinder do
   subject(:vlinder) { described_class.allocate }
 
-  # Builds a fake DB row hash shaped like what the mysql2/rom-sql adapter
-  # would hand to Vlinder#process (see the `data:` hash built in #process).
+  # a row hash shaped like what the rom-sql adapter hands to #process
   def row(overrides = {})
     {
       StationID: 'station1',
@@ -138,10 +131,7 @@ RSpec.describe Vlinder do
 
       statuses = vlinder.send(:process, measurements).map { |m| m[:status] }
 
-      # index 0: baseline (compared against itself) -> Ok
-      # index 1,2: still unchanged, no_changes climbs to 1, 2 -> Ok
-      # index 3: no_changes reaches LOOKBACK_UPDATES (3) -> Offline
-      # index 4: still unchanged -> stays Offline
+      # flips to Offline once no_changes reaches LOOKBACK_UPDATES (3)
       expect(statuses).to eq(%w[Ok Ok Ok Offline Offline])
     end
 
@@ -194,10 +184,7 @@ RSpec.describe Vlinder do
     end
   end
 
-  # #all_stations and #station are public and call #retry_until_succeeded
-  # (which normally runs a real where/order/to_a query chain). Stubbing that
-  # one method lets these run for real against a canned result set, without
-  # needing a live DB connection - same technique as spec/app_spec.rb.
+  # stubbing the query layer lets the real methods run without a live DB
   describe '#all_stations' do
     it 'returns an empty, non-crashing result when the lookback window has no rows yet' do
       allow(vlinder).to receive(:retry_until_succeeded).and_return([])

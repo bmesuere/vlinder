@@ -9,19 +9,14 @@
  */
 import type { Station, Measurement } from '../app/types';
 
-// The three station ids hardcoded as defaults in src/store/app.ts. These are
-// real, live station ids (vlinder02, and two others) so reusing them here
-// means the app's default-selection logic actually finds a match, exactly
-// like it would against the real API.
+// the default station ids hardcoded in src/store/app.ts, so default selection matches
 export const DEFAULT_STATION_IDS = [
   'zZ6ZeSg11dJ5zp5GrNwNck9A',
   'Do5lLMfezIdmUCzzsE0IwIbE',
   'XeIIA97QzN5xxk6AvdzAPquY',
 ] as const;
 
-// A station whose name does not start with "vlinder" (mirrors the real
-// MOCCA stations returned by the API), to exercise the filter in
-// D3StationsMap.ts that only plots "vlinder*" stations on the map.
+// a non-"vlinder" station, to exercise the map's vlinder*-only filter
 const MOCCA_STATION_ID = 'bas0provinciehuis000000';
 
 function landUse(waterBias: number) {
