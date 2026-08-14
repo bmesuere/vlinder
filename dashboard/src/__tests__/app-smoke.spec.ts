@@ -1,24 +1,8 @@
 /**
- * Warning-strict Vuetify smoke test.
- *
- * Unlike the per-component unit tests (which build a minimal local Vuetify
- * instance with an explicit component/directive list), this test mounts the
- * real App using the *real* Vuetify plugin instance from
- * src/plugins/vuetify.ts and the *real* router config from src/router, and
- * escalates every Vue runtime warning to a thrown error.
- *
- * That escalation is the whole point: an unknown-component warning (eg. a
- * renamed/removed Vuetify component after a major version bump) or an
- * invalid-prop-type warning would otherwise just print to the console and
- * the test would still pass. Here it fails the test instead, which is
- * exactly the kind of breakage a Vuetify 3->4 upgrade can introduce that
- * store/composable/d3-mocked component tests and vue-tsc cannot catch
- * (vue-tsc doesn't type-check template tag resolution against installed
- * Vuetify components, and it can't see runtime prop-shape mismatches).
- *
- * D3 rendering itself is intentionally still mocked out (as in the other
- * component tests) - the goal here is Vuetify component resolution, not
- * exercising d3-in-jsdom.
+ * Mounts the real App with the real Vuetify plugin and router, escalating
+ * every Vue runtime warning (unknown component, invalid prop, ...) to a
+ * thrown error - the failure mode of a Vuetify major bump that vue-tsc and
+ * the d3-mocked component tests cannot see.
  */
 import { mount, flushPromises } from '@vue/test-utils';
 import { describe, it, expect, vi, afterEach } from 'vitest';
@@ -37,16 +21,12 @@ import {
   topologyFixture,
 } from '../tests/fixtures';
 
-// Mock vue-gtag-next: main.ts installs it as a real plugin via app.use(),
-// but we mount App directly without going through main.ts, so useGtag()
-// would otherwise throw for lack of the injected gtag instance.
+// App is mounted without main.ts, which normally installs vue-gtag
 vi.mock('vue-gtag-next', () => ({
   useGtag: () => ({ event: vi.fn() }),
 }));
 
-// Mock the D3 wrapper classes, same as the existing per-component specs.
-// These touch the DOM directly with d3 selections in ways jsdom doesn't
-// need to fully support for a Vuetify-resolution smoke test.
+// mock the d3 wrappers, as in the per-component specs
 vi.mock('../app/d3/D3StationsMap', () => ({
   D3StationsMap: class {
     init = vi.fn();
@@ -78,8 +58,7 @@ function jsonResponse(body: unknown, ok = true) {
   } as Response);
 }
 
-// Realistic network mock: routes on the same URL shapes fetched by
-// src/store/app.ts and StationsMap.vue, matching the real API/static asset.
+// routes on the URL shapes fetched by the store and StationsMap.vue
 function installFetchMock() {
   vi.stubGlobal(
     'fetch',
@@ -144,9 +123,6 @@ describe('App smoke test (real Vuetify + real router + warning-strict)', () => {
       global: {
         plugins: [vuetify, pinia, router],
         config: {
-          // Escalate Vue runtime warnings (unknown components, invalid prop
-          // types/values, missing required props, ...) to thrown errors so
-          // this test fails loudly instead of just printing to console.
           warnHandler: (msg, _instance, trace) => {
             warnings.push(msg);
             throw new Error(`Vue warning escalated to failure: ${msg}\n${trace}`);
@@ -156,18 +132,14 @@ describe('App smoke test (real Vuetify + real router + warning-strict)', () => {
     });
 
     await router.isReady();
-    // Allow the lazily-imported layout/view chain and the store's async
-    // initialize()/fetchMeasurements()/fetchHistoricMeasurements() chain
-    // (which depends on watch(selectedStations) firing after initialize
-    // resolves) to settle.
+    // let the lazy view chain and the store's async init settle
     await flushPromises();
     await flushPromises();
     await flushPromises();
 
     expect(warnings).toEqual([]);
 
-    // Something meaningful actually rendered, not just "didn't crash":
-    // station data from the fixtures should be visible on the page.
+    // station data from the fixtures actually rendered
     const text = wrapper.text();
     expect(text).toContain(stationsFixture[0].city);
     expect(text).toContain(stationsFixture[0].given_name);

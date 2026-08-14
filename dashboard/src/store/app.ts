@@ -5,9 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'https://mooncake.ugent.be/api';
 const STATIONS_PATH = '/stations';
 const MEASUREMENTS_PATH = '/measurements';
 
-// Incrementing token used to guard against overlapping fetchHistoricMeasurements calls
-// (eg. a station toggle firing while a poll is still in flight) overwriting fresher data
-// with a stale response.
+// guards overlapping fetchHistoricMeasurements calls from clobbering fresher data
 let historicMeasurementsRequestId = 0;
 
 export const useVlinderStore = defineStore('vlinder', {
