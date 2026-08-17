@@ -1,0 +1,9 @@
+// Vuetify 3 breakpoints (v4 lowered them); keep in sync with plugins/vuetify.ts
+@use 'vuetify/settings' with (
+  $grid-breakpoints: (
+    'md': 960px,
+    'lg': 1280px,
+    'xl': 1920px,
+    'xxl': 2560px,
+  )
+);

@@ -1,7 +1,7 @@
 <template>
-  <v-card rounded="lg" elevation=10>
+  <v-card rounded="lg" elevation="5">
     <v-list-item lines="two">
-      <div class="text-overline" style="line-height: 1rem; font-size: 0.625rem !important;">
+      <div class="text-label-medium text-uppercase" style="line-height: 1rem; font-size: 0.625rem !important;">
         {{ station.name }}
         <span v-if="typedMeasurements['status'] == 'Offline'"> &middot; offline</span>
       </div>
@@ -15,8 +15,8 @@
     </v-list-item>
 
     <v-list density="compact" class="mb-3">
-      <v-row>
-        <v-col cols="6" class="py-0 pr-0" v-for="p in activeProperties" :key="p.property">
+      <v-row :gap="[12, 0]" class="my-n3">
+        <v-col cols="6" v-for="p in activeProperties" :key="p.property">
           <v-list-item class="pr-0" style="min-height: 36px;">
             <v-list-item-subtitle :title="p.title" style="font-weight: 500;">
               <v-icon class='mr-1'>{{ p.icon }}</v-icon> {{ typedMeasurements['status'] == "Offline" ? "-" :

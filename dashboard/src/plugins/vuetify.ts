@@ -15,6 +15,8 @@ import { createVuetify } from 'vuetify'
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
   theme: {
+    // v4 defaults to 'system'; this app only has a light theme
+    defaultTheme: 'light',
     themes: {
       light: {
         colors: {
@@ -22,6 +24,15 @@ export default createVuetify({
           secondary: '#5CBBF6',
         },
       },
+    },
+  },
+  // Vuetify 3 breakpoints; keep in sync with src/styles/settings.scss
+  display: {
+    thresholds: {
+      md: 960,
+      lg: 1280,
+      xl: 1920,
+      xxl: 2560,
     },
   },
 })

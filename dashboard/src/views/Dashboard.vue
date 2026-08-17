@@ -10,8 +10,8 @@
       </v-col>
     </v-row>
 
-    <v-toolbar class="mt-n4" variant="flat" color="white">
-      <v-toolbar-title class="text-h5 ml-0">Geselecteerde stations</v-toolbar-title>
+    <v-toolbar class="mt-n1" variant="flat" color="white">
+      <v-toolbar-title class="text-headline-small ml-0">Geselecteerde stations</v-toolbar-title>
       <StationSelector />
     </v-toolbar>
 
@@ -21,7 +21,7 @@
       </v-col>
     </v-row>
 
-    <v-toolbar-title class="mt-5 text-h5">Afgelopen 24u</v-toolbar-title>
+    <v-toolbar-title class="mt-5 text-headline-small">Afgelopen 24u</v-toolbar-title>
 
     <v-banner sticky class="px-0" color="white" style="top:40px; z-index:10;">
       <v-chip size="small" label closable v-for="s in selectedStations" :key="s.id" class="ma-1" :color="legendColors[s.id]" @click:close="removeFromList(s.id)">

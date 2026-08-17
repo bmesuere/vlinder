@@ -14,7 +14,7 @@
     </v-main>
 
     <v-footer class="justify-space-between bg-blue-grey-darken-4">
-      <v-card-title class="white--text text-body-2 px-8">
+      <v-card-title class="text-body-medium px-8">
         &copy; {{ new Date().getFullYear() }} Universiteit Gent &middot; v{{ version }}
       </v-card-title>
       <div>

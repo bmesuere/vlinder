@@ -16,6 +16,10 @@ export default defineConfig({
     // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
     vuetify({
       autoImport: true,
+      // compile styles from source so settings.scss can override Sass variables
+      styles: {
+        configFile: 'src/styles/settings.scss',
+      },
     }),
   ],
   test: {
