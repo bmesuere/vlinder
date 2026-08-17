@@ -1,1 +1,0 @@
-import{Ct as e,Ot as t,Wt as n,kt as r,qt as i,rn as a}from"./ssrBoot-BdeKlILV.js";import{n as o,t as s}from"./VMain-Bh3ncERu.js";var c=r({__name:`View`,setup(r){return(r,o)=>{let c=i(`router-view`);return n(),e(s,null,{default:a(()=>[t(c)]),_:1})}}}),l=r({__name:`Default`,setup(r){return(r,i)=>(n(),e(o,null,{default:a(()=>[t(c)]),_:1}))}});export{l as default};
