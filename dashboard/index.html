@@ -6,6 +6,32 @@
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#005eb6">
+
+    <script>
+        // index.html is served without Cache-Control, so a browser may reuse a cached
+        // copy pointing at hashed assets that a later deploy already removed. Refetch
+        // the HTML past the cache and reload when an asset fails to load.
+        (function () {
+            var KEY = 'asset-404-reload'
+
+            function recover() {
+                var now = Date.now()
+                try {
+                    if (now - Number(sessionStorage.getItem(KEY) || 0) < 10000) return
+                    sessionStorage.setItem(KEY, String(now))
+                } catch (e) { /* storage unavailable: reload once and hope for the best */ }
+                fetch(location.href, { cache: 'reload' })
+                    .catch(function () { })
+                    .then(function () { location.reload() })
+            }
+
+            addEventListener('error', function (event) {
+                var el = event.target
+                if (el && (el.tagName === 'SCRIPT' || el.tagName === 'LINK')) recover()
+            }, true)
+            addEventListener('vite:preloadError', recover)
+        })()
+    </script>
     <title>VLINDER dashboard</title>
 </head>
 
