@@ -1,1 +1,0 @@
-import{At as e,Ft as t,It as n,Zt as r,en as i,un as a}from"./ssrBoot-B_Wnw-Un.js";import{n as o,t as s}from"./VMain-rjXn9Tz8.js";var c=n({__name:`View`,setup(n){return(n,o)=>{let c=i(`router-view`);return r(),e(s,null,{default:a(()=>[t(c)]),_:1})}}}),l=n({__name:`Default`,setup(n){return(n,i)=>(r(),e(o,null,{default:a(()=>[t(c)]),_:1}))}});export{l as default};
