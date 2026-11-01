@@ -1,1 +1,0 @@
-import{Ht as e,Jt as t,Sn as n,fn as r,ln as i,qt as a}from"./ssrBoot-kNRdBMbn.js";import{l as o,st as s}from"./index-DSnuNl7b.js";var c=t({__name:`View`,setup(t){return(t,s)=>{let c=r(`router-view`);return i(),e(o,null,{default:n(()=>[a(c)]),_:1})}}}),l=t({__name:`Default`,setup(t){return(t,r)=>(i(),e(s,null,{default:n(()=>[a(c)]),_:1}))}});export{l as default};
