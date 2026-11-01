@@ -1,1 +1,0 @@
-import{An as e,Xt as t,_n as n,bn as r,nn as i,tn as a}from"./ssrBoot-BBr2ZjOx.js";import{l as o,st as s}from"./index-BOgRLf-U.js";var c=i({__name:`View`,setup(i){return(i,s)=>{let c=r(`router-view`);return n(),t(o,null,{default:e(()=>[a(c)]),_:1})}}}),l=i({__name:`Default`,setup(r){return(r,i)=>(n(),t(s,null,{default:e(()=>[a(c)]),_:1}))}});export{l as default};
