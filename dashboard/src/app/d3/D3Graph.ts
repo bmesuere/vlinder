@@ -1,4 +1,6 @@
 import * as d3 from 'd3';
+// adds selection.transition(); d3 is side-effect free since 7.9.1, so bundlers drop it otherwise
+import 'd3-transition';
 import { multiFormat } from './TimeFormatter';
 
 import { Station, WeatherProperty, MeasurementSeries } from '../types';
