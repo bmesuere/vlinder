@@ -52,6 +52,11 @@ RSpec.describe 'Vlinder API' do
       expect(json_response).to have_key('stations')
       expect(json_response).to have_key('measurements')
     end
+
+    it 'allows cross-origin requests' do
+      get '/'
+      expect(last_response.headers['Access-Control-Allow-Origin']).to eq('*')
+    end
   end
 
   describe 'GET /stations' do

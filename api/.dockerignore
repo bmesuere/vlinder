@@ -1,0 +1,7 @@
+login.json
+Dockerfile
+.dockerignore
+.bundle
+.ruby-lsp
+vendor
+spec
