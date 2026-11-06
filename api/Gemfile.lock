@@ -40,8 +40,6 @@ GEM
     logger (1.7.0)
     multi_json (1.20.1)
     mustermann (3.1.1)
-    mysql2 (0.5.7)
-      bigdecimal
     nio4r (2.7.5)
     puma (8.0.2)
       nio4r (~> 2.0)
@@ -113,6 +111,8 @@ GEM
       tilt (~> 2.0)
     tilt (2.7.0)
     transproc (1.1.1)
+    trilogy (2.13.3)
+      bigdecimal
     zeitwerk (2.7.5)
 
 PLATFORMS
@@ -122,13 +122,13 @@ DEPENDENCIES
   byebug (~> 13.0.0)
   csv (~> 3.3.7)
   json (~> 3.1.0)
-  mysql2 (~> 0.5.7)
   puma (~> 8.0.2)
   rack-test (~> 2.3.0)
   rom-sql (~> 3.7.0)
   rspec (~> 3.13.2)
   sinatra (~> 4.2.1)
   sinatra-contrib (~> 4.2.1)
+  trilogy (~> 2.13.3)
 
 BUNDLED WITH
   4.0.7

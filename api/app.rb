@@ -58,6 +58,8 @@ end
 
 before do
   cache_control :public, :must_revalidate, max_age: CACHE_MAX_AGE
+  # the dashboard calls this API from other origins
+  headers 'Access-Control-Allow-Origin' => '*'
 end
 
 #
@@ -238,9 +240,9 @@ def reconnect_database
 
   opts = JSON.parse(File.read(DB_CONFIG_FILE)).transform_keys(&:to_sym)
   opts[:connect_timeout] = 10
-  opts[:adapter] = :mysql2
-  # production runs multi-process under Passenger; Puma is dev-only
-  opts[:max_connections] = 1
+  opts[:adapter] = :trilogy
+  # one connection per Puma thread (Puma reads the same variable, default 5)
+  opts[:max_connections] = Integer(ENV.fetch('PUMA_MAX_THREADS', 5))
 
   conf = ROM::Configuration.new(:sql, opts)
   conf.register_relation(Vlinder)

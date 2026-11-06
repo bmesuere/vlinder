@@ -1,0 +1,74 @@
+# Builds, checks and pushes the API image. See "Deploying the API" in README.md.
+name: Images
+
+on:
+  push:
+    branches: [master]
+    paths: ["api/**", ".github/workflows/images.yml", ".github/workflows/ruby-tests.yml"]
+  pull_request:
+    paths: ["api/**", ".github/workflows/images.yml"]
+  schedule:
+    - cron: "0 10 1 * *"
+      timezone: Europe/Brussels
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: ghcr.io/bmesuere/vlinder-api
+
+jobs:
+  test:
+    uses: ./.github/workflows/ruby-tests.yml
+
+  image:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - id: meta
+        run: echo "sha=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v4
+      - name: Build the api image
+        uses: docker/build-push-action@v7
+        with:
+          context: api
+          platforms: linux/amd64
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          pull: true
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+          load: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ steps.meta.outputs.sha }}
+      # The database is only reachable from the UGent network, so the check runs without it:
+      # RACK_ENV=test skips the connection, but still loads every gem, including trilogy.
+      - name: Check that the image starts
+        run: |
+          docker run -d --name api -p 8080:8080 -e RACK_ENV=test "$IMAGE:latest"
+          check() {
+            for _ in $(seq 30); do
+              curl -sf -o /dev/null --max-time 10 "$1" && return 0
+              sleep 2
+            done
+            echo "$1 did not answer with 2xx"
+            docker logs api
+            exit 1
+          }
+          check http://localhost:8080/
+          check http://localhost:8080/stations
+          curl -sfI http://localhost:8080/stations | grep -qi '^access-control-allow-origin: \*' \
+            || { echo "/stations has no CORS header"; exit 1; }
+      - if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        run: docker push --all-tags "$IMAGE"
