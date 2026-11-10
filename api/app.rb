@@ -247,6 +247,10 @@ def reconnect_database
   conf = ROM::Configuration.new(:sql, opts)
   conf.register_relation(Vlinder)
   $rom_instance = ROM.container(conf)
+  # check a pooled connection before each use, so one the server closed is replaced
+  db = $rom_instance.gateways[:default].connection
+  db.extension(:connection_validator)
+  db.pool.connection_validation_timeout = -1
   $rom_instance.relations[:vlinder]
 end
 
